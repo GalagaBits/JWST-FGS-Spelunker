@@ -13,4 +13,4 @@ Every time JWST observes an object, it simultaneously observes a nearby star ---
 To install and use FGS Spelunker, see the [quickstart guide](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/fgs-spelunker_quickstart.ipynb).
 
 
-![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/1541movie.gif)# JWST-FGS-Spelunker
+![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/1541movie.gif)
