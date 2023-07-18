@@ -811,7 +811,7 @@ class load:
 
             event_t = Time(event_time, format='mjd', scale='utc')
 
-            self.mnemonics_event_hga = event_code, event_time
+            self.mnemonics_event_hga = (event_time, event_code)
 
             # https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
             def pairwise(iterable):
@@ -822,8 +822,11 @@ class load:
 
             for x_time, y_time in pairwise(event_time):
                 ax.axvspan(x_time, y_time, alpha=0.3)
-                ax.vlines(x_time,0,6000, linewidth = 2, color='g', label='hga_start')
-                ax.vlines(y_time,0,6000, linewidth = 2, color='r', label='hga_stop')
+                ax.axvline(x_time,color='g',)
+                ax.axvline(y_time, color='r',)
+
+            ax.axvline(x_time, color='g', label='hga_start')
+            ax.axvline(y_time, color='r', label='hga_stop')
 
             return ax 
         
@@ -836,7 +839,7 @@ class load:
             action_times = action.time
             action_t = Time(action_times, scale='utc')
 
-            ax.plot(action_t.mjd, action.value, label='NIRISS Filter Wheel Motor Current')
+            ax.plot(action_t.mjd, action.value, color='goldenrod', label='NIRISS Filter Wheel Motor Current')
 
             return ax
         
@@ -848,7 +851,7 @@ class load:
             action_times = action.time
             action_t = Time(action_times, scale='utc')
 
-            ax.plot(action_t.mjd, action.value, label=mnemonic)
+            ax.plot(action_t.mjd, action.value, label=mnemonic,)
 
             return ax     
        
@@ -874,9 +877,9 @@ class load:
             trans = transforms.blended_transform_factory(ax.transData, ax.transAxes) #https://stackoverflow.com/a/63153806
 
             for (x, y) in zip(self.guidestar_mnemonics[0], self.guidestar_mnemonics[1]):
-                ax.axvline(x, color='lightgreen')
+                ax.axvline(x, color='lightgreen',)
                 ax.text(x, 0.9, s=y, transform=trans, clip_on=True)
-            
+            ax.axvline(self.guidestar_mnemonics[0][0], color='lightgreen', label='guidestar')
             return ax
         
         elif mnemonic == 'FILENAME':
@@ -890,11 +893,13 @@ class load:
             trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
 
             for idx, (x, y) in enumerate(zip(self.filename_mnemonics[0], self.filename_mnemonics[1])):
-                ax.axvline(x, color='brown')
+                ax.axvline(x, color='brown',)
 
                 ax.text(x, 0.75, s=str(' '+y[0:20]),transform=trans, clip_on=True, rotation=5, wrap=True)
                 ax.text(x, 0.7, s=str(' '+y[20:42]),transform=trans, clip_on=True, rotation=5, wrap=True)
-            
+
+            ax.axvline(self.filename_mnemonics[0][0], color='brown', label='filename')
+                
             return ax
 
     def periodogram(self, table='None', time='None'):
