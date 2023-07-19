@@ -1,6 +1,6 @@
 # Spelunker — NIRISS FGS quicklook pipeline 
 
-![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/fgsspelunker.png)
+![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/spelunker.png)
 
 JWST FGS Spelunker is a package that assists and finds technical anomalies from the JWST and stellar properties from guidestars. 
 

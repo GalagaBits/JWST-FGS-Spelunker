@@ -1,6 +1,6 @@
 import sys
 sys.path.append('/Users/ddeal/JWST-Treasure-Chest-2023/JWST-FGS-Spelunker-Repos/JWST-FGS-Spelunker/')
-import Spelunker
+import spelunker.spelunker as spelunker
 
 import tkinter as tk
 from PIL import Image, ImageTk

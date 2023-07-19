@@ -819,7 +819,7 @@ class load:
             distance.append(np.sqrt(  (target.ra.value - coord.ra.value)**2
                                 + (target.dec.value - coord.dec.value)**2  ))
 
-        fov_radius = np.mean(distance)*u.deg + 3*np.std(distance)*u.deg
+        fov_radius = np.mean(distance)*u.deg + 2.5*np.std(distance)*u.deg
         fov_radius = 4 * u.deg if fov_radius > 4 * u.deg else fov_radius
 
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
