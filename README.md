@@ -1,4 +1,4 @@
-# JWST FGS Spelunker
+# Spelunker — NIRISS FGS quicklook pipeline 
 
 ![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/fgsspelunker.png)
 
