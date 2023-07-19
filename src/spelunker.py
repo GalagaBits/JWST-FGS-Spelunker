@@ -31,7 +31,18 @@ import ray
 import glob
 import os
 
-# Spelunker Class
+
+
+try:
+    from jwstuser import engdb
+    jwstuser_installed = True
+
+except ImportError:
+    jwstuser_installed = False
+    print('jwstuser is not installed. mnemonics() will not work.')
+
+
+
 class load:
 
     def __init__(self, directory, pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
@@ -841,6 +852,12 @@ class load:
         '''
         Overlays a selected mnemonic from JWST and plots it on top of a 2D timeseries.
         '''
+
+        if not jwstuser_installed:
+            raise ImportError("jwstuser needs to be installed before using the mnemonics function. Visit https://github.com/spacetelescope/jwstuser for installation instructions.")
+        if self.mast_api_token == None:
+            raise ImportError('The mast_api_token is not set. To set the token, use self.mast_api_token = token.')
+
         self.EDB = engdb.EngineeringDatabase(mast_api_token = self.mast_api_token)
 
         start, end = Time(start, format='mjd',scale = 'utc'), Time(end, format='mjd',scale = 'utc')
