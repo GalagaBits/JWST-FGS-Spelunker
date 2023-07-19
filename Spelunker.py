@@ -15,6 +15,11 @@ from astropy.time import Time
 from astropy import units as u
 from astropy.timeseries import LombScargle
 
+from astroplan.plots import plot_finder_image
+from astropy import coordinates
+from astropy.coordinates import SkyCoord
+from astroquery.skyview import SkyView
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes, inset_axes
@@ -45,6 +50,8 @@ class load:
         self.quickfit_results = None
 
         self.object_properties = None
+
+        self.fontsize = 14
         
         if pid != 'None':
             self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequnence_id=parallel_sequnence_id,
@@ -157,6 +164,9 @@ class load:
         Downloads the data from the projectid website. Turns the projectid into a manageable
         fits file. Downloads the files onto a local directory.
         '''
+
+        self.pid = pid
+
         os.chdir(self.directory)
         
         if obs_num == 'None' and visit != 'None':
@@ -720,7 +730,7 @@ class load:
         ax.errorbar(tbin, ybin, ybinerr, fmt = 'o', 
              mfc = 'white', mec = 'black', ecolor = 'black', elinewidth = 1, alpha=0.8)
         
-        ax.set_ylabel('Relative flux')
+        ax.set_ylabel('Relative flux', fontsize = self.fontsize)
         ax.set_xlabel('Time (mjd)')
         ax.set_ylim(0.4, 1.6)
 
@@ -733,37 +743,58 @@ class load:
                 table = self.gaussfit_results
                 fg_time = self.fg_time
 
-        fig, ax = plt.subplots(4,2, figsize = (12,20), dpi = 200)
+        fig, ax = plt.subplots(4,2, figsize = (12,21), dpi = 200)
 
         #ax[].plot(fg_time, cen_x, color = 'black', alpha = .4)
         ax[0,0].set_title('Centroid_x')
         ax[0,0].plot(fg_time, table['x_mean'])
-        ax[0,0].set_ylim(2.2,3.4)
-
+        ax[0,0].set_xlabel('Time (mjd)')
+        ax[0,0].set_ylabel('Pixel')
+        ax[0,0].set_ylim(np.mean(table['x_mean']) - 5*np.nanstd(table['x_mean']), 
+                         np.mean(table['x_mean']) + 5*np.nanstd(table['x_mean']))
 
         ax[1,0].set_title('stddev_x')
         ax[1,0].plot(fg_time, table['x_stddev'])
-        #ax[1,0].set_ylim(0,4)
+        ax[1,0].set_ylim(np.mean(table['x_stddev']) - 1*np.nanstd(table['x_stddev']), 
+                         np.mean(table['x_stddev']) + 5*np.nanstd(table['x_stddev']))
+        ax[1,0].set_xlabel('Time (mjd)')
+        ax[1,0].set_ylabel('Pixel')
 
         ax[0,1].set_title('Centroid_y')
         ax[0,1].plot(fg_time,table['y_mean'], color='orange')
-        #ax[0,1].set_ylim(2.7,3.4)
-
+        ax[0,1].set_ylim(np.mean(table['y_mean']) - 5*np.nanstd(table['y_mean']), 
+                         np.mean(table['y_mean']) + 5*np.nanstd(table['y_mean']))
+        ax[0,1].set_xlabel('Time (mjd)')
+        ax[0,1].set_ylabel('Pixel')
+        
         ax[1,1].set_title('stddev_y')
         ax[1,1].plot(fg_time,table['y_stddev'], color='orange')
-        #ax[1,1].set_ylim(0,4)
+        ax[1,1].set_ylim(np.mean(table['y_stddev']) - 1*np.nanstd(table['y_stddev']), 
+                         np.mean(table['y_stddev']) + 5*np.nanstd(table['y_stddev']))
+        ax[1,1].set_xlabel('Time (mjd)')
+        ax[1,1].set_ylabel('Pixel')
 
         ax[2,0].set_title('amplitude')
         ax[2,0].plot(fg_time,table['amplitude'], color='blue')
-        #ax[2,0].set_ylim(0000,28000)
+        ax[2,0].set_ylim(np.mean(table['amplitude']) - 3*np.nanstd(table['amplitude']), 
+                         np.mean(table['amplitude']) + 3*np.nanstd(table['amplitude']))
+        ax[2,0].set_xlabel('Time (mjd)')
+        ax[2,0].set_ylabel('Counts')
 
         ax[2,1].set_title('theta')
         ax[2,1].plot(fg_time,table['theta'], color='red')
-        #ax[2,1].set_ylim(-4,4)
+        ax[2,1].set_ylim(np.mean(table['theta']) - 3*np.nanstd(table['theta']), 
+                         np.mean(table['theta']) + 3*np.nanstd(table['theta']))
+        ax[2,1].set_xlabel('Time (mjd)')
+        ax[2,1].set_ylabel('Radians')
 
         ax[3,0].set_title('offset')
         ax[3,0].plot(fg_time,table['offset'], color='lightblue')
-        #ax[3,0].set_ylim(-4,4)
+        ax[3,0].set_ylim(np.mean(table['offset']) - 3*np.nanstd(table['offset']), 
+                         np.mean(table['offset']) + 3*np.nanstd(table['offset']))
+        ax[3,0].set_xlabel('Time (mjd)')
+        ax[3,0].set_ylabel('Counts')
+
         ax[3,1].set_visible(False)
 
         if start_time and end_time != 'None':
@@ -774,11 +805,30 @@ class load:
             ax[2,0].set_xlim(start_time,end_time)
             ax[2,1].set_xlim(start_time,end_time)
             ax[3,0].set_xlim(start_time,end_time)
-        
-        plt.show()
 
         return ax
    
+    def guidestar_plot(self,):
+        '''
+        '''
+
+        coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
+        target = SkyCoord(np.mean(coords.ra),np.mean(coords.dec),unit='deg')
+
+        fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
+        ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=15*u.arcmin,)
+
+        ax1.set_axis_off()
+
+        ax.scatter(coords.ra, coords.dec,  color='darkorange', marker='x', s=100, linewidth=1.5, transform=ax.get_transform('fk5'), label='guidestars')
+        ax.plot(coords.ra, coords.dec,  color='gold', linewidth=1, transform=ax.get_transform('fk5'), label='gs track')
+        ax.text(coords.ra[0].value, coords.dec[0].value, s='start   ', horizontalalignment='right' , verticalalignment='center', weight='bold', transform=ax.get_transform('fk5'),)
+
+        ax.set_title("Guidestar positions — "+str(self.pid))
+        ax.legend()
+
+        return ax
+
 
     def mnemonics(self, mnemonic, start, end):
         '''
@@ -945,6 +995,9 @@ class load:
         ax[4].text(0.99,0.9,'y_stddev',transform=ax[4].transAxes, horizontalalignment='right', fontweight='bold')
         ax[5].text(0.99,0.9,'theta',transform=ax[5].transAxes, horizontalalignment='right', fontweight='bold')
         ax[6].text(0.99,0.9,'offset',transform=ax[6].transAxes, horizontalalignment='right', fontweight='bold')
+        
+        ax[3].set_ylabel('Power', fontsize = self.fontsize)
+        ax[6].set_xlabel('Period (s)', fontsize = self.fontsize)
 
         pgram_table = Table()
 
@@ -966,98 +1019,8 @@ class load:
         self.pgram_theta = pgram_table['frequency_theta'], pgram_table['power_theta']
         self.pgram_offset = pgram_table['frequency_offset'], pgram_table['power_offset']
 
-        plt.show()
-
         return ax
 
-    def periodogram_inset_plot(self, time, parameter,):
-        '''
-        Creates an inset plot of a selected time frame.
-        '''
-
-    def periodogram_timeseries_inset_plot(self, time, parameter,):
-        '''
-        Creates an inset plot of a selected time frame with adjectent periodogram of a selected parameter.
-        '''
-        fig, ax = plt.subplots(1,2, figsize=(20,6), dpi=200)
-
-        frequency, power = LombScargle(time, parameter).autopower()
-        best_frequency = frequency[np.argmax(power)]
-
-        ls = LombScargle(time, parameter)
-        y_fit = ls.model(time, best_frequency)
-
-        ax[0].plot(time,parameter ,alpha=0.2, color='black')
-        ax[0].plot(time,y_fit, '--m', label='fitted Lomb-Scargle model')
-        ax[0].set_ylabel('Position')
-        ax[0].set_xlabel('Time (s)')
-        ax[0].axis([200,400,2.64,2.77])
-        ax[0].set_title('Centroid Y', fontsize=16)
-        ax[0].legend(loc=1)
-
-        ax[0].arrow(375, 2.65, 0.000, 0.001,
-                head_width=0, head_length=0,
-                fc='red', ec='red', width=25,)
-
-        ax[0].text(375, 2.645, '25 s',
-                color='red', rotation=0, fontsize=12, horizontalalignment='center')
-
-        axins = inset_axes(ax[0], loc=2, width=3/1.5, height=2/1.5,)
-        axins.plot(time, parameter,alpha=0.2, color='black')
-        axins.plot(time,y_fit, '--m', label='fitted Lomb-Scargle model')
-        axins.axis([325,370,2.66,2.76])
-
-        axins.xaxis.set_visible(True)
-        axins.set_xticks([330,340,350,360], minor=True)
-        axins.yaxis.set_visible(False)
-
-        mark_inset(parent_axes=ax[0], inset_axes=axins,
-                        fc="none", ec="b", loc1=1, loc2=4)
-
-        axins2 = inset_axes(ax[0], loc=3, width=3/1.5, height=2/1.5,)
-        axins2.plot(time, parameter, alpha=0.2, color='black')
-        #axins2.plot(time,y_fit_sum, '--m', label='fitted Lomb-Scargle model')
-        axins2.axis([350.5,353.5,2.67,2.75])
-
-        axins2.arrow(352, 2.7, 0.000, 0.001,
-                head_width=0, head_length=0,
-                fc='green', ec='green', width=0.065,)
-        axins2.arrow(352, 2.685, 0.000, 0.001,
-                head_width=0, head_length=0,
-                fc='orange', ec='orange', width=1.8,)
-
-
-        axins2.text(352, 2.69, '0.065 s',
-                color='green', rotation=0, fontsize=12, horizontalalignment='center')
-
-        axins2.text(352, 2.675, '1.8 s',
-                color='orange', rotation=0, fontsize=12, horizontalalignment='center')
-
-
-        axins2.xaxis.set_visible(False)
-        axins2.yaxis.set_visible(False)
-
-
-        mark_inset(parent_axes=axins, inset_axes=axins2,
-                        fc="none", ec="b", loc1=1, loc2=2)
-
-        ax[1].set_ylabel('Power')
-        ax[1].set_xlabel('Period (s)')
-        ax[1].set_title('Periodogram of Centroid X', fontsize=16)
-        ax[1].semilogx(1/frequency, power, linewidth=.2, color='black', alpha=0.6)
-        ax[1].set_xlim(1e-2,2e2)
-
-        ax[1].arrow(25, -0.0004, 0.000, 0.0001,
-                head_width=5, head_length=.00020,
-                fc='red', ec='red', width=1,)
-
-        ax[1].arrow(6.5e-2, -0.0004, 0.000, 0.0001,
-                head_width=0.01, head_length=.00020,
-                fc='green', ec='green', width=0.001,)
-
-        ax[1].arrow(1.8, -0.0004, 0.000, 0.0001,
-                head_width=0.3, head_length=.00020,
-                fc='orange', ec='orange', width=0.01,)
 
 
     '''
@@ -1084,7 +1047,7 @@ class load:
         # From matplotlib https://matplotlib.org/stable/gallery/animation/dynamic_image.html
         ims = []
 
-        min, max = self.minmax_gaussian_postprocessing(short_fg_array)
+        min, max = self.minmax_gaussian_postprocessing(fg_array)
 
         for i in range(len(short_fg_array)):
             im = ax.imshow(short_fg_array[i], animated=True)
@@ -1125,7 +1088,7 @@ class load:
 
         ims = []
 
-        min, max = self.minmax_gaussian_postprocessing(short_fg_array)
+        min, max = self.minmax_gaussian_postprocessing(fg_array)
 
         for i in range(len(short_fg_array)):
             im = ax1.imshow(short_fg_array[i], animated=True)
@@ -1135,52 +1098,6 @@ class load:
             im3 = ax2.vlines(i, np.min(short_fg_flux), np.max(short_fg_flux),  animated=True, color='red')
 
             ims.append([im, im2, im3])
-
-
-        '''
-        im = ax1.imshow(short_fg_array[0], animated=True)
-        im2, = ax2.plot(short_fg_flux, animated=True, color='black', alpha=0.5)
-
-        ray.shutdown()
-        @ray.remote(num_cpus=ncpus,)
-        def animate(i):
-
-            im.set_array(short_fg_array[i])
-            im.set_clim(min, max)
-            im3 = ax2.vlines(i, np.min(short_fg_flux), np.max(short_fg_flux),  animated=True, color='red')
-
-            if i == 0:
-                ax1.imshow(short_fg_array[i])
-
-            return (im, im2, im3)
-            
-        animate_ray = []
-        ray.init(ignore_reinit_error=True)
-
-        for i in range(len(short_fg_array)):
-            imgs = animate.remote(i)
-            animate_ray.append(imgs)
-
-        for i in animate_ray:
-            ims.append(ray.get(i))
-
-        ray.shutdown()
-        '''
-
-        '''
-        for i in range(len(short_fg_array)):
-
-            im = ax1.imshow(short_fg_array[i], animated=True)
-            im.set_clim(min, max)
-
-            im2, = ax2.plot(short_fg_flux, animated=True, color='black', alpha=0.5)
-            im3 = ax2.vlines(i, np.min(short_fg_flux), np.max(short_fg_flux),  animated=True, color='red')
-
-            if i == 0:
-                ax1.imshow(short_fg_array[i])
-
-            ims.append([im, im2, im3])
-        '''     
 
         fig.suptitle('Guidestar spatial timeseries animation')
         fig.colorbar(im, label='Counts', ax = ax1)

@@ -14,3 +14,5 @@ To install and use FGS Spelunker, see the [quickstart guide](https://github.com/
 
 
 ![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/1541movie.gif)
+
+![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png)
