@@ -19,7 +19,7 @@ setup(name='spelunker',
       author_email='dealderod@ufl.edu',
       license='MIT',
       packages=['spelunker'],
-      package_dir={'spelunker': 'spelunker'},
+      package_dir={'src': 'spelunker'},
       install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray'],
       python_requires='>=3.0',
       zip_safe=False)
