@@ -811,12 +811,19 @@ class load:
     def guidestar_plot(self,):
         '''
         '''
-
         coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
         target = SkyCoord(np.mean(coords.ra),np.mean(coords.dec),unit='deg')
 
+        distance = []
+        for coord in coords:
+            distance.append(np.sqrt(  (target.ra.value - coord.ra.value)**2
+                                + (target.dec.value - coord.dec.value)**2  ))
+
+        fov_radius = np.mean(distance)*u.deg + 3*np.std(distance)*u.deg
+        fov_radius = 4 * u.deg if fov_radius > 4 * u.deg else fov_radius
+
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
-        ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=15*u.arcmin,)
+        ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=fov_radius,)
 
         ax1.set_axis_off()
 
@@ -863,22 +870,29 @@ class load:
 
             self.mnemonics_event_hga = (event_time, event_code)
 
-            # https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
-            def pairwise(iterable):
-                a = iter(iterable)
-                return zip(a, a)
+            if event_time != []:
+                # https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
+                def pairwise(iterable):
+                    a = iter(iterable)
+                    return zip(a, a)
 
-            ax = plt.subplot()
+                ax = plt.subplot()
 
-            for x_time, y_time in pairwise(event_time):
-                ax.axvspan(x_time, y_time, alpha=0.3)
-                ax.axvline(x_time,color='g',)
-                ax.axvline(y_time, color='r',)
+                for x_time, y_time in pairwise(event_time):
+                    ax.axvspan(x_time, y_time, alpha=0.3)
+                    ax.axvline(x_time,color='g',)
+                    ax.axvline(y_time, color='r',)
 
-            ax.axvline(x_time, color='g', label='hga_start')
-            ax.axvline(y_time, color='r', label='hga_stop')
+                print(event_time)
 
-            return ax 
+                ax.axvline(x_time, color='g', label='hga_start')
+                ax.axvline(y_time, color='r', label='hga_stop')
+
+                return ax
+            elif event_time == []:
+                print('No HGA events found. Returning a blank plot.')
+                ax = plt.subplot()
+                return ax
         
         elif mnemonic == 'INIS_FWMTRCURR':
 
