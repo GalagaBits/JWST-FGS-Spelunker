@@ -1,6 +1,6 @@
 import re
 import numpy
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 
 VERSIONFILE='src/_version.py'
 verstrline = open(VERSIONFILE, "rt").read()
@@ -19,7 +19,8 @@ setup(name='spelunker',
       author_email='dealderod@ufl.edu',
       license='MIT',
       packages=['spelunker'],
-      package_dir={'src': 'spelunker'},
+      package_dir={'spelunker': 'src'},
       install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray'],
+      keywords='guidestars',
       python_requires='>=3.0',
       zip_safe=False)
