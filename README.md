@@ -43,7 +43,7 @@ plt.ylabel('Counts')
 
 ```
 <p align='center'>
-    <img src="https://github.com/nespinoza/JWST-FGS-Spelunker/blob/develop/plots/timeseries.png"  width=80% height=80%>
+    <img src="https://github.com/nespinoza/JWST-FGS-Spelunker/blob/develop/plots/timeseries.png"  width=100% height=80%>
 </p>
 
 (See below on more information that can be extracted, including fitting 2D gaussians to each FGS integration!). We can even make a plot of the tracked guidestars within this Program ID:
