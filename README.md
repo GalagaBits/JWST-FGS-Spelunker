@@ -34,8 +34,9 @@ With our object `spk`, we can start interpeting data from guidestars, such as ma
 ```python
 spk.guidestar_plot()
 ```
-
-<img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png" width=80% height=80%>
+<p align='center'>
+    <img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png"  width=80% height=80%>
+</p>
 
 We can also plot the timeseries of fitted gaussian parameters (use `spk.gauss2d_fit` to apply gaussian fitting to all guidestar frames) or the flux timeseries. Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or the FGS tracks a new guidestar.
 
