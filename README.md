@@ -82,3 +82,7 @@ For more information on the tools under `spelunker` and how to get started, visi
 ## Licence and attribution
 
 This project is under the MIT License, which can be viewed [here](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE).
+
+## Acknowledgments
+
+DD and NE would like to thank the STScI's Space Astronomy Summer Program (SASP) as well as the National Astronomy Consortium (NAC) program which made it possible for them to work together on this fantastic project!
