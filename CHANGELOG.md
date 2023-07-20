@@ -1,11 +1,12 @@
-# Changelog
+# Change Log
 
-Changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-## 0.5.4 (unreleased)
-------------------------
-- no changes yet
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 0.5.3 (2023-07-19-23)
-------------------------
-- Added project to GitHub
+## [0.5.3] - 2023-07-19
+
+### Added
+
+- spelunker
