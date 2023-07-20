@@ -31,7 +31,6 @@ import glob
 import os
 
 
-
 try:
     from jwstuser import engdb
     jwstuser_installed = True
@@ -41,13 +40,35 @@ except ImportError:
     print('jwstuser is not installed. mnemonics() will not work.')
 
 
-
 class load:
 
-    def __init__(self, directory, pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2):
-        self.directory = directory
-        os.chdir(self.directory)
+    init_dir = os.getcwd()
+
+    def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False):
+        
+        os.chdir(self.init_dir)
+
+        created_dir = "spelunker_outputs"
+        current_dir = self.init_dir
+
+        if dir != 'None':
+            os.chdir(dir)
+            if not os.path.exists(dir+'/'+created_dir):  #https://www.geeksforgeeks.org/how-to-create-directory-if-it-does-not-exist-using-python/
+                os.makedirs(created_dir)
+                temp_dirc = created_dir
+            else:
+                temp_dirc = created_dir
+
+        else:
+            if not os.path.exists(current_dir+'/'+created_dir):
+                os.makedirs(created_dir)
+                temp_dirc = created_dir
+            else:
+                temp_dirc = created_dir
+
+        self.directory = os.getcwd()+'/'+temp_dirc
+        print('Current working directory for spelunker: '+self.directory+'\n')
 
         self.mast_api_token = None
         self.fg_table = None
@@ -65,8 +86,7 @@ class load:
         
         if pid != 'None':
             self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequnence_id=parallel_sequnence_id,
-                          activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level)
-
+                          activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level, save=save)
 
     def stitcher(self, fg_timeseries):
         '''
@@ -169,7 +189,7 @@ class load:
 
 
     def download(self, pid, obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2):
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False):
         '''
         Downloads the data from the projectid website. Turns the projectid into a manageable
         fits file. Downloads the files onto a local directory.
@@ -178,7 +198,7 @@ class load:
         self.pid = pid
 
         os.chdir(self.directory)
-        
+
         if obs_num == 'None' and visit != 'None':
             raise ValueError('When a visit is identified, the obs_num needs to be identified.')
 
@@ -267,7 +287,7 @@ class load:
 
         manifest = Observations.download_products(productsx,)
 
-        os.chdir(self.directory+'mastDownload/JWST/')
+        os.chdir(self.directory+'/mastDownload/JWST/')
         fg_raw = sorted(glob.glob('**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
 
         fg = []
@@ -387,8 +407,6 @@ class load:
 
         self.fg_timeseries = [fn for fn in self.fg_datamodel]
 
-        os.chdir(self.directory)
-
         all_times = []
         all_fluxes = []
         
@@ -419,9 +437,22 @@ class load:
 
             fg_array, fg_time, fg_flux = self.negative_flux_preprocessing(norm_array, fg_time, norm_flux)
 
-        np.save(self.directory+str(pid)+'fg_array', fg_array)
-        np.save(self.directory+str(pid)+'fg_flux', fg_flux)
-        np.save(self.directory+str(pid)+'fg_time', fg_time)
+
+        # Saving numpy arrays
+
+        os.chdir(self.directory)
+
+        if save:
+            data_arrays_dir = 'data_arrays'
+            if not os.path.exists(data_arrays_dir):
+                os.makedirs(data_arrays_dir)
+
+            os.chdir(self.directory+'/'+data_arrays_dir)
+            np.save('pid_'+str(pid)+'_fg_array', fg_array)
+            np.save('pid_'+str(pid)+'_fg_time', fg_time)
+            np.save('pid_'+str(pid)+'_fg_flux', fg_flux)
+
+            os.chdir(self.directory)
 
         self.fg_array = fg_array
         self.fg_time = fg_time
