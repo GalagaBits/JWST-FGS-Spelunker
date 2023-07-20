@@ -34,7 +34,8 @@ With our object `spk`, we can start interpeting data from guidestars, such as ma
 ```python
 spk.guidestar_plot()
 ```
-![](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png | width=200)
+
+<img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png" width=50% height=50%>
 
 We can also plot the timeseries of fitted gaussian parameters (use `spk.gauss2d_fit` to apply gaussian fitting to all guidestar frames) or the flux timeseries. Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or the FGS tracks a new guidestar.
 
@@ -52,6 +53,7 @@ plt.legend(loc=3)
 plt.xlim(60067.84, 60067.9)
 plt.show()
 ```
+<img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/plots/mnemonics.png">
 
 For more information on the tools under `spelunker` and how to get started, visit the [quickstart guide](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/fgs-spelunker_quickstart.ipynb). Get acquainted with `spelunker` with the following example notebook:
 
