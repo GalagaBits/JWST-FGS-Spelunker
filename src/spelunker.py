@@ -6,8 +6,7 @@ import pandas as pd
 import datetime
 
 from jwst import datamodels
-from jwstuser import engdb
- 
+
 from astroquery.mast import Observations
 
 from astropy.table import Table, hstack
