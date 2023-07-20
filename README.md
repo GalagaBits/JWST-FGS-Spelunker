@@ -29,7 +29,7 @@ import spelunker
 
 spk = spelunker.load(pid=1534)
 ```
-This will download guidestar data for Program ID 1534; the `spk` object itself can then be used to explore this guidestar data! For example, let's make a plot of the guidestar time-series for the first few hours of this PID:
+This will download guidestar data for Program ID 1534; the `spk` object itself can then be used to explore this guidestar data! For example, let's make a plot of the guidestar time-series for the first minutes of this PID:
 
 ```python
 import matplotlib.pyplot as plt
