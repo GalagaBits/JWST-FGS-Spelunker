@@ -587,7 +587,7 @@ class load:
             popt, pcov = opt.curve_fit(gaussian_2d, (xx, yy), datar, p0=initial_guess, maxfev = 500000)
             return popt
     
-        ray.init(ignore_reinit_error=True)
+        ray.init(ignore_reinit_error=True, num_cpus = ncpus)
         
         x = np.linspace(0, 7, 8)
         y = np.linspace(0, 7, 8)
