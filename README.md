@@ -4,13 +4,13 @@
 
 -------------------------------------------------------------------------------------
 
-`spelunker` is a package that assists and finds technical anomalies and stellar properties from guidestars. 
+`spelunker` is a package that assists on studying JWST FGS/NIRISS guidestar data.
 
 **Authors:** Derod Deal (dealderod@ufl.edu), Néstor Espinoza (nespinoza@stsci.edu)
 
 ## Statement of need
 
-Every time JWST observes an object, it simultaneously observes a nearby star --- a so-called "guide star" --- with the NIRISS Fine Guidance Sensor (FGS) that is used to keep the telescope locked on the target of interest. While researchers typically focus on their science targets, the guide star data can be extremely interesting on its own right. On the one hand, telescope-level anomalies could be detected (and, in principle, corrected) using this guide star data. On the other, this data also provides a "free" sky survey in the infrared (0.6 to 5 microns), on which short (~hours to days) time series of stars are recorded --- which one could "mine" if a pipeline existed for it to search for, e.g., stellar variability or even exoplanet transits: a true treasure chest. Here we present a first version of an automated, public quick-look time-series data processing pipeline for NIRISS FGS data. The pipeline is able to generate time-series for several metrics of the FGS data in an automated fashion, including fluxes and PSF variations, along with derived products from those such as periodograms that can aid on their analysis given only a JWST program ID number.
+Every time JWST observes an object, it simultaneously observes a nearby star --- a so-called "guide star" --- with the NIRISS Fine Guidance Sensor (FGS) that is used to keep the telescope locked on the target of interest. While researchers typically focus on their science targets, the guide star data can be extremely interesting on its own right both to detect anomalies on science data, as well as to explore time-series data of guidestars themselves. `spelunker` provides an easy-to-access ("plug-and-play") library to access this guide star data. The library is able to generate time-series for several metrics of the FGS data in an automated fashion, including fluxes and PSF variations, along with derived products from those such as periodograms that can aid on their analysis given only a JWST program ID number.
 
 ## Installation
 
@@ -27,9 +27,26 @@ Get started with `spelunker` with only two lines of code.
 ```python
 import spelunker
 
-spk = spelunker.load('/Users/ddeal/JWST-Treasure-Chest/', pid=1534)
+spk = spelunker.load(pid=1534)
 ```
-With our object `spk`, we can start interpeting data from guidestars, such as making a plot of the tracked guidestars within a Program ID.
+This will download guidestar data for Program ID 1534; the `spk` object itself can then be used to explore this guidestar data! For example, let's make a plot of the guidestar time-series for the first minutes of this PID:
+
+```python
+import matplotlib.pyplot as plt
+
+# Convert times from MJD to minutes:
+plt.plot( ( spk.fg_time - spk.fg_time[0] ) * 24 * 60, spk.fg_flux )
+
+plt.xlim(0,10)
+plt.xlabel('Time from start (minutes)')
+plt.ylabel('Counts')
+
+```
+<p align='center'>
+    <img src="plots/timeseries.png"  width=100% height=80%>
+</p>
+
+(See below on more information that can be extracted, including fitting 2D gaussians to each FGS integration!). We can even make a plot of the tracked guidestars within this Program ID:
 
 ```python
 spk.guidestar_plot()
@@ -38,7 +55,7 @@ spk.guidestar_plot()
     <img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png"  width=80% height=80%>
 </p>
 
-We can also plot the timeseries of fitted gaussian parameters (use `spk.gauss2d_fit` to apply gaussian fitting to all guidestar frames) or the flux timeseries. Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or when the FGS tracks a new guidestar.
+Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or to identify if the FGS tracks a new guidestar [if the `jwstuser` package is also installed](https://github.com/spacetelescope/jwstuser/):
 
 ```python
 import matplotlib.pyplot as plt
@@ -65,3 +82,7 @@ For more information on the tools under `spelunker` and how to get started, visi
 ## Licence and attribution
 
 This project is under the MIT License, which can be viewed [here](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE).
+
+## Acknowledgments
+
+DD and NE would like to thank the STScI's Space Astronomy Summer Program (SASP) as well as the National Astronomy Consortium (NAC) program which made it possible for them to work together on this fantastic project!
