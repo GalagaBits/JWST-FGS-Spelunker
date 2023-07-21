@@ -135,7 +135,6 @@ class load:
         '''
         Normalize star flux by star metadata.
         '''
-        os.chdir('mastDownload/JWST/')
 
         norm_array = []
         for data in self.fg_timeseries:
@@ -143,8 +142,6 @@ class load:
 
         norm_array = np.vstack(norm_array)
         norm_flux = np.nansum(norm_array, axis=(1,2))
-
-        os.chdir(self.directory)
 
         return norm_array, norm_flux
 
