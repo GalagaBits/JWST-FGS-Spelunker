@@ -626,15 +626,20 @@ class load:
                 popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
                 rows5_obj.append(popt)
 
-            rows5 = []
-            for i in rows5_obj:
-                try:
-                    popt3 = ray.get(i)
-                    rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
+            self.tester = []
 
-                except RuntimeError:
-                    print('A runtime error has occured with fitting. Logging nan.')
-                    rows5.append([np.nan]*7)
+            rows5 = []
+            for idx, i in enumerate(rows5_obj):
+                popt3 = ray.get(i)
+                rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
+                self.tester.append(idx)
+                # try:
+                #     popt3 = ray.get(i)
+                #     rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
+
+                # except RuntimeError:
+                #     print('A runtime error has occured with fitting. Logging nan.')
+                #     rows5.append([np.nan]*7)
 
         elif len(fg_array.shape) == 2 and (fg_array.shape[0] & fg_array.shape[1]) == 8:
             
