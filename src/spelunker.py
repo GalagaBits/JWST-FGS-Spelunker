@@ -620,9 +620,10 @@ class load:
             for idx, data in enumerate(fg_array):
                 datar = data.ravel()
                 zodical_light = np.nanmedian(data[0:3,5:8])
+                coords = np.where(data==datar.max())
 
                 initial_guess[6] = zodical_light
-
+                initial_guess[1], initial_guess[2] = int(coords[1]), int(coords[0])
                 popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
                 rows5_obj.append(popt)
 
@@ -630,16 +631,16 @@ class load:
 
             rows5 = []
             for idx, i in enumerate(rows5_obj):
-                popt3 = ray.get(i)
-                rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
-                self.tester.append(idx)
-                # try:
-                #     popt3 = ray.get(i)
-                #     rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
+                # popt3 = ray.get(i)
+                # rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
+                # self.tester.append(idx)
+                try:
+                    popt3 = ray.get(i)
+                    rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
 
-                # except RuntimeError:
-                #     print('A runtime error has occured with fitting. Logging nan.')
-                #     rows5.append([np.nan]*7)
+                except RuntimeError:
+                    print('A runtime error has occured with fitting. Logging nan.')
+                    rows5.append([np.nan]*7)
 
         elif len(fg_array.shape) == 2 and (fg_array.shape[0] & fg_array.shape[1]) == 8:
             
@@ -662,7 +663,7 @@ class load:
 
         return table
     
-    def quick_fit(self, fg_array):
+    def quick_fit(self, fg_array='None'):
         '''
         Performs a quick fit to an array of fg data. Outputs an astropy table
         '''
