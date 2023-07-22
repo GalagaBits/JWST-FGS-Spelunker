@@ -1204,7 +1204,7 @@ class load:
 
                 base_fname = suffix + '_' +  base_fname
 
-            header += '# Column 0: Time (MJD)\n'
+            header += '# Column 0: Time (JD-2400000.5)\n'
             header += '# Column 1: Total flux (Counts)\n'
             
             if self.gaussfit_results is not None:
