@@ -1171,71 +1171,71 @@ class load:
     ------------------------------------------------------------------------------------------------------
     '''
 
-def save(self, suffix = None):
-    '''
-    This function saves all the time-series information available from the guidestar in an easy-to-read format. Right now works only for 
-    the case on which one has a single guidestar:
+    def save(self, suffix = None):
+        '''
+        This function saves all the time-series information available from the guidestar in an easy-to-read format. Right now works only for 
+        the case on which one has a single guidestar:
 
-    Inputs:
-    -------
+        Inputs:
+        -------
 
-    :param suffix: (optional, string)
-    String that will be added in front of the output filename.
+        :param suffix: (optional, string)
+        String that will be added in front of the output filename.
 
-    Outputs:
-    -------
-    This function saves outputs to a .txt file.
+        Outputs:
+        -------
+        This function saves outputs to a .txt file.
 
 
-    '''
+        '''
 
-    header = '# spelunker guidestar outputs\n'+\
-             '# ---------------------------\n#\n' 
+        header = '# spelunker guidestar outputs\n'+\
+                 '# ---------------------------\n#\n' 
 
-    for i in range( len(self.object_properties['guidestar_catalog_id']) ):
+        for i in range( len(self.object_properties['guidestar_catalog_id']) ):
 
-        base_fname = self.object_properties['guidestar_catalog_id'][i] +\
-                     '_'+str(self.object_properties['int_start'][0]) + '.txt'
+            base_fname = self.object_properties['guidestar_catalog_id'][i] +\
+                         '_'+str(self.object_properties['int_start'][0]) + '.txt'
 
-        header += '# Guidestar ID: {0:} | RA: {1:.6f}, DEC: {2:.6f}\n'.format(self.object_properties['guidestar_catalog_id'][i], \
-                                                                             self.object_properties['ra'][i], \
-                                                                             self.object_properties['dec'][i])
-        if suffix is not None:
+            header += '# Guidestar ID: {0:} | RA: {1:.6f}, DEC: {2:.6f}\n'.format(self.object_properties['guidestar_catalog_id'][i], \
+                                                                                 self.object_properties['ra'][i], \
+                                                                                 self.object_properties['dec'][i])
+            if suffix is not None:
 
-            base_fname = suffix + '_' +  base_fname
+                base_fname = suffix + '_' +  base_fname
 
-        header += '# Column 0: Time (MJD)\n'
-        header += '# Column 1: Total flux (Counts)\n'
-        
-        if self.gaussfit_results is not None:
+            header += '# Column 0: Time (MJD)\n'
+            header += '# Column 1: Total flux (Counts)\n'
+            
+            if self.gaussfit_results is not None:
 
-            header += '# Column 2: Gaussian Amplitude (counts) \n'
-            header += '# Column 3: Gaussian X location (pix) \n'
-            header += '# Column 4: Gaussian Y location (pix) \n'
-            header += '# Column 5: Gaussian stdev X (pix) \n'
-            header += '# Column 6: Gaussian stdev Y (pix) \n'
-            header += '# Column 7: Gaussian theta (degs)\n'
-            header += '# Column 8: Background counts \n'
+                header += '# Column 2: Gaussian Amplitude (counts) \n'
+                header += '# Column 3: Gaussian X location (pix) \n'
+                header += '# Column 4: Gaussian Y location (pix) \n'
+                header += '# Column 5: Gaussian stdev X (pix) \n'
+                header += '# Column 6: Gaussian stdev Y (pix) \n'
+                header += '# Column 7: Gaussian theta (degs)\n'
+                header += '# Column 8: Background counts \n'
 
-        fout = open(self.directory+'/'+base_fname, 'w')
-        fout.write(header)
+            fout = open(self.directory+'/'+base_fname, 'w')
+            fout.write(header)
 
-        for j in range( len(self.fg_time) ):
+            for j in range( len(self.fg_time) ):
 
-            if self.gaussfit_results is None:
+                if self.gaussfit_results is None:
 
-                fout.write('{0:.12f} {1:.5f}\n'.format(self.fg_time[j], self.fg_flux[j]))
+                    fout.write('{0:.12f} {1:.5f}\n'.format(self.fg_time[j], self.fg_flux[j]))
 
-            else:
+                else:
 
-                fout.write('{0:.12f} {1:.5f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f}\n'.format(self.fg_time[j], self.fg_flux[j], 
-                                                                                                               self.gaussfit_results['amplitude'].value[j],
-                                                                                                               self.gaussfit_results['x_mean'].value[j],
-                                                                                                               self.gaussfit_results['y_mean'].value[j],
-                                                                                                               self.gaussfit_results['x_stddev'].value[j],
-                                                                                                               self.gaussfit_results['y_stddev'].value[j],
-                                                                                                               self.gaussfit_results['theta'].value[j],
-                                                                                                               self.gaussfit_results['offset'].value[j]
-                                                                                                               ))
+                    fout.write('{0:.12f} {1:.5f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f}\n'.format(self.fg_time[j], self.fg_flux[j], 
+                                                                                                                   self.gaussfit_results['amplitude'].value[j],
+                                                                                                                   self.gaussfit_results['x_mean'].value[j],
+                                                                                                                   self.gaussfit_results['y_mean'].value[j],
+                                                                                                                   self.gaussfit_results['x_stddev'].value[j],
+                                                                                                                   self.gaussfit_results['y_stddev'].value[j],
+                                                                                                                   self.gaussfit_results['theta'].value[j],
+                                                                                                                   self.gaussfit_results['offset'].value[j]
+                                                                                                                   ))
 
-        fout.close()
+            fout.close()
