@@ -9,7 +9,7 @@ from jwst import datamodels
 
 from astroquery.mast import Observations
 
-from astropy.table import Table, hstack
+from astropy.table import Table, hstack, vstack
 from astropy.time import Time
 from astropy import units as u
 from astropy.timeseries import LombScargle
@@ -135,7 +135,6 @@ class load:
         '''
         Normalize star flux by star metadata.
         '''
-        os.chdir('mastDownload/JWST/')
 
         norm_array = []
         for data in self.fg_timeseries:
@@ -143,8 +142,6 @@ class load:
 
         norm_array = np.vstack(norm_array)
         norm_flux = np.nansum(norm_array, axis=(1,2))
-
-        os.chdir(self.directory)
 
         return norm_array, norm_flux
 
@@ -202,13 +199,16 @@ class load:
         if obs_num == 'None' and visit != 'None':
             raise ValueError('When a visit is identified, the obs_num needs to be identified.')
 
+        print("Connecting with astroquery...")
+        
         if obs_num != 'None' and visit != 'None':
             matched_obs = Observations.query_criteria(
                 obs_collection = 'JWST',
                 proposal_id=str(pid),
             )
             
-            data_products = Observations.get_product_list(matched_obs)
+            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
+            data_products = vstack(data_products)
 
             products = Observations.filter_products(data_products,
                         productType=["AUXILIARY",],
@@ -243,7 +243,9 @@ class load:
                 proposal_id=str(pid),
             )
 
-            data_products = Observations.get_product_list(matched_obs)
+            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
+            data_products = vstack(data_products)
+
             products = Observations.filter_products(data_products,
                         productType=["AUXILIARY",],
                         extension="fits",
@@ -271,7 +273,9 @@ class load:
                 proposal_id=str(pid),
                 )
 
-            data_products = Observations.get_product_list(matched_obs)
+            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
+            data_products = vstack(data_products)
+
             products = Observations.filter_products(data_products,
                                     productType=["AUXILIARY",],
                                     extension="fits",
@@ -544,7 +548,7 @@ class load:
         self.fg_table = None
         self.object_properties = None
 
-    def time_array_sec(self, fg_time):
+    def time_to_sec(self, fg_time):
         '''
         Creates an time array using from fg_time. Outputs elasped time and epoch time in mjd.
         '''
@@ -557,7 +561,7 @@ class load:
     '''
 
 
-    def gauss2d_fit(self, fg_array='None', ncpus=4):
+    def gauss2d_fit(self, fg_array='None', ncpus=4, save=False):
         '''
         Applies a spatial gaussian fit to a data array for guide star data. The gaussian parameters
         include amplitude, centriods, stddev, and theta. Uses ray. Outputs an astopy table.
@@ -582,10 +586,15 @@ class load:
         
         ray.shutdown()
 
-        @ray.remote(num_cpus=ncpus,)
+        @ray.remote(num_cpus=ncpus, max_retries=3)
         def ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess):
-            popt, pcov = opt.curve_fit(gaussian_2d, (xx, yy), datar, p0=initial_guess, maxfev = 500000)
-            return popt
+            try:
+                popt, pcov = opt.curve_fit(gaussian_2d, (xx, yy), datar, p0=initial_guess, maxfev = 2000)
+                return popt
+            
+            except RuntimeError:
+                popt = [np.nan]*7
+                return popt
     
         ray.init(ignore_reinit_error=True, num_cpus = ncpus)
         
@@ -607,6 +616,7 @@ class load:
                 initial_guess_main_obj.append(popt)
 
             initial_guess_main = []
+
             for i in initial_guess_main_obj:
                 popt2 = ray.get(i)
                 initial_guess_main.append([popt2[0], popt2[1],popt2[2],popt2[3],popt2[4],popt2[5],popt2[6]])
@@ -624,23 +634,13 @@ class load:
 
                 initial_guess[6] = zodical_light
                 initial_guess[1], initial_guess[2] = int(coords[1]), int(coords[0])
+
                 popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
                 rows5_obj.append(popt)
 
-            self.tester = []
-
-            rows5 = []
             for idx, i in enumerate(rows5_obj):
-                # popt3 = ray.get(i)
-                # rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
-                # self.tester.append(idx)
-                try:
-                    popt3 = ray.get(i)
-                    rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])
-
-                except RuntimeError:
-                    print('A runtime error has occured with fitting. Logging nan.')
-                    rows5.append([np.nan]*7)
+                popt3 = ray.get(i)
+                rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])                
 
         elif len(fg_array.shape) == 2 and (fg_array.shape[0] & fg_array.shape[1]) == 8:
             
@@ -660,10 +660,15 @@ class load:
 
         self.gaussfit_results = table
         
+        if save:
+            gaussfits_array_dir = 'gaussfits'
+            if not os.path.exists(gaussfits_array_dir):
+                os.makedirs(gaussfits_array_dir)
+            table.write(str(self.pid)+'_'+gaussfits_array_dir+'.dat', format='ascii', overwrite=True)
 
         return table
     
-    def quick_fit(self, fg_array='None'):
+    def quick_fit(self, fg_array='None', save=False):
         '''
         Performs a quick fit to an array of fg data. Outputs an astropy table
         '''
@@ -716,6 +721,12 @@ class load:
         quick_fit_table['offset'] = 0
 
         self.quickfit_results = quick_fit_table
+        
+        if save:
+            quickfits_array_dir = 'quickfits'
+            if not os.path.exists(quickfits_array_dir):
+                os.makedirs(quickfits_array_dir)
+            quick_fit_table.write(str(self.pid)+'_'+quickfits_array_dir+'.dat', format='ascii', overwrite=True)
 
         return quick_fit_table
 
@@ -745,7 +756,33 @@ class load:
     ANALYTICAL TOOLS 
     ------------------------------------------------------------------------------------------------------
     '''
-
+    def timescale(self, fg_time, fg_time_sec,):
+        '''
+        '''
+        if fg_time_sec[-1] > 172800:
+            # in mjd
+            #ax2.plot(short_fg_time, short_fg_flux)
+            xlabel = 'Time (mjd)'
+            time = fg_time
+            return xlabel, time
+        elif fg_time_sec[-1] > 10800:
+            # in hours
+            #ax2.plot(short_fg_time_sec /60 /60, short_fg_flux)
+            xlabel = 'Time (hours)'
+            time = fg_time_sec /60 /60
+            return xlabel, time
+        elif fg_time_sec[-1] > 300:
+            # in minutes
+            #ax2.plot(short_fg_time_sec /60, short_fg_flux)
+            xlabel = 'Time (mins)'
+            time = fg_time_sec /60
+            return xlabel, time
+        else:
+            # in secs
+            #ax2.plot(short_fg_time_sec, short_fg_flux)
+            xlabel = 'Time (sec)'
+            time = fg_time_sec
+            return xlabel, time
 
     def bin_data(self, time, y, n_bin):
     
@@ -762,24 +799,35 @@ class load:
             
         return np.array(time_bins), np.array(y_bins), np.array(y_err_bins)
     
-    def timeseries_binned_plot(self, fg_time='None', fg_flux='None'):
+    def timeseries_binned_plot(self, fg_time='None', fg_flux='None', start_time='None', end_time='None'):
 
         if type(fg_flux) and type(fg_time) == str:
             if fg_time and fg_flux == 'None':
                 fg_time = self.fg_time
                 fg_flux = self.fg_flux
 
+        if start_time and end_time != 'None':
+            start_time_idx = np.abs(fg_time - start_time).argmin() # https://www.geeksforgeeks.org/find-the-nearest-value-and-the-index-of-numpy-array/
+            end_time_idx = np.abs(fg_time - end_time).argmin()
+
+            fg_time = fg_time[start_time_idx:end_time_idx]
+            fg_flux = fg_flux[start_time_idx:end_time_idx]
+            
+        fg_time_sec = self.time_to_sec(fg_time)
+        xlabel, time_scaled = self.timescale(fg_time, fg_time_sec)
+
         ax = plt.subplot()
 
-        tbin, ybin, ybinerr = self.bin_data(fg_time, fg_flux / np.nanmedian(fg_flux), n_bin = 314)
+        norm_flux = fg_flux/ np.nanmedian(fg_flux)
 
-        ax.plot(fg_time, fg_flux/ np.nanmedian(fg_flux), color = 'black', alpha = 0.1)
+        tbin, ybin, ybinerr = self.bin_data(time_scaled, norm_flux, n_bin = 96)
+        ax.plot(time_scaled, norm_flux, color = 'black', alpha = 0.1)
         ax.errorbar(tbin, ybin, ybinerr, fmt = 'o', 
              mfc = 'white', mec = 'black', ecolor = 'black', elinewidth = 1, alpha=0.8)
         
         ax.set_ylabel('Relative flux', fontsize = self.fontsize)
-        ax.set_xlabel('Time (mjd)')
-        ax.set_ylim(0.4, 1.6)
+        ax.set_xlabel(xlabel)
+        ax.set_ylim(np.nanmean(norm_flux) - 2*np.nanstd(norm_flux), np.nanmean(norm_flux) + 2*np.nanstd(norm_flux))
 
         return ax
     
@@ -790,68 +838,67 @@ class load:
                 table = self.gaussfit_results
                 fg_time = self.fg_time
 
+        if start_time and end_time != 'None':
+            start_time_idx = np.abs(fg_time - start_time).argmin()
+            end_time_idx = np.abs(fg_time - end_time).argmin()
+            fg_time = fg_time[start_time_idx:end_time_idx]
+
+        fg_time_sec = self.time_to_sec(fg_time)
+        xlabel, time_scaled = self.timescale(fg_time, fg_time_sec)
+
         fig, ax = plt.subplots(4,2, figsize = (12,21), dpi = 200)
 
         #ax[].plot(fg_time, cen_x, color = 'black', alpha = .4)
         ax[0,0].set_title('Centroid_x')
-        ax[0,0].plot(fg_time, table['x_mean'])
-        ax[0,0].set_xlabel('Time (mjd)')
+        ax[0,0].plot(time_scaled, table['x_mean'])
+        ax[0,0].set_xlabel(xlabel)
         ax[0,0].set_ylabel('Pixel')
-        ax[0,0].set_ylim(np.mean(table['x_mean']) - 5*np.nanstd(table['x_mean']), 
-                         np.mean(table['x_mean']) + 5*np.nanstd(table['x_mean']))
+        ax[0,0].set_ylim(np.nanmean(table['x_mean']) - 5*np.nanstd(table['x_mean']), 
+                         np.nanmean(table['x_mean']) + 5*np.nanstd(table['x_mean']))
 
         ax[1,0].set_title('stddev_x')
-        ax[1,0].plot(fg_time, table['x_stddev'])
-        ax[1,0].set_ylim(np.mean(table['x_stddev']) - 1*np.nanstd(table['x_stddev']), 
-                         np.mean(table['x_stddev']) + 5*np.nanstd(table['x_stddev']))
-        ax[1,0].set_xlabel('Time (mjd)')
+        ax[1,0].plot(time_scaled, table['x_stddev'])
+        ax[1,0].set_ylim(np.nanmean(table['x_stddev']) - 1*np.nanstd(table['x_stddev']), 
+                         np.nanmean(table['x_stddev']) + 5*np.nanstd(table['x_stddev']))
+        ax[1,0].set_xlabel(xlabel)
         ax[1,0].set_ylabel('Pixel')
 
         ax[0,1].set_title('Centroid_y')
-        ax[0,1].plot(fg_time,table['y_mean'], color='orange')
-        ax[0,1].set_ylim(np.mean(table['y_mean']) - 5*np.nanstd(table['y_mean']), 
-                         np.mean(table['y_mean']) + 5*np.nanstd(table['y_mean']))
-        ax[0,1].set_xlabel('Time (mjd)')
+        ax[0,1].plot(time_scaled,table['y_mean'], color='orange')
+        ax[0,1].set_ylim(np.nanmean(table['y_mean']) - 5*np.nanstd(table['y_mean']), 
+                         np.nanmean(table['y_mean']) + 5*np.nanstd(table['y_mean']))
+        ax[0,1].set_xlabel(xlabel)
         ax[0,1].set_ylabel('Pixel')
         
         ax[1,1].set_title('stddev_y')
-        ax[1,1].plot(fg_time,table['y_stddev'], color='orange')
-        ax[1,1].set_ylim(np.mean(table['y_stddev']) - 1*np.nanstd(table['y_stddev']), 
-                         np.mean(table['y_stddev']) + 5*np.nanstd(table['y_stddev']))
-        ax[1,1].set_xlabel('Time (mjd)')
+        ax[1,1].plot(time_scaled,table['y_stddev'], color='orange')
+        ax[1,1].set_ylim(np.nanmean(table['y_stddev']) - 1*np.nanstd(table['y_stddev']), 
+                         np.nanmean(table['y_stddev']) + 5*np.nanstd(table['y_stddev']))
+        ax[1,1].set_xlabel(xlabel)
         ax[1,1].set_ylabel('Pixel')
 
         ax[2,0].set_title('amplitude')
-        ax[2,0].plot(fg_time,table['amplitude'], color='blue')
-        ax[2,0].set_ylim(np.mean(table['amplitude']) - 3*np.nanstd(table['amplitude']), 
-                         np.mean(table['amplitude']) + 3*np.nanstd(table['amplitude']))
-        ax[2,0].set_xlabel('Time (mjd)')
+        ax[2,0].plot(time_scaled,table['amplitude'], color='blue')
+        ax[2,0].set_ylim(np.nanmean(table['amplitude']) - 3*np.nanstd(table['amplitude']), 
+                         np.nanmean(table['amplitude']) + 3*np.nanstd(table['amplitude']))
+        ax[2,0].set_xlabel(xlabel)
         ax[2,0].set_ylabel('Counts')
 
         ax[2,1].set_title('theta')
-        ax[2,1].plot(fg_time,table['theta'], color='red')
-        ax[2,1].set_ylim(np.mean(table['theta']) - 3*np.nanstd(table['theta']), 
-                         np.mean(table['theta']) + 3*np.nanstd(table['theta']))
-        ax[2,1].set_xlabel('Time (mjd)')
+        ax[2,1].plot(time_scaled,table['theta'], color='red')
+        ax[2,1].set_ylim(np.nanmean(table['theta']) - 3*np.nanstd(table['theta']), 
+                         np.nanmean(table['theta']) + 3*np.nanstd(table['theta']))
+        ax[2,1].set_xlabel(xlabel)
         ax[2,1].set_ylabel('Radians')
 
         ax[3,0].set_title('offset')
-        ax[3,0].plot(fg_time,table['offset'], color='lightblue')
-        ax[3,0].set_ylim(np.mean(table['offset']) - 3*np.nanstd(table['offset']), 
-                         np.mean(table['offset']) + 3*np.nanstd(table['offset']))
+        ax[3,0].plot(time_scaled,table['offset'], color='lightblue')
+        ax[3,0].set_ylim(np.nanmean(table['offset']) - 3*np.nanstd(table['offset']), 
+                         np.nanmean(table['offset']) + 3*np.nanstd(table['offset']))
         ax[3,0].set_xlabel('Time (mjd)')
         ax[3,0].set_ylabel('Counts')
 
         ax[3,1].set_visible(False)
-
-        if start_time and end_time != 'None':
-            ax[0,0].set_xlim(start_time,end_time)
-            ax[0,1].set_xlim(start_time,end_time)
-            ax[1,0].set_xlim(start_time,end_time)
-            ax[1,1].set_xlim(start_time,end_time)
-            ax[2,0].set_xlim(start_time,end_time)
-            ax[2,1].set_xlim(start_time,end_time)
-            ax[3,0].set_xlim(start_time,end_time)
 
         return ax
    
@@ -1019,7 +1066,7 @@ class load:
                 
             return ax
 
-    def periodogram(self, table='None', time='None'):
+    def periodogram(self, table='None', time='None', save=False):
         '''
         Creates a periodogram plot for all parameters.
         '''
@@ -1033,7 +1080,7 @@ class load:
         gs_theta, gs_amplitude = table['theta'].value, table['amplitude'].value
         gs_offset = table['offset'].value
 
-        time_t = self.time_array_sec(time_t)
+        time_t = self.time_to_sec(time_t)
 
         frequency_sub0, power_sub0 = LombScargle(time_t, gs_amplitude).autopower(samples_per_peak=5)
         frequency_sub1, power_sub1 = LombScargle(time_t, gs_xmean).autopower(samples_per_peak=5)
@@ -1086,8 +1133,13 @@ class load:
         self.pgram_theta = pgram_table['frequency_theta'], pgram_table['power_theta']
         self.pgram_offset = pgram_table['frequency_offset'], pgram_table['power_offset']
 
+        if save:
+            periodogram_dir = 'periodograms'
+            if not os.path.exists(periodogram_dir):
+                os.makedirs(periodogram_dir)
+            table.write(str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
+        
         return ax
-
 
 
     '''
@@ -1118,6 +1170,7 @@ class load:
 
         for i in range(len(short_fg_array)):
             im = ax.imshow(short_fg_array[i], animated=True)
+            im.set_clim(vmin=min, vmax=max)
             if i == 0:
                 ax.imshow(short_fg_array[i])
             ims.append([im])
@@ -1130,14 +1183,15 @@ class load:
                                         repeat_delay=1000)
         ani.save(filename)
 
-    def flux_spatial_timelapse_animation(self,fg_array='None', fg_flux='None', start = 0, stop = -1, interval=100, filename='movie.mp4',):
+    def flux_spatial_timelapse_animation(self,fg_array='None', fg_time='None', fg_flux='None', start = 0, stop = 100, interval=100, filename='movie.mp4',):
         '''
         Creates an animation of a timeseries for a fg_array. Inputs array, start frame and stop frame
         '''
-        if type(fg_flux) and type(fg_array) == str:
+        if type(fg_flux) and type(fg_array) and type(fg_time) == str:
             if fg_array and fg_flux == 'None':
                 fg_array = self.fg_array
                 fg_flux = self.fg_flux
+                fg_time = self.fg_time
 
         fig = plt.figure(figsize=(14,6), dpi=200)
 
@@ -1148,22 +1202,29 @@ class load:
         ax1.get_yaxis().set_visible(False)
 
         ax2.set_ylabel('Counts')
-        ax2.get_xaxis().set_visible(False)
+        ax2.get_xaxis().set_visible(True)
         
         short_fg_array = fg_array[start:stop]
         short_fg_flux = fg_flux[start:stop]
+        short_fg_time = fg_time[start:stop]
 
+        short_fg_time_sec = self.time_to_sec(short_fg_time)
+
+        xlabel, short_fg_time_animated = self.timescale(short_fg_time, short_fg_time_sec)
+
+        ax2.set_xlabel(xlabel)
+            
         ims = []
 
         min, max = self.minmax_gaussian_postprocessing(fg_array)
 
-        for i in range(len(short_fg_array)):
-            im = ax1.imshow(short_fg_array[i], animated=True)
-            im.set_clim(min, max)
+        im2, = ax2.plot(short_fg_time_animated, short_fg_flux, animated=True, color='black', alpha=0.5)
+        for idx, i in enumerate(short_fg_time_animated):
+            
+            im = ax1.imshow(short_fg_array[0], animated=True)
+            im.set_clim(vmin=min, vmax=max)
 
-            im2, = ax2.plot(short_fg_flux, animated=True, color='black', alpha=0.5)
             im3 = ax2.vlines(i, np.min(short_fg_flux), np.max(short_fg_flux),  animated=True, color='red')
-
             ims.append([im, im2, im3])
 
         fig.suptitle('Guidestar spatial timeseries animation')
