@@ -637,6 +637,7 @@ class load:
                 popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
                 rows5_obj.append(popt)
 
+            rows5 = []
             for idx, i in enumerate(rows5_obj):
                 popt3 = ray.get(i)
                 rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])                
@@ -982,8 +983,6 @@ class load:
                     ax.axvline(x_time,color='g',)
                     ax.axvline(y_time, color='r',)
 
-                print(event_time)
-
                 ax.axvline(x_time, color='g', label='hga_start')
                 ax.axvline(y_time, color='r', label='hga_stop')
 
@@ -1182,7 +1181,7 @@ class load:
                                         repeat_delay=1000)
         ani.save(filename)
 
-    def flux_spatial_timelapse_animation(self,fg_array='None', fg_time='None', fg_flux='None', start = 0, stop = 100, interval=100, filename='movie.mp4',):
+    def flux_spatial_timelapse_animation(self,fg_array='None', fg_time='None', fg_flux='None', start = 0, stop = 100, interval=100, filename='movie.gif',):
         '''
         Creates an animation of a timeseries for a fg_array. Inputs array, start frame and stop frame
         '''
@@ -1220,7 +1219,7 @@ class load:
         im2, = ax2.plot(short_fg_time_animated, short_fg_flux, animated=True, color='black', alpha=0.5)
         for idx, i in enumerate(short_fg_time_animated):
             
-            im = ax1.imshow(short_fg_array[0], animated=True)
+            im = ax1.imshow(short_fg_array[idx], animated=True)
             im.set_clim(vmin=min, vmax=max)
 
             im3 = ax2.vlines(i, np.min(short_fg_flux), np.max(short_fg_flux),  animated=True, color='red')
