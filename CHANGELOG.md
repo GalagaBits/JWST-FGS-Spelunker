@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added a scalable x axis that changes timescales based on the input time array.
 - You can specify a directory for `spelunker.load` with the `dir` parameter. Specifying a directory is now optional and you can call `spelunker.load` without any parameters.
 - Added a `save` parameter for `spelunker.load` to toggle saving the `fg_array`, `fg_flux`, and `fg_time` arrays as a `.npy` file.
-- Added saving methods for `gauss2d_fit` and `quick_fit` with the `save` parameter.
-- Added try and except statement to `gauss2d_fit` to prevent code crashing if a fit fails
+- Added saving methods for `gauss2d_fit`, `quick_fit`, and  with the `save` parameter.
+- Added try and except statements to `gauss2d_fit` to prevent code crashing if a fit fails
+- Added `save` method to save Gaussian fit results and object properties to a `txt` file.
 
 ### Fixed
 - Fixed initial guesses of gaussian fits in `gauss2d_fit` to handle guidestar changes in position. Gaussian fits should run faster and be more reliable.
