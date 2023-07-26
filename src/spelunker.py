@@ -45,7 +45,7 @@ class load:
     init_dir = os.getcwd()
 
     def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False):
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False, token = None):
         
         os.chdir(self.init_dir)
 
@@ -86,7 +86,7 @@ class load:
         
         if pid != 'None':
             self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequnence_id=parallel_sequnence_id,
-                          activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level, save=save)
+                          activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level, save=save, token = token)
 
     def stitcher(self, fg_timeseries):
         '''
@@ -186,11 +186,16 @@ class load:
 
 
     def download(self, pid, obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False):
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, 
+                 save=False, token=None):
         '''
         Downloads the data from the projectid website. Turns the projectid into a manageable
         fits file. Downloads the files onto a local directory.
         '''
+
+        if token is not None:
+
+            Observations.login(token=token)
 
         self.pid = pid
 
@@ -293,6 +298,12 @@ class load:
 
         os.chdir(self.directory+'/mastDownload/JWST/')
         fg_raw = sorted(glob.glob('**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
+
+        if len(fg_raw) == 0:
+
+            raise Exception('No files were downloaded for program '+str(pid)+'. Two common causes of this issue are: \n'+\
+                           +' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n')
+                           +' 2.- There is no guidestar data for your program as of yet in MAST.'
 
         fg = []
         sliced_directory = []
@@ -464,6 +475,10 @@ class load:
 
         self.fg_table = self.table()
         self.object_properties = self.object_properties_func()
+
+        if token is not None:
+
+            Observations.logout()
     
     def object_properties_func(self,):
 
