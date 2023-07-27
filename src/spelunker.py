@@ -1,5 +1,3 @@
-# fgs_spelunker_ver5003
-
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
@@ -147,7 +145,7 @@ class load:
 
     def time_sort_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
-        Sorts the three arrays by time, regardless of filename or file order.
+        Sorts the three arrays by time, regardless of filename or file order. CHANGED
         '''
 
         table = Table()
