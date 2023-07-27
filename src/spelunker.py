@@ -302,8 +302,8 @@ class load:
         if len(fg_raw) == 0:
 
             raise Exception('No files were downloaded for program '+str(pid)+'. Two common causes of this issue are: \n'+\
-                           +' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n')
-                           +' 2.- There is no guidestar data for your program as of yet in MAST.'
+                           +' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
+                           +' 2.- There is no guidestar data for your program as of yet in MAST.')
 
         fg = []
         sliced_directory = []
