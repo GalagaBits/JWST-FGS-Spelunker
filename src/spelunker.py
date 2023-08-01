@@ -1,5 +1,3 @@
-# fgs_spelunker_ver5003
-
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
@@ -158,7 +156,6 @@ class load:
         sort_table = table.sort(['fg_time'])
 
         return np.array(table['fg_array']), np.array(table['fg_time']), np.array(table['fg_flux'])
-
 
 
     '''
@@ -415,7 +412,7 @@ class load:
         # Reads in all fits files from reformed_directory
         #fg1 = datamodels.open(list(reformed_directory))
 
-        sort_table = fg_table.sort(['guidestar_time'])
+        _ = fg_table.sort(['guidestar_time'])
 
         self.fg_datamodel = list(fg_table['object_fg'])
         self.fg_table = fg_table
@@ -452,7 +449,14 @@ class load:
 
             fg_array, fg_time, fg_flux = self.negative_flux_preprocessing(norm_array, fg_time, norm_flux)
 
+        data_table = Table()
+        data_table['spatial'] = fg_array
+        data_table['time'] = fg_time
+        data_table['flux'] = fg_flux
 
+        _ = data_table.sort(['time'])
+
+        
         # Saving numpy arrays
 
         os.chdir(self.directory)
@@ -463,15 +467,15 @@ class load:
                 os.makedirs(data_arrays_dir)
 
             os.chdir(self.directory+'/'+data_arrays_dir)
-            np.save('pid_'+str(pid)+'_fg_array', fg_array)
-            np.save('pid_'+str(pid)+'_fg_time', fg_time)
-            np.save('pid_'+str(pid)+'_fg_flux', fg_flux)
+            np.save('pid_'+str(pid)+'_fg_array', list(data_table['spatial']))
+            np.save('pid_'+str(pid)+'_fg_time', list(data_table['time']))
+            np.save('pid_'+str(pid)+'_fg_flux', list(data_table['flux']))
 
             os.chdir(self.directory)
 
-        self.fg_array = fg_array
-        self.fg_time = fg_time
-        self.fg_flux = fg_flux
+        self.fg_array = list(data_table['spatial'])
+        self.fg_time = list(data_table['time'])
+        self.fg_flux = list(data_table['flux'])
 
         self.fg_table = self.table()
         self.object_properties = self.object_properties_func()
