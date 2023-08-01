@@ -145,7 +145,7 @@ class load:
 
     def time_sort_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
-        Sorts the three arrays by time, regardless of filename or file order. CHANGED
+        Sorts the three arrays by time, regardless of filename or file order.
         '''
 
         table = Table()
