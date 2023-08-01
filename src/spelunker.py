@@ -158,7 +158,6 @@ class load:
         return np.array(table['fg_array']), np.array(table['fg_time']), np.array(table['fg_flux'])
 
 
-
     '''
     DOWNLOADING FROM ASTROQUERY AND READING FILES
     ------------------------------------------------------------------------------------------------------
