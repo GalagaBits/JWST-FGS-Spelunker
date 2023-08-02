@@ -584,7 +584,7 @@ class load:
         '''
         if type(fg_array) == str:
             if fg_array == 'None':
-                fg_array = self.fg_array
+                fg_array = np.array(self.fg_array)
 
         # creates a gaussian function, from stack overflow
         # https://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m
