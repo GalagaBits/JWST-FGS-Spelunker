@@ -48,10 +48,8 @@ class load:
         os.chdir(self.init_dir)
 
         created_dir = "spelunker_outputs"
-        current_dir = self.init_dir
 
         if dir != 'None':
-            os.chdir(dir)
             if not os.path.exists(dir+'/'+created_dir):  #https://www.geeksforgeeks.org/how-to-create-directory-if-it-does-not-exist-using-python/
                 os.makedirs(created_dir)
                 temp_dirc = created_dir
@@ -59,7 +57,7 @@ class load:
                 temp_dirc = created_dir
 
         else:
-            if not os.path.exists(current_dir+'/'+created_dir):
+            if not os.path.exists(self.init_dir+'/'+created_dir):
                 os.makedirs(created_dir)
                 temp_dirc = created_dir
             else:
@@ -68,7 +66,7 @@ class load:
         self.directory = os.getcwd()+'/'+temp_dirc
         print('Current working directory for spelunker: '+self.directory+'\n')
 
-        self.mast_api_token = None
+        self.mast_api_token = token
         self.fg_table = None
 
         self.fg_array = None
