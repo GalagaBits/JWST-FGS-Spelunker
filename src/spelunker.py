@@ -461,9 +461,9 @@ class load:
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_time', list(data_table['time']))
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_flux', list(data_table['flux']))
 
-        self.fg_array = list(data_table['spatial'])
-        self.fg_time = list(data_table['time'])
-        self.fg_flux = list(data_table['flux'])
+        self.fg_array = data_table['spatial']
+        self.fg_time = data_table['time']
+        self.fg_flux = data_table['flux']
 
         self.fg_table = self.table()
         self.object_properties = self.object_properties_func()
