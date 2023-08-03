@@ -77,6 +77,7 @@ For more information on the tools under `spelunker` and how to get started, visi
 
 - [Guidestar Targets](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/examples/guidestar_targets.ipynb)
 - [Pixel centroid changes and mnemonics](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/examples/pixel_centroid_mnemonics.ipynb)
+- [TSOS Guidestar Demo](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/examples/fgs-spelunker-and-tsos.ipynb)
 
 
 ## Licence and attribution
