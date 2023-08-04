@@ -151,7 +151,7 @@ class load:
             idx = np.where(np.array(rms) == np.min(rms))[0]
 
             # Get photometry with this mask:
-            mask = self.get_mask(median_frame, npixels = pixels[idx])
+            mask = self.get_mask(median_frame, npixels = pixels[idx[0]])
 
         self.photometry_mask = mask
         self.fg_flux = list(np.sum( np.array(self.fg_array) * mask, axis = (1,2) ))
