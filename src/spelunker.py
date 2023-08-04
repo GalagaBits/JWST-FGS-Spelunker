@@ -40,30 +40,26 @@ except ImportError:
 
 class load:
 
-    init_dir = os.getcwd()
 
     def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
                  activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False, token = None):
-        
-        os.chdir(self.init_dir)
+
+        self.init_dir = os.getcwd()
 
         created_dir = "spelunker_outputs"
 
         if dir != 'None':
             if not os.path.exists(dir+'/'+created_dir):  #https://www.geeksforgeeks.org/how-to-create-directory-if-it-does-not-exist-using-python/
                 os.makedirs(created_dir)
-                temp_dirc = created_dir
-            else:
-                temp_dirc = created_dir
+        
+            self.directory = dir+created_dir
 
         else:
             if not os.path.exists(self.init_dir+'/'+created_dir):
                 os.makedirs(created_dir)
-                temp_dirc = created_dir
-            else:
-                temp_dirc = created_dir
+        
+            self.directory = os.getcwd()+'/'+created_dir
 
-        self.directory = os.getcwd()+'/'+temp_dirc
         print('Current working directory for spelunker: '+self.directory+'\n')
 
         self.mast_api_token = token
@@ -194,8 +190,6 @@ class load:
 
         self.pid = pid
 
-        os.chdir(self.directory)
-
         if obs_num == 'None' and visit != 'None':
             raise ValueError('When a visit is identified, the obs_num needs to be identified.')
 
@@ -291,8 +285,7 @@ class load:
 
         manifest = Observations.download_products(productsx,)
 
-        os.chdir(self.directory+'/mastDownload/JWST/')
-        fg_raw = sorted(glob.glob('**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
+        fg_raw = sorted(glob.glob(self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
 
         if len(fg_raw) == 0:
 
@@ -305,7 +298,7 @@ class load:
 
         for i in fg_raw:
                 fg.append(i.rsplit('/')[-1])
-                sliced_directory.append(i.split('/')[0])
+                sliced_directory.append(i.split('/')[-2])
 
         fg_table = Table()
 
@@ -386,11 +379,13 @@ class load:
                 fg_table = fg_table[mask8]    
 
         f_slash = []
+        mastDownload_dir = []
         for i in range(len(fg_table['filenames'])):
             f_slash.append('/')
+            mastDownload_dir.append(self.directory+'/mastDownload/JWST/')
 
         reformed_directory = np.char.add(np.char.add(fg_table['sliced_directory'], f_slash), fg_table['filenames'])
-        fg_table['reformed_directory'] = reformed_directory
+        fg_table['reformed_directory'] = np.char.add(mastDownload_dir, reformed_directory)
 
         gs_id = []
         guidestar_time = []
@@ -457,19 +452,14 @@ class load:
         
         # Saving numpy arrays
 
-        os.chdir(self.directory)
-
         if save:
             data_arrays_dir = 'data_arrays'
             if not os.path.exists(data_arrays_dir):
                 os.makedirs(data_arrays_dir)
 
-            os.chdir(self.directory+'/'+data_arrays_dir)
-            np.save('pid_'+str(pid)+'_fg_array', list(data_table['spatial']))
-            np.save('pid_'+str(pid)+'_fg_time', list(data_table['time']))
-            np.save('pid_'+str(pid)+'_fg_flux', list(data_table['flux']))
-
-            os.chdir(self.directory)
+            np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_array', list(data_table['spatial']))
+            np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_time', list(data_table['time']))
+            np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_flux', list(data_table['flux']))
 
         self.fg_array = list(data_table['spatial'])
         self.fg_time = list(data_table['time'])
@@ -484,7 +474,7 @@ class load:
     
     def object_properties_func(self,):
 
-        object_table = pd.DataFrame(columns=['guidestar_catalog_id', 'gaiadr1ID','gaiadr1ID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
+        object_table = pd.DataFrame(columns=['guidestar_catalog_id', 'gaiadr1ID','gaiadr2ID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
 
         for idx, gs_id in enumerate(self.fg_table['gs_id']):
 
@@ -576,6 +566,7 @@ class load:
     FITTING TOOLS
     ------------------------------------------------------------------------------------------------------
     '''
+
 
     def gauss2d_fit(self, fg_array='None', ncpus=4, save=False):
         '''
@@ -679,9 +670,9 @@ class load:
         
         if save:
             gaussfits_array_dir = 'gaussfits'
-            if not os.path.exists(gaussfits_array_dir):
-                os.makedirs(gaussfits_array_dir)
-            table.write(str(self.pid)+'_'+gaussfits_array_dir+'.dat', format='ascii', overwrite=True)
+            if not os.path.exists(self.directory+'/'+gaussfits_array_dir):
+                os.makedirs(self.directory+'/'+gaussfits_array_dir)
+            table.write(self.directory+'/'+gaussfits_array_dir+'/'+str(self.pid)+'_'+gaussfits_array_dir+'.dat', format='ascii', overwrite=True)
 
         return table
     
@@ -741,9 +732,9 @@ class load:
         
         if save:
             quickfits_array_dir = 'quickfits'
-            if not os.path.exists(quickfits_array_dir):
-                os.makedirs(quickfits_array_dir)
-            quick_fit_table.write(str(self.pid)+'_'+quickfits_array_dir+'.dat', format='ascii', overwrite=True)
+            if not os.path.exists(self.directory+'/'+quickfits_array_dir):
+                os.makedirs(self.directory+'/'+quickfits_array_dir)
+            quick_fit_table.write(self.directory+'/'+quickfits_array_dir+'/'+str(self.pid)+'_'+quickfits_array_dir+'.dat', format='ascii', overwrite=True)
 
         return quick_fit_table
 
@@ -1150,9 +1141,9 @@ class load:
 
         if save:
             periodogram_dir = 'periodograms'
-            if not os.path.exists(periodogram_dir):
-                os.makedirs(periodogram_dir)
-            table.write(str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
+            if not os.path.exists(self.directory+'/'+periodogram_dir):
+                os.makedirs(self.directory+'/'+periodogram_dir)
+            table.write(self.directory+'/'+periodogram_dir+'/'+str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
         
         return ax
 
