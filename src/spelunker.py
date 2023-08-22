@@ -339,15 +339,18 @@ class load:
 
         productsx = self.duplicate_rm(productsx)
 
-        manifest = Observations.download_products(productsx,)
+        manifest = Observations.download_products(productsx, download_dir=self.directory)
 
-        fg_raw = sorted(glob.glob(self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
+        lookup_directory = self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'
+        fg_raw = sorted(glob.glob(lookup_directory))
 
         if len(fg_raw) == 0:
 
+            print('\t Could not find any files in '+lookup_directory)
+
             raise Exception('No files were downloaded for program '+str(pid)+'. Two common causes of this issue are: \n'+\
-                           +' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
-                           +' 2.- There is no guidestar data for your program as of yet in MAST.')
+                           ' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
+                           ' 2.- There is no guidestar data for your program as of yet in MAST.')
 
         fg = []
         sliced_directory = []
