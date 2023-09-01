@@ -7,6 +7,7 @@ producing results that make sense.
 
 import os
 import shutil
+import traceback
 
 import spelunker
 
@@ -21,6 +22,10 @@ def run_tests():
     results['2dgaussian']['pass'] = False
     results['2dgaussian']['function'] = test_2dgaussian
     results['2dgaussian']['description'] = '2D gaussian fits (spk.gauss2d_fit)'
+    results['guidestarplot'] = {}
+    results['guidestarplot']['pass'] = False
+    results['guidestarplot']['function'] = test_guidestarplot
+    results['guidestarplot']['description'] = 'Guidestar plot (spk.guidestar_plot)'
 
     spk = 'init'
     for key in list( results.keys() ):
@@ -60,6 +65,18 @@ def test_2dgaussian(spk):
 
         return False, None, type(error).__name__, error
 
+def test_guidestarplot(spk):
+
+    try:
+
+        spk.guidestar_plot()
+
+        return True, spk, '', ''
+
+    except Exception as error:
+
+        return False, None, type(error).__name__, error
+
 def test_summary(results):
 
     all_good = True
@@ -77,20 +94,30 @@ def test_summary(results):
             
     if not all_good:
 
-        print('\t - Final assessment: some tests \033[31mfailed\033[0m. Here is a summary of those, along with errors raised:')
+        print('\n\t - Final assessment: some tests \033[31mfailed\033[0m. Here is a summary of those, along with errors raised:\n')
 
+        counter = 1
         for key in list( results.keys() ):
 
             if not results[key]['pass']:
 
-                print('\t - '+results[key]['description']+' \033[31mfailed\033[0m with a',results[key]['errorname'],'error:')
-                print(results[key]['error'])
+                try:
 
+                    print('\t\t '+str(counter)+') '+results[key]['description']+' \033[31mfailed\033[0m with a',results[key]['errorname'],':\n')
+                    tb_str = ''.join(traceback.format_exception(None, results[key]['error'], results[key]['error'].__traceback__))
+                    print(tb_str)
+                    print('\n')
+
+                except:
+
+                    print('\t\t '+str(counter)+') '+results[key]['description']+' test not run (possibily because of dependance with prior test that failed)')
+
+                counter += 1
         print('\n >> Some spelunker tests \033[31mfailed\033[0m. Please check errors above.\n')
 
     else:
 
-        print('\t - Final assessment: all tests \033[32msuccessful\033[0m!')
+        print('\n\t - Final assessment: all tests \033[32msuccessful\033[0m!')
 
         print('\n >> spelunker is \033[32mready to go\033[0m!\n')
 
