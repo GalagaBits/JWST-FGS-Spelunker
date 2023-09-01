@@ -35,7 +35,7 @@ try:
 
 except ImportError:
     jwstuser_installed = False
-    print('jwstuser is not installed. mnemonics() will not work.')
+    print('Warning: jwstuser is not installed. mnemonics() will not work.')
 
 
 class load:
