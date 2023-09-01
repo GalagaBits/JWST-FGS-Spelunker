@@ -1003,14 +1003,14 @@ class load:
    
     def guidestar_plot(self, fov = None):
         '''
-        Function that generates guidestar plots. If a single target is present, the default FOV is of 1 arcmin. If many targets, FOV 
+        Function that generates guidestar plots. If a single target is present, the default FOV is of 30 arcmin. If many targets, FOV 
         is calculated from the dispersion of target coordinates. This can be all overriden by the input `fov` (in arcsecs).
 
         Input
         -----
 
         fov : float
-            (Optional) Field of view for the plot in arcmins; default is 1 arcmin, unless there are multiple targets, in which case a FOV is estimated by 
+            (Optional) Field of view for the plot in arcmins; default is 30 arcmin, unless there are multiple targets, in which case a FOV is estimated by 
             default based on their distances from each other.
         '''
         coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
@@ -1028,7 +1028,7 @@ class load:
 
             if fov_radius.value == 0.:
 
-                fov_radius = (1. / 60.) * u.deg
+                fov_radius = (30. / 60.) * u.deg
 
         else:
 
