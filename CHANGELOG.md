@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   a manual mask can also be passed instead via `spk.optimize_photometry(mask = mask)`. TODO: handle optimal masks for 
   multiple guidestars.
 
+### Fixed
+- Fixed bug introduced when storing `data_arrays` in the `spelunker_outputs` directory.
+- Fixed bug introduced by directory changes.
+
 ## [1.0.1] - 2023-08-02 (Release)
 - Error message when data is not downloaded either to not having propietary access period or no data.
 - Possibility to download data with exclusive access period by specifying a `token` in `spelunker.load`. This is a string.
