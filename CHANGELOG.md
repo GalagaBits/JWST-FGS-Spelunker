@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - (Unreleased)
+### Added
+- Added option to define field-of-view for `guidestar_plot()`.
+
+### Fixed
+- Fixed bug on `guidestar_plot()` which didn't work for single targets.
+
 ## [1.0.2] - 2023-09-01 (Current release)
 ### Added
 - Photometry can now be optimized with a mask. `spk.optimize_photometry()` does the trick via an automatic mask generation; 
