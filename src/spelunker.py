@@ -512,9 +512,12 @@ class load:
         # Saving numpy arrays
 
         if save:
+
             data_arrays_dir = 'data_arrays'
-            if not os.path.exists(data_arrays_dir):
-                os.makedirs(data_arrays_dir)
+
+            if not os.path.exists(self.directory+'/'+data_arrays_dir):
+
+                os.makedirs(self.directory+'/'+data_arrays_dir)
 
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_array', list(data_table['spatial']))
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_time', list(data_table['time']))
