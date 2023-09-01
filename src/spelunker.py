@@ -99,6 +99,62 @@ class load:
     ------------------------------------------------------------------------------------------------------
     '''
 
+    def optimize_photometry(self, mask = None, min_pixel = 1, max_pixel = 30, n_bin = 100):
+        '''
+        This function optimizes the photometry in `self.fg_flux` via either a user-defined `mask` (of size [8,8]), which has values of 1 
+        in the pixels that want to be included in the photometry, or automatically by testing masks of the brightest npixels from min_pixel to 
+        max_pixel.
+
+        Parameters
+        ----------
+            
+            mask : np.array
+                (Optional) mask array. Must have same dimensions as an FGS frame, ie, [8,8]. Values of 1 are pixels to be used, values of 0 won't be used.
+
+            min_pixel : int
+                (Optional) minimum range of pixels to explore to optimize a mask.
+
+            max_pixel : int
+                (Optional) maximum range of pixels to explore to optimize a mask.
+
+            n_bin : int
+                (Optional) number of datapoints to bin to compare the precision between pixel mask sizes.
+
+        Returns
+        -------
+
+            The function rewrites the self.fg_flux attribute to have the optimized photometry. It also rewrites the self.photometry_mask containing the 
+            optimized mask.
+
+        '''
+
+        if mask is None:
+
+            # Find optimal mask. To do this, we first get the median frame:
+            median_frame = np.nanmedian( np.array( self.fg_array ), axis = 0)
+            pixels = []
+            rms = []
+            for i in range(min_pixel, max_pixel + 1):
+
+                # Get current mask:
+                mask = self.get_mask(median_frame, npixels = i)
+
+                # Get photometry; bin it:
+                photometry = np.sum( np.array(self.fg_array) * mask, axis = (1,2) )
+                _, fbin, fbinerr = self.bin_data( self.fg_time, photometry, n_bin = n_bin )
+
+                # Calculate rms; save it:
+                rms.append( np.nanmedian( fbinerr / np.nanmedian(fbin) ) )
+                pixels.append(i)
+
+            # Find optimal mask:
+            idx = np.where(np.array(rms) == np.min(rms))[0]
+
+            # Get photometry with this mask:
+            mask = self.get_mask(median_frame, npixels = pixels[idx[0]])
+
+        self.photometry_mask = mask
+        self.fg_flux = list(np.sum( np.array(self.fg_array) * mask, axis = (1,2) ))
 
     def negative_flux_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
@@ -283,15 +339,18 @@ class load:
 
         productsx = self.duplicate_rm(productsx)
 
-        manifest = Observations.download_products(productsx,)
+        manifest = Observations.download_products(productsx, download_dir=self.directory)
 
-        fg_raw = sorted(glob.glob(self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'))
+        lookup_directory = self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'
+        fg_raw = sorted(glob.glob(lookup_directory))
 
         if len(fg_raw) == 0:
 
+            print('\t Could not find any files in '+lookup_directory)
+
             raise Exception('No files were downloaded for program '+str(pid)+'. Two common causes of this issue are: \n'+\
-                           +' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
-                           +' 2.- There is no guidestar data for your program as of yet in MAST.')
+                           ' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
+                           ' 2.- There is no guidestar data for your program as of yet in MAST.')
 
         fg = []
         sliced_directory = []
@@ -464,6 +523,7 @@ class load:
         self.fg_array = list(data_table['spatial'])
         self.fg_time = list(data_table['time'])
         self.fg_flux = list(data_table['flux'])
+        self.photometry_mask = np.ones([data_table['spatial'].shape[1], data_table['spatial'].shape[2]])
 
         self.fg_table = self.table()
         self.object_properties = self.object_properties_func()
@@ -575,7 +635,7 @@ class load:
         '''
         if type(fg_array) == str:
             if fg_array == 'None':
-                fg_array = self.fg_array
+                fg_array = np.array(self.fg_array)
 
         # creates a gaussian function, from stack overflow
         # https://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m
@@ -791,6 +851,32 @@ class load:
             xlabel = 'Time (sec)'
             time = fg_time_sec
             return xlabel, time
+
+    def get_mask(self, frame, npixels):
+    
+        cpixels = 0
+        flat_mi = frame.flatten()
+        
+        values = np.array([])
+        while cpixels < npixels:
+            max_val = np.max(flat_mi)
+            idx = np.where(flat_mi == max_val)[0]
+            values = np.append(values, flat_mi[idx])
+            flat_mi = np.delete(flat_mi,idx)
+            cpixels += len(idx)
+            
+        # With these values, now fill the mask:
+        mask = np.zeros(frame.shape)
+        mask_idxs = np.array([])
+        mask_idys = np.array([])
+        
+        for i in range(len(values)):
+            idx = np.where(frame == values[i])
+            mask_idxs = np.append(mask_idxs,idx[0][0])
+            mask_idys = np.append(mask_idys,idx[1][0])
+            mask[idx] = 1.
+            
+        return mask
 
     def bin_data(self, time, y, n_bin):
     
