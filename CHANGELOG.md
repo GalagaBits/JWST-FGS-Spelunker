@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.0.3] - (Unreleased)
 ### Added
 - Added option to define field-of-view for `guidestar_plot()`.
+- Added test in `testing` for the `guidestar_plot()` function.
+- Added the `traceback` library for general checks in `testing` which spits the full traceback.
 
 ### Fixed
 - Fixed bug on `guidestar_plot()` which didn't work for single targets.
