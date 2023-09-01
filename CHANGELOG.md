@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Photometry can now be optimized with a mask. `spk.optimize_photometry()` does the trick via an automatic mask generation; 
   a manual mask can also be passed instead via `spk.optimize_photometry(mask = mask)`. TODO: handle optimal masks for 
   multiple guidestars.
+- Added test function in `testing`, useful for testing before releases/updates. 
 
 ### Fixed
 - Fixed bug introduced when storing `data_arrays` in the `spelunker_outputs` directory.
