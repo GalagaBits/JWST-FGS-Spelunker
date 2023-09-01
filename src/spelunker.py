@@ -1,3 +1,5 @@
+#Spelunker
+
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
@@ -523,9 +525,9 @@ class load:
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_time', list(data_table['time']))
             np.save(self.directory+'/'+data_arrays_dir+'/'+'pid_'+str(pid)+'_fg_flux', list(data_table['flux']))
 
-        self.fg_array = list(data_table['spatial'])
-        self.fg_time = list(data_table['time'])
-        self.fg_flux = list(data_table['flux'])
+        self.fg_array = data_table['spatial']
+        self.fg_time = data_table['time']
+        self.fg_flux = data_table['flux']
         self.photometry_mask = np.ones([data_table['spatial'].shape[1], data_table['spatial'].shape[2]])
 
         self.fg_table = self.table()

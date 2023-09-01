@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.0.1] - 2023-08-02 (Release)
 - Error message when data is not downloaded either to not having propietary access period or no data.
 - Possibility to download data with exclusive access period by specifying a `token` in `spelunker.load`. This is a string.
+- Time is now sorted by guidestar epochs.
+- Spelunker now does not use `os.chdir`, so the directory will not change unexpectedly while using Jupyter notebooks.
 
 ## [1.0.0] - 2023-07-23
 ### Added
