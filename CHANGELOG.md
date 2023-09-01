@@ -5,13 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.1] - Unreleased
+## [1.0.2] - Unreleased
 ### Added
-- Error message when data is not downloaded either to not having propietary access period or no data.
-- Possibility to download data with exclusive access period by specifying a `token` in `spelunker.load`. This is a string.
 - Photometry can now be optimized with a mask. `spk.optimize_photometry()` does the trick via an automatic mask generation; 
   a manual mask can also be passed instead via `spk.optimize_photometry(mask = mask)`. TODO: handle optimal masks for 
   multiple guidestars.
+- Added test function in `testing`, useful for testing before releases/updates. 
+
+### Fixed
+- Fixed bug introduced when storing `data_arrays` in the `spelunker_outputs` directory.
+- Fixed bug introduced by directory changes.
+
+## [1.0.1] - 2023-08-02 (Release)
+- Error message when data is not downloaded either to not having propietary access period or no data.
+- Possibility to download data with exclusive access period by specifying a `token` in `spelunker.load`. This is a string.
 
 ## [1.0.0] - 2023-07-23
 ### Added
