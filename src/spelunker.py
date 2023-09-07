@@ -1,5 +1,3 @@
-#Spelunker
-
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
@@ -42,9 +40,84 @@ except ImportError:
 
 class load:
 
+    """
+    This class loads auxiliary FITS files of FG-GS guidestar data from MAST from a JWST Program ID. Using "load" will create attributes as np.array for the spatial data, time array,
+    and flux array. After downloading the MAST files, other attributes become available, such as "object_properties" and "fg_table", which contains metadata and stellar properties 
+    about the guidestar data. Example usage:
 
-    def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
+                >>> spk = spelunker.load(pid=1534,obs_num='2',token='abcdefg1234567')
+
+    :param dir: (optional, string)
+        The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+        If ignored, "load" will save the current directory as an attribute for use with other functions.
+
+    :param pid: (optional, int or string)
+        An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+        with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+        to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+        within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+        the function ``download`` given ``pid`` and the following parameters. For example:
+                
+                >>> spk = spelunker.load()
+                >>> spk.download(pid=1534)
+
+    :param obs_num: (optional, int or string)
+        The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+        number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+        
+    :param visit: (optional, int or string)
+        The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+        before downloading all files.
+
+    :param visit_group: (optional, int or string)
+        The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+        data to only include files with the given visit group before loading the data into the object.
+
+    :param parallel_sequence_id: (optional, int or string)
+        The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+        will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+
+    :param activity_number: (optional, int or string)
+        The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+        data to only include files with the given activity number before loading the data into the object.
+
+    :param exposure_number: (optional, int or string)
+        The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+        data to only include files with the given exposure number before loading the data into the object.
+
+    :param dir_seg: (optional, int or string)
+        The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+        files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+        into the object.
+
+    :param guider: (optional, int or string)
+        Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+        header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+        the data is loaded into the object.
+
+    :param calib_level: (optional, int or string)
+        The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
+        parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
+        files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+
+    :param save: (optional, boolean)
+        Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
+        ignored, ``save`` will default to false.
+
+
+    :param token: (optional, string)
+        This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
+        as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
+        exclusive rights will not be loaded.
+    """
+
+
+    def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequence_id='None', 
                  activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False, token = None):
+
+        '''
+        The initalization function for ``load``. This function reads the current directory and initalizes essential attributes.
+        '''
 
         self.init_dir = os.getcwd()
 
@@ -79,13 +152,27 @@ class load:
         self.fontsize = 14
         
         if pid != 'None':
-            self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequnence_id=parallel_sequnence_id,
+            self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequence_id=parallel_sequence_id,
                           activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level, save=save, token = token)
 
     def stitcher(self, fg_timeseries):
         '''
-        Stitches multiple projectids with respect to epoch in one single array.
+        Stitches multiple of JWST objects together and creates a data array from the guidestar frames. 
+
+        Parameters
+        ----------
+
+            fg_timeseries : list
+                (Mandatory) This list should include JWST datamodel objects in each element.
+
+        
+        Returns
+        -------
+
+            The function creates an np.array of guidestar frames.
+            
         '''
+
         fg_cube = []
         for data in fg_timeseries:
             for i in data.data:
@@ -160,8 +247,27 @@ class load:
 
     def negative_flux_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
-        Cuts any element within fg_array, fg_time, and fg_flux that has negative flux. Outputs
-        the preprocessed guidestar array, time array, and flux array.
+        The function ``negative_flux_preprocessing`` removes elements in the parameters that are marked with counts with negative values from the parameter
+        ``fg_flux``. All parameters needs to have the same amount of elements in each array.
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Mandatory) The spatial array of guidestar data. This must have a shape of (X, 8, 8), with X being the number of elements in the array.
+
+            fg_time : np.array
+                (Mandatory) The time array of guidestar data. This must have a shape of (X,), with X being the number of elements in the array.
+
+            fg_flux : np.array
+                (Mandatory) The flux array of guidestar data. This must have a shape of (X,), with X being the number of elements in the array.
+
+        Returns
+        -------
+
+            Any elements in fg_flux that have negative values will be removed for elements in the given parameters as well. This function will return the three
+            processed arrays.
+
         '''
 
         neg_elements = []
@@ -183,7 +289,15 @@ class load:
     
     def normalization_flux_preprocessing(self,):
         '''
-        Normalize star flux by star metadata.
+        Normalize star counts from guidestar datamodel objects. This function takes the data from the guidestar objects and divides it by the median of the
+        guidestar data for each frame.
+
+        Returns
+        -------
+            
+            This function returns two arrays: the normalized spatial array and the normalized flux array.
+
+
         '''
 
         norm_array = []
@@ -197,7 +311,7 @@ class load:
 
     def time_sort_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
-        Sorts the three arrays by time, regardless of filename or file order.
+        Sorts the three arrays by ascending order of the values in ``fg_time``, regardless of filename or file order.
         '''
 
         table = Table()
@@ -234,12 +348,24 @@ class load:
         return products[duplicates_mask]
 
 
-    def download(self, pid, obs_num='None',  visit='None', visit_group='None', parallel_sequnence_id='None', 
+    def download(self, pid, obs_num='None',  visit='None', visit_group='None', parallel_sequence_id='None', 
                  activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, 
                  save=False, token=None):
         '''
-        Downloads the data from the projectid website. Turns the projectid into a manageable
-        fits file. Downloads the files onto a local directory.
+        This function downloads FG-GS FITS for a given program ID, observtion number, visit number, and other parameters described as parameters in the ``load`` class. The
+        function also creates a working directory within the current directory to download selected FITS files and save results and plots. Additionally, the guidestar is
+        processed and packaged into objects including the timeseries of guidiesstars, time and spatial arrays, and guidestar properties.
+
+        Returns
+        -------
+
+            The ``download`` function creates attributes for frame by frame flux timeseries of a guidestar, as well as a time array, and spatial array. Other data that are
+            created as attributes includes a table of the metadata for a selected program ID and object properties, which includes stellar properties of guidestars present
+            within the program. Other attributes are created and recorded using the processed guidestar data, such as ``self.datamodel`` that stores the objects for the JWST 
+            datamodel for each opened FITS and ``self.photometry_mask``. Example usage:
+
+                        >>> self.fg_array; self.fg_flux; self.fg_time; self.object_properties
+        
         '''
 
         if token is not None:
@@ -419,8 +545,8 @@ class load:
                 mask4 = fg_table['visit_group'] == int(visit_group)
                 fg_table = fg_table[mask4]         
        
-        if parallel_sequnence_id != 'None':
-                mask5 = fg_table['parallel_sequence_id'] == int(parallel_sequnence_id)
+        if parallel_sequence_id != 'None':
+                mask5 = fg_table['parallel_sequence_id'] == int(parallel_sequence_id)
                 fg_table = fg_table[mask5]
 
         if activity_number != 'None':
@@ -538,6 +664,10 @@ class load:
             Observations.logout()
     
     def object_properties_func(self,):
+        '''
+        This function neatly packages useful stellar properties of guidestars in a specified program ID from the ``self.fg_table``, created from running the ``download``
+        function.
+        '''
 
         object_table = pd.DataFrame(columns=['guidestar_catalog_id', 'gaiadr1ID','gaiadr2ID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
 
@@ -572,7 +702,13 @@ class load:
     
     def table(self,):
         '''
-        Outputs fg_table from download().
+        This function takes the guidestar ID from ``self.fg_table`` and adds essential information to a new table such as stellar properties, GAIA IDs, and magnitudes.
+
+        Returns
+        -------
+
+            This function returns a new table that includes the information from ``self.table`` along with the added stellar properties as a ``pandas`` table.
+
         '''
 
         guidestar_id = self.fg_table['gs_id'][0]
@@ -600,7 +736,12 @@ class load:
     
 
     def readfile(self, filename):
-    
+        '''
+        This function opens a singular FG-GS guidestar FITS and writes attributes for ``self.fg_array``, ``self.fg_time``, and ``self.flux``. Note that if a program ID
+        is previously loaded using ``load``, the attributes already created will be overwritten. Currently, ``readfile`` does not create ``fg_table`` and ``object_properties``
+        attributes.
+        '''
+
         fg2 = datamodels.open(filename)
 
         all_times = np.linspace(fg2.meta.guidestar.data_start, 
@@ -622,7 +763,13 @@ class load:
 
     def time_to_sec(self, fg_time):
         '''
-        Creates an time array using from fg_time. Outputs elasped time and epoch time in mjd.
+        This function converts the values in ``fg_time`` from mjd epoch time to elapsed guidestar time in seconds.
+
+        Returns
+        -------
+
+            A new numpy array ``np.array`` is returned containing the converted time values in elapsed guidestar time in seconds.
+
         '''
         return (fg_time - fg_time[0]) * 24 * 3600.
 
@@ -635,8 +782,30 @@ class load:
 
     def gauss2d_fit(self, fg_array='None', ncpus=4, save=False):
         '''
-        Applies a spatial gaussian fit to a data array for guide star data. The gaussian parameters
-        include amplitude, centriods, stddev, and theta. Uses ray. Outputs an astopy table.
+        This function applies a spatial gaussian fit to ``self.fg_array`` for guidestar data. The Gaussian parameters include amplitude, centriods, stddev, theta,
+        and offset. Additionally, the function ``gauss2d_fit`` will automatically apply ``ray`` parallel processing. For each frame in ``self.fg_array``, a gaussian
+        (which is defined with the function ``gauss2d_fit``), is fit using ``scipy.optimize.curve_fit``.
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Optional) The spatial array can be changed into a user-defined input guidestar array for the fitting process.
+
+            ncpus : int
+                (Optional) The number of cores used for ray parallel processing. If ignored, the number of cpu cores will default to 4 cores.
+            
+            save : boolean
+                (Optional) This parameter will determine whether or not to save the output Gaussian fit table as a ``.dat`` data file. If ignored, ``gauss2d_fit`` will not
+                save as a data file.
+
+        Returns
+        -------
+
+            The results from the Gaussian fitting will be saved into the following attribute as an astropy table: ``self.gaussfit_results``. This function will also return
+            an astropy table.
+
+
         '''
         if type(fg_array) == str:
             if fg_array == 'None':
@@ -743,7 +912,27 @@ class load:
     
     def quick_fit(self, fg_array='None', save=False):
         '''
-        Performs a quick fit to an array of fg data. Outputs an astropy table
+        The function ``quick_fit`` fits the x and y pixel locations and standard deviations of a guidestar spatial array using centroid and variance calculations. This 
+        function is 'quicker' than ``gauss2d_fit``. However, it is less accuarate and does not fit for offset or theta. The amplitude is calculated by simply measuring
+        the brightest pixel in each guidestar frame.
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Optional) The spatial array can be changed into a user-defined input guidestar array for the fitting process.
+
+            save : boolean
+                (Optional) This parameter will determine whether or not to save the output Gaussian fit table as a ``.dat`` data file. If ignored, ``quick_fit`` will not
+                save as a data file.
+
+                
+        Returns
+        -------
+
+            The results from the quick fitting will be saved into the following attribute as an astropy table: ``self.quickfit_results``. This function will also return
+            an astropy table of the results.
+
         '''
         if type(fg_array) == str:
             if fg_array == 'None':
@@ -812,6 +1001,19 @@ class load:
 
     def minmax_gaussian_postprocessing(self, fg_array,):
         '''
+        Calculates the minimum and maximum counts of a median guidestar frame using Gaussian fitting. The offset parameter will be the minimum value and
+        the sum of the amplitude and offset counts will be the maximum value.
+
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Mandatory) The spatial array can be changed into a user-defined input guidestar array for the fitting process.
+
+        Returns
+        -------
+            This function returns minimum and maximum float values for a median frame.
         '''
 
         median_fg_image = np.median(fg_array, axis=0)
@@ -831,6 +1033,13 @@ class load:
     '''
     def timescale(self, fg_time, fg_time_sec,):
         '''
+        Creates scaling to convert time from seconds to minutes, hours, or mjd based on the elapsed time.
+
+        Returns
+        -------
+
+            A string and converted time returned based on how much time has elapsed.
+
         '''
         if fg_time_sec[-1] > 172800:
             # in mjd
@@ -858,7 +1067,23 @@ class load:
             return xlabel, time
 
     def get_mask(self, frame, npixels):
-    
+        '''
+        A speficied number of pixels with the highest counts in a given frame are gathered within a mask.
+
+        Parameters
+        ----------
+
+            frame : np.array
+                (Mandatory) A guidestar frame with a shape of (8,8) is required.
+
+        Returns
+        -------
+
+            Returns a boolean mask as a ``np.array`` type.
+
+        '''
+
+
         cpixels = 0
         flat_mi = frame.flatten()
         
@@ -884,7 +1109,10 @@ class load:
         return mask
 
     def bin_data(self, time, y, n_bin):
-    
+        '''
+        Bins a timeseries given a number of bins. 
+        '''
+
         # Stolen from juliet: https://github.com/nespinoza/juliet/blob/master/juliet/utils.py
         time_bins = []
         y_bins = []
@@ -899,6 +1127,31 @@ class load:
         return np.array(time_bins), np.array(y_bins), np.array(y_err_bins)
     
     def timeseries_binned_plot(self, fg_time='None', fg_flux='None', start_time='None', end_time='None'):
+        '''
+        Creates a matplotlib plot of the guidestar flux timeseries along with the binned flux timeseries.
+
+        Parameters
+        ----------
+
+            fg_time : np.array
+                (Optional) The guidestar time array with the same shape as the guidestar flux array. If ignored, the fg_time will be taken from ``self.fg_time``.
+
+            fg_flux : np.array
+                (Optional) The guidestar flux array with the same shape as the guidestar time array. If ignored, the fg_flux will be taken from ``self.fg_flux``.
+
+            start_time : float
+                (Optional) A specified left bound for the time component of the timeseries. The float must in the modified julian day (mjd) format. The ``start_time``
+                represents when the timeseries will start in the created plot.
+            
+            end_time : float
+                (Optional) A specified right bound for the time component of the timeseries. The float must in the modified julian day (mjd) format. The ``end_time``
+                represents when the timeseries will end in the created plot.
+
+        Returns
+        -------
+
+            This function will output a plot of the binned flux timeseries. Additionally, the functions returns the timeseries as a matplotlib ``axes`` object.
+        '''
 
         if type(fg_flux) and type(fg_time) == str:
             if fg_time and fg_flux == 'None':
@@ -931,6 +1184,46 @@ class load:
         return ax
     
     def timeseries_list_plot(self, table='None', fg_time='None', start_time='None', end_time='None'):
+        '''
+        After Gaussian fitting with ``gauss2d_fit``, this function will plot each of the Gaussian parameters as a timeseries. This function can also handle quick fit fitting
+        with the following example:
+        
+                    >>> spk.timeseries_list_plot(table=spk.quickfit_results)
+
+        Parameters
+        ----------
+
+            fg_time : np.array
+                (Optional) The guidestar time array. If ignored, the fg_time will be taken from ``self.fg_time``.
+
+            table : np.array
+                (Optional) Here, the user can input either the Gaussian fitting results of the quick fitting results as an astropy table. Note that the table has to have exactly
+                seven columns with ordered columns representing amplitude, x_mean, y_mean, x_stddev, y_stddev, theta, and offset. If ignored, the fg_time will be taken from 
+                ``self.gaussfit_results``.
+
+            start_time : float
+                (Optional) A specified left bound for the time component of the timeseries plots. The float must in the modified julian day (mjd) format. The ``start_time``
+                represents when the timeseries will start in the created plot.
+            
+            end_time : float
+                (Optional) A specified right bound for the time component of the timeseries plots. The float must in the modified julian day (mjd) format. The ``end_time``
+                represents when the timeseries will end in the created plot.
+
+        Returns
+        -------
+
+            This function will output a figure of seven timeseries plots for each of the Gaussian fitting parameters. Additionally, the functions returns the plot as a matplotlib
+            ``axes`` object. Each plot within the figure can be manipulated using the ``axes`` object. For instance:
+
+                        >>> ax[0,0].set_title('Centroid_x')
+                        >>> ax[1,0].set_title('stddev_x')
+                        >>> ax[0,1].set_title('Centroid_y')
+                        >>> ax[1,1].set_title('stddev_x')
+                        >>> ax[2,0].set_title('amplitude')
+                        >>> ax[2,1].set_title('theta')
+                        >>> ax[3,0].set_title('offset')
+        
+        '''
 
         if type(fg_time) and type(table) == str:
             if table and fg_time == 'None':
@@ -1003,6 +1296,13 @@ class load:
    
     def guidestar_plot(self,):
         '''
+        Using astroplan, the guidestars within a given program ID are overplotted on reference stars from the Digitized Sky Survey (DSS). During a program ID, if multiple guidestars
+        are used, a line is created between the positions of the guidestar.
+
+        Returns
+        -------
+
+            This function returns a matplotlib ``axes`` object of the guidestar plot. Additionally, the function outputs guidestar track plot.
         '''
         coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
         target = SkyCoord(np.mean(coords.ra),np.mean(coords.dec),unit='deg')
@@ -1032,7 +1332,39 @@ class load:
 
     def mnemonics(self, mnemonic, start, end):
         '''
-        Overlays a selected mnemonic from JWST and plots it on top of a 2D timeseries.
+        Accesses JWST MAST for JWST technical mnemonics. This function searches for engineering telemetry from the Engineering Database (EDB) for
+        a given time range in mjd. Currently, there are two mnemonics that are supported:
+
+                    >>> 'SA_ZHGAUPST' (high gain antenna movement)
+                    >>> 'INIS_FWMTRCURR' (NIS filter wheel current)
+
+        Thousands of mnemonics are avaliable in the EDB, however only two are tested for this function. The output for each mnemonic can vary. Additionally,
+        a MAST API token is required to use `mnemonics`.
+
+        Parameters
+        ----------
+
+            mnemonic : string
+                (Mandatory) This parameter contains a string with the mnemonic code for a selected engineering telemetry.
+            
+            start : float
+                (Mandatory) The start time in mjd, which is the start of time range to search for mnemonic events.
+
+            end : float
+                (Mandatory) The end time in mjd, which is the end of time range to search for mnemonic events.
+
+        Returns
+        -------
+
+            The function returns a matplotlib ``axes`` object for the mnemonics. For the ``SA_ZHGAUPST`` and ``INIS_FWMTRCURR``, the events are stored as a
+            ``tuple`` in the respective attributes:
+
+                        >>> self.mnemonics_event_hga
+                        >>> self.mnemonics_event_nisfil
+
+            For other mnemonics, the events will be stored within the following attribute:
+
+                        >>> self.mnemonics_event   
         '''
 
         if not jwstuser_installed:
@@ -1117,6 +1449,30 @@ class load:
             return ax     
        
     def mnemonics_local(self, mnemonic,):
+        '''
+        There are 'local mnemonics' from the attribute ``fg_table`` that the function accesses. This function returns information such as the guidestar ID and
+        filename as a mnemonic with a timestamp for which each event has occurred. A MAST API token is not required and will not impact functionality. Currently,
+        there are only two local mnemonics that are supported:
+
+                    >>> 'GUIDESTAR' (guidestar ID)
+                    >>> 'FILENAME' (filename)
+
+        Parameters
+        ----------
+
+            mnemonic : string
+                (Mandatory) A string that includes one of the two supported local mnemonics.
+
+        Returns
+        -------
+
+            Here, the function ``mnemonics_local`` returns matplotlib ``axes`` objects. The mnemonics are also stored as ``tuples`` in attributes depending
+            on which local mnemonic is specified in the parameter:
+
+                >>> self.guidestar_mnemonics
+                >>> self.filename_mnemonics 
+
+        '''
 
         event_code = []
         event_time = []
@@ -1165,8 +1521,44 @@ class load:
 
     def periodogram(self, table='None', time='None', save=False):
         '''
-        Creates a periodogram plot for all parameters.
+        Creates Lomb-Scargle periodogram plots for all fitted Gaussian or quick fit parameters.
+
+        Parameters
+        ----------
+
+            table : np.array
+                (Optional) Here, the user can input either the Gaussian fitting results of the quick fitting results as an astropy table. Note that the table has 
+                to have exactly seven columns with ordered columns representing amplitude, x_mean, y_mean, x_stddev, y_stddev, theta, and offset. If ignored, the 
+                fg_time will be taken from ``self.gaussfit_results``.
+
+            time : np.array
+                (Optional) The guidestar time array. If ignored, the fg_time will be taken from ``self.fg_time``.
+
+            save : boolean
+                (Optional) This parameter will determine whether or not to save the output periodogram table as a ``.dat`` data file. If ignored, ``periodogram`` will not
+                save as a data file.
+            
+        Returns
+        -------
+
+            This function returns a matplotlib ``axes`` object. Each periodogram plot for each of the fitted parameters are accessed through the ``axes`` object.
+            For example:
+                        >>> ax[0].text('amplitude')
+                        >>> ax[1].text('x_mean')
+                        >>> ax[2].text('y_mean')
+                        >>> ax[3].text('x_stddev')
+                        >>> ax[4].text('y_stddev')
+                        >>> ax[5].text('theta')
+                        >>> ax[6].text('offset')
+
+            Additionally, the results from the periodogram analysis can be accessed through attributes as astropy tables:
+
+                        >>> self.pgram_results
+            
+            The individual parameters can be accessed through attributes for usability. 
+
         '''
+
         if type(time) and type(table) == str:
             if table and time == 'None':
                 table = self.gaussfit_results
@@ -1247,8 +1639,29 @@ class load:
 
     def timelapse_animation(self,fg_array='None', start = 0, stop = -1, interval=100, filename='movie.gif'):
         '''
-        Creates an animation of a timeseries for a fg_array. Inputs array, start frame and stop frame
+        Creates an animation of a timeseries for a fg_array.
+
+        Parameters
+        ----------
+        
+            fg_array : np.array
+                (Optional) The guidestar spatial array. If ignored, the fg_array will be taken from ``self.fg_array``.
+
+            start : int
+                (Optional) The starting index for animation to start within ``fg_array``.
+
+            end : int
+                (Optional) The ending index for animation to end within ``fg_array``.
+
+            interval : int 
+                (Optional) The delay between frames in milliseconds, according to ``matplotlib.animation.ArtistAnimation``.
+
+        Returns
+        -------
+
+            The animation saves as a specified file, either as ``.mp4`` or ``.gif``.
         '''
+
         if type(fg_array) == str:
             if fg_array == 'None':
                 fg_array = self.fg_array
@@ -1282,7 +1695,39 @@ class load:
 
     def flux_spatial_timelapse_animation(self,fg_array='None', fg_time='None', fg_flux='None', start = 0, stop = 100, interval=100, filename='movie.gif',):
         '''
-        Creates an animation of a timeseries for a fg_array. Inputs array, start frame and stop frame
+        This function animates the spatial timeseries from ``self.fg_array``. The function will generate two plots, one with the flux timeseries, the other with
+        the spatial timeseries sharing the same time array. Thus, this function will animate events in both plots simultaneously.
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Optional) The guidestar spatial array with the same number of elements as ``fg_time`` and ``fg_flux``. If ignored, the fg_array will be taken
+                from ``self.fg_array``.
+
+            fg_time : np.array
+                (Optional) The guidestar time array with the same shape as the guidestar flux array. If ignored, the fg_time will be taken from ``self.fg_time``.
+
+            fg_flux : np.array
+                (Optional) The guidestar flux array with the same shape as the guidestar time array. If ignored, the fg_flux will be taken from ``self.fg_flux``.
+            
+            start : int
+                (Optional) The starting index for animation to start within ``fg_array``.
+
+            end : int
+                (Optional) The ending index for animation to end within ``fg_array``.
+
+            interval : int 
+                (Optional) The delay between frames in milliseconds, according to ``matplotlib.animation.ArtistAnimation``.
+
+            filename : string
+                (Optional) A filename to save the animation. To change the file type, the extension can be changed between ``.mp4`` and ``.gif``.
+
+        Returns
+        -------
+
+            The animation saves as a specified file, either as ``.mp4`` or ``.gif``.
+
         '''
         if type(fg_flux) and type(fg_array) and type(fg_time) == str:
             if fg_array and fg_flux == 'None':
@@ -1344,15 +1789,16 @@ class load:
         This function saves all the time-series information available from the guidestar in an easy-to-read format. Right now works only for 
         the case on which one has a single guidestar:
 
-        Inputs:
+        Parameters
+        ----------
+
+            :param suffix: (optional, string)
+            String that will be added in front of the output filename.
+
+        Returns
         -------
 
-        :param suffix: (optional, string)
-        String that will be added in front of the output filename.
-
-        Outputs:
-        -------
-        This function saves outputs to a .txt file.
+            This function saves outputs to a .txt file.
 
 
         '''
