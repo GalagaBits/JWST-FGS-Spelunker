@@ -2,9 +2,8 @@
 
 API
 ====
+
 .. module:: spelunker
-
-
 
 .. autoclass:: spelunker.load
    :members:
