@@ -1,7 +1,7 @@
 spelunker
 ======
 
-.. image:: ../spklogo.png
+.. image:: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/spelunker.png
     :align: center
 
 
