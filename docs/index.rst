@@ -1,9 +1,9 @@
 spelunker
 ======
 
-.. image:: ../SPK.png
-    :width: 400pt
+.. image:: ../spklogo.png
     :align: center
+
 
 
 .. toctree::
