@@ -1,7 +1,7 @@
 spelunker
 ======
 
-.. image:: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/spelunker.png
+.. image:: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/docs/spklogo2.png
     :align: center
 
 ``spelunker`` is a package that assists and finds technical anomalies on the JWST and stellar properties from guidestars.
