@@ -1,4 +1,5 @@
 Guidestar Time Series Observations (TSOs)
+=========================================
 
 Our package ``Spelunker`` can perform TSOs of guidestar data.
 
