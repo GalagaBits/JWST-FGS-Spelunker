@@ -37,7 +37,7 @@ Tutorials
 
     * Guidestar Targets
     * Pixel Centroid Mnemonics
-    * Using `spelunker` to study :doc: `JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
+    * Using `spelunker` to study :doc:`JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
 
 License & Attribution
 =====================
