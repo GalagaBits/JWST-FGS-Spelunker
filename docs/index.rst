@@ -37,6 +37,7 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <use
 
    Index <self>
    Time Series Observations (TSO) <timeseries_observations>
+   Engineering Telemetry <engineering_telemetry>
    API <api>
 
 
