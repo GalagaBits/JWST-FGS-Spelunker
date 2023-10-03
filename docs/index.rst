@@ -23,11 +23,11 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
 .. raw:: html
 
    <br>
-   
+
 User Guide
 ==========
 
-For a quick start on how to use spelunker, go to the :doc:`Quickstart guide` <user/quickstart> .
+For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <user/quickstart>` .
 
     * Installation
     * :doc:`API <api>`
