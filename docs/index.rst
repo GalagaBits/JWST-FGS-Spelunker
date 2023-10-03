@@ -27,7 +27,7 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
 User Guide
 ==========
 
-For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <user/fgs-spelunker_quickstart>` .
+For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <user/fgs-spelunker_quickstart>`.
 
     * Installation
     * :doc:`API <api>`
@@ -37,7 +37,7 @@ Tutorials
 
     * Guidestar Targets
     * Pixel Centroid Mnemonics
-    * Using `spelunker` to study JWST Time Series Observations (TSOs)
+    * Using `spelunker` to study :doc: `JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
 
 License & Attribution
 =====================
