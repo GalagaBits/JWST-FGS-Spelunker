@@ -32,6 +32,14 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <use
     * Installation
     * :doc:`API <api>`
 
+.. toctree::
+   :maxdepth: 3
+   :hidden:
+
+   Index <self>
+   API <api>
+
+
 Tutorials
 =========
 
