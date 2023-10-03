@@ -21,7 +21,6 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
     :target: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE
 
 .. raw:: html
-
    <br>
 
 User Guide
@@ -37,6 +36,7 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <use
    :hidden:
 
    Index <self>
+   Time Series Observations (TSO) <timeseries_observations>
    API <api>
 
 
