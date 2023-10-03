@@ -37,6 +37,8 @@ templates_path = ['_templates']
 # The master toctree document.
 master_doc = 'index'
 
+html_sidebars = {'**':['globaltoc.html', 'localtoc.html', 'relations.html',
+                      'sourcelink.html', 'searchbox.html']}
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
