@@ -43,6 +43,8 @@ minutes of this PID:
    plt.xlabel('Time from start (minutes)')
    plt.ylabel('Counts')
 
+.. image:: simple_guidesar_files/timeseries.png
+
 .. raw:: html
 
    <p align="center">
@@ -59,6 +61,9 @@ tracked guidestars within this Program ID:
 
    spk.guidestar_plot()
 
+
+.. image:: simple_guidestar_files/guidestar_positions.png
+
 .. raw:: html
 
    <p align="center">
@@ -69,8 +74,8 @@ tracked guidestars within this Program ID:
 
 Mnemonics from JWST technical events can be overplotted on any
 timeseries, such as high-gain antenna (HGA) movement or to identify if
-the FGS tracks a new guidestar `if the ``jwstuser`` package is also
-installed <https://github.com/spacetelescope/jwstuser/>`__:
+the FGS tracks a new guidestar if the `jwstuser package is also
+installed <https://github.com/spacetelescope/jwstuser/>`_.
 
 .. code:: python
 
@@ -86,3 +91,5 @@ installed <https://github.com/spacetelescope/jwstuser/>`__:
    plt.legend(loc=3)
    plt.xlim(60067.84, 60067.9)
    plt.show()
+
+.. image:: simple_guidestar_files/mnemonics.png
