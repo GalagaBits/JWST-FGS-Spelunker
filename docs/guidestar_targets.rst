@@ -4,7 +4,7 @@ Guidestar Targets Example
 Some programs uses multiple guidestar targets for a given observation.
 We can observe the technical functions of the JWST when FGS locks on to
 a guidestar and switches to the next using Spelunker. For this example,
-we will be exploring Program ID 2079.
+we will be exploring Program ID 6079.
 
 .. code:: ipython3
 
@@ -33,7 +33,7 @@ we will be exploring Program ID 2079.
 
 
 .. image:: guidestar_targets_files/guidestar_targets_3_1.png
-   :scale: 20%
+   :scale: 60%
 
 .. code:: ipython3
 
@@ -101,8 +101,8 @@ we will be exploring Program ID 2079.
         <tr>
           <th>2</th>
           <td>S1HP078573</td>
-          <td>4657983910572904320</td>
-          <td>4657983910572904320</td>
+          <td>4657983910572904360</td>
+          <td>4657983910572904360</td>
           <td>59917.112547</td>
           <td>59917.118705</td>
           <td>80.807043</td>
@@ -114,7 +114,7 @@ we will be exploring Program ID 2079.
           <th>3</th>
           <td>S1HP079590</td>
           <td>4657986831103727872</td>
-          <td>4657986835382982016</td>
+          <td>4657986835382986016</td>
           <td>59918.999015</td>
           <td>59919.005848</td>
           <td>80.510790</td>
@@ -125,7 +125,7 @@ we will be exploring Program ID 2079.
         <tr>
           <th>4</th>
           <td>S1HP079769</td>
-          <td>4657986831078120832</td>
+          <td>4657986831078160832</td>
           <td>4657986835433225728</td>
           <td>59919.019436</td>
           <td>59919.025598</td>
@@ -188,7 +188,7 @@ we will be exploring Program ID 2079.
           <td>4658078056254368128</td>
           <td>4658078056254368128</td>
           <td>60069.753592</td>
-          <td>60069.759620</td>
+          <td>60069.759660</td>
           <td>80.758291</td>
           <td>-69.524143</td>
           <td>12.765</td>
@@ -223,7 +223,7 @@ we will be exploring Program ID 2079.
     
     spk.mast_api_token = 'enter_mast_token_id_here'
     
-    fig, ax = plt.subplots(figsize=(12,4),dpi=200)
+    fig, ax = plt.subplots(figsize=(12,4),dpi=600)
     #ax = spk.mnemonics_local('FILENAME')
     ax = spk.mnemonics_local('GUIDESTAR')
     ax = spk.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9)
@@ -235,13 +235,13 @@ we will be exploring Program ID 2079.
 
 
 .. image:: guidestar_targets_files/guidestar_targets_6_2.png
-   :scale: 20%
+   :scale: 60%
 
 .. code:: ipython3
 
     spk.mast_api_token = '8eedd0a371a44e598a9c4489e3148811'
     
-    fig, ax = plt.subplots(figsize=(12,4),dpi=200)
+    fig, ax = plt.subplots(figsize=(12,4),dpi=600)
     ax = spk.mnemonics_local('FILENAME')
     
     ax.plot(spk.fg_time, spk.fg_flux)
@@ -252,4 +252,4 @@ we will be exploring Program ID 2079.
 
 
 .. image:: guidestar_targets_files/guidestar_targets_7_1.png
-  :scale: 20%
+  :scale: 60%

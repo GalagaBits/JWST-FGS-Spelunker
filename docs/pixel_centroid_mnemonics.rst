@@ -145,7 +145,7 @@ centroid plots.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_11_1.png
-   :scale: 20%
+   :scale: 60%
 
 We can see there is multiple events happening. First off, there are
 certain breaks between the timeseries, which indicates the time where
