@@ -9,67 +9,6 @@ Pixel centroid changes and mnemonics \| PID 2079 Example
     
     spk = spelunker.load('/Users/ddeal/JWST-Treasure-Chest/', pid=2079, obs_num=4, visit=1)
 
-
-.. parsed-literal::
-
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031214828-seg001_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031214828-seg002_cal.fits with expected size 43096320. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031214829-seg001_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031214829-seg002_cal.fits with expected size 53496000. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031231651-seg003_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031231651-seg004_cal.fits with expected size 31645440. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031231652-seg003_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023031231652-seg004_cal.fits with expected size 39245760. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032005233-seg005_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032005233-seg006_cal.fits with expected size 38445120. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032005234-seg005_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032005234-seg006_cal.fits with expected size 47736000. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032005730_cal.fits with expected size 5129280. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032010230_cal.fits with expected size 5137920. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032023826-seg007_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032023826-seg008_cal.fits with expected size 38488320. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032023827-seg007_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032023827-seg008_cal.fits with expected size 48216960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032040648-seg009_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032040648-seg010_cal.fits with expected size 31642560. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032040649-seg009_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032040649-seg010_cal.fits with expected size 39240000. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032054253-seg011_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032054253-seg012_cal.fits with expected size 38926080. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032054254-seg011_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032054254-seg012_cal.fits with expected size 48303360. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032054750_cal.fits with expected size 5129280. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032055311_cal.fits with expected size 5693760. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032073157-seg013_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032073157-seg014_cal.fits with expected size 41492160. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032073158-seg013_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032073158-seg014_cal.fits with expected size 51471360. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032090020-seg015_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032090020-seg016_cal.fits with expected size 31642560. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032090021-seg015_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032090021-seg016_cal.fits with expected size 39240000. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032103608-seg017_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032103608-seg018_cal.fits with expected size 38859840. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032103609-seg017_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032103609-seg018_cal.fits with expected size 48170880. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032104106_cal.fits with expected size 5137920. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032104608_cal.fits with expected size 5146560. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032122200-seg019_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032122200-seg020_cal.fits with expected size 38862720. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032122201-seg019_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032122201-seg020_cal.fits with expected size 48179520. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032135024-seg021_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032135024-seg022_cal.fits with expected size 31651200. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032135025-seg021_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032135025-seg022_cal.fits with expected size 39257280. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032152632-seg023_cal.fits with expected size 51960960. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032152632-seg024_cal.fits with expected size 38934720. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032152633-seg023_cal.fits with expected size 64540800. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032152633-seg024_cal.fits with expected size 48320640. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032153129_cal.fits with expected size 5129280. [astroquery.query]
-    INFO: Found cached file ./mastDownload/JWST/jw02079004001_02101_00001_nis/jw02079004001_gs-fg_2023032153639_cal.fits with expected size 5610240. [astroquery.query]
-
-
 .. code:: ipython3
 
     spk.mast_api_token = 'enter_mast_token_id_here'
@@ -79,8 +18,6 @@ Lets look at how many guidestars this program uses.
 .. code:: ipython3
 
     spk.object_properties
-
-
 
 
 .. raw:: html
@@ -118,8 +55,8 @@ Lets look at how many guidestars this program uses.
         <tr>
           <th>0</th>
           <td>S33T007497</td>
-          <td>5057488505467609856</td>
-          <td>5057488509763935872</td>
+          <td>2057488205467609856</td>
+          <td>2057488209763935872</td>
           <td>59975.839346</td>
           <td>59975.877272</td>
           <td>53.227801</td>
@@ -146,7 +83,7 @@ flux timeseries for the guidestar in the program.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_6_0.png
-
+   :scale: 20%
 
 We can see that there are chucks of data points that largely changes in
 flux for each chunk. Lets see how the obserbed properties of the target
@@ -208,7 +145,7 @@ centroid plots.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_11_1.png
-
+   :scale: 20%
 
 We can see there is multiple events happening. First off, there are
 certain breaks between the timeseries, which indicates the time where
@@ -252,7 +189,7 @@ into the event on the right and apply mnemonics.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_13_1.png
-
+   :scale: 20%
 
 We can clearly see that some of the centroid movement can be attributed
 to the high-gain antenna (HGA) and even events from the NIRISS Filter
@@ -263,13 +200,13 @@ guidestar for another event.
 
 .. code:: ipython3
 
-    plt.plot(gaussfit_table['x_mean'][51500:57000], linewidth=.8)
+    plt.plot(gaussfit_table['x_mean'][51200:57000], linewidth=.8)
     plt.show()
 
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_16_0.png
-
+   :scale: 20%
 
 .. code:: ipython3
 
@@ -284,6 +221,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_17_1.png
-
+   :scale: 20%
 
 .. image:: /Users/ddeal/JWST-Treasure-Chest-2023/JWST-FGS-Spelunker-Repos/JWST-FGS-Spelunker/plots/1541movie.gif
+   :scale: 20%
