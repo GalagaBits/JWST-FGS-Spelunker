@@ -1,8 +1,8 @@
 Spelunker
-======
+=========
 
-.. image:: spklogo.png
-    :align: center
+.. .. image:: spklogo.png
+..     :align: center
 
 ``spelunker`` is a package that assists and finds technical anomalies on the JWST and stellar properties from guidestars. This pipeline includes tools for
 conveniently handling guidestar data products and provides methods for investigating its potential in scientific and technical observations.
@@ -21,9 +21,22 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
     :target: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE
 
 
-.. toctree::
-   :maxdepth: 2
-   :caption: User Guide
+User Guide
+==========
 
-   user/quickstart
-   user/api
+For a quick start on how to use spelunker, go to the :doc:`Quickstart guide` <user/quickstart> .
+
+    * Installation
+    * :doc:`API` <api>
+
+Tutorials
+=========
+
+    * Guidestar Targets
+    * Pixel Centroid Mnemonics
+    * Using `spelunker` to study JWST Time Series Observations (TSOs)
+
+License & Attribution
+=====================
+
+Copyright (c) 2023 Derod Deal & Nestor Espinoza under the `MIT License <https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE>`_.
