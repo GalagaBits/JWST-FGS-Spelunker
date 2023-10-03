@@ -20,14 +20,17 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
     :target: https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE
 
+.. raw:: html
 
+   <br>
+   
 User Guide
 ==========
 
 For a quick start on how to use spelunker, go to the :doc:`Quickstart guide` <user/quickstart> .
 
     * Installation
-    * :doc:`API` <api>
+    * :doc:`API <api>`
 
 Tutorials
 =========
