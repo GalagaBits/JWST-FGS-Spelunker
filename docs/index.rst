@@ -27,7 +27,7 @@ The pipline is currently under development on `GitHub <https://github.com/Galaga
 User Guide
 ==========
 
-For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <user/quickstart>` .
+For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <user/fgs-spelunker_quickstart>` .
 
     * Installation
     * :doc:`API <api>`
