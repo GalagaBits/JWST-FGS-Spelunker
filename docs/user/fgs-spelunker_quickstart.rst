@@ -1,4 +1,4 @@
-FGS Spelunker Quickstart
+Spelunker Guidestar Tools
 ========================
 
 --------------
