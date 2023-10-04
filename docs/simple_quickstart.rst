@@ -25,11 +25,12 @@ Get started with ``spelunker`` with only two lines of code.
 
    import spelunker
 
-   spk = spelunker.load(pid=1534)
+   spk = spelunker.load(pid=1534, token='ENTER_MAST_API_TOKEN')
 
 This will download guidestar data for Program ID 1534; the ``spk``
-object itself can then be used to explore this guidestar data! For
-example, let us make a plot of the guidestar time-series for the first
+object itself can then be used to explore this guidestar data! Futhermore, you can specify
+your MAST API token with the parameter ``token`` to gain access to programs with exclusive rights.
+Let us make a plot of the guidestar time-series for the first
 minutes of this PID:
 
 .. code:: python
@@ -83,6 +84,8 @@ installed <https://github.com/spacetelescope/jwstuser/>`_.
 
    import matplotlib.pyplot as plt
 
+   # for mnemonics to work, you will need to specify a MAST API Token in spk.load
+   # or you can overwrite the existing token with the attribute spk.mast_api_token.
    spk.mast_api_token = 'insert a token from auth.MAST here'
 
    fig, ax = plt.subplots(figsize=(12,4),dpi=200)
