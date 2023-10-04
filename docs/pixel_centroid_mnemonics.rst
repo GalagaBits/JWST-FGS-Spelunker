@@ -36,7 +36,7 @@ Lets look at how many guidestars this program uses.
             text-align: right;
         }
     </style>
-    <table border="1" class="dataframe">
+    <table border="1" class="dataframe" style="width: 50%">
       <thead>
         <tr style="text-align: right;">
           <th></th>
@@ -83,7 +83,7 @@ flux timeseries for the guidestar in the program.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_6_0.png
-   :scale: 20%
+   :scale: 50%
 
 We can see that there are chucks of data points that largely changes in
 flux for each chunk. Lets see how the obserbed properties of the target
@@ -103,7 +103,7 @@ file, so we can load the table here.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_9_0.png
-
+   :scale: 40%
 
 
 
@@ -145,7 +145,7 @@ centroid plots.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_11_1.png
-   :scale: 60%
+   :scale: 50%
 
 We can see there is multiple events happening. First off, there are
 certain breaks between the timeseries, which indicates the time where
@@ -189,7 +189,7 @@ into the event on the right and apply mnemonics.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_13_1.png
-   :scale: 20%
+   :scale: 50%
 
 We can clearly see that some of the centroid movement can be attributed
 to the high-gain antenna (HGA) and even events from the NIRISS Filter
@@ -206,7 +206,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_16_0.png
-   :scale: 20%
+   :scale: 70%
 
 .. code:: ipython3
 
@@ -221,7 +221,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_17_1.png
-   :scale: 20%
+   :scale: 50%
 
-.. image:: /Users/ddeal/JWST-Treasure-Chest-2023/JWST-FGS-Spelunker-Repos/JWST-FGS-Spelunker/plots/1541movie.gif
-   :scale: 20%
+.. image:: pixel_centroid_mnemonics_files/1541movie.gif
+   :scale: 50%
