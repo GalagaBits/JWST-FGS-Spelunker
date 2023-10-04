@@ -475,7 +475,6 @@ spatial timeseries and a parameter, use
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_50_1.png
-   :scale: 50%
 
 .. code:: ipython3
 
@@ -489,7 +488,7 @@ spatial timeseries and a parameter, use
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_51_1.png
-   :scale: 50%
+   :scale: 40%
 
 Getting tables
 --------------
