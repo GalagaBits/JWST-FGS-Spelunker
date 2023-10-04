@@ -43,7 +43,8 @@ minutes of this PID:
    plt.xlabel('Time from start (minutes)')
    plt.ylabel('Counts')
 
-.. image:: simple_guidesar_files/timeseries.png
+.. image:: simple_guidestar_files/timeseries.png
+   :scale: 60%
 
 .. raw:: html
 
@@ -63,6 +64,7 @@ tracked guidestars within this Program ID:
 
 
 .. image:: simple_guidestar_files/guidestar_positions.png
+   :scale: 60%
 
 .. raw:: html
 
@@ -93,3 +95,4 @@ installed <https://github.com/spacetelescope/jwstuser/>`_.
    plt.show()
 
 .. image:: simple_guidestar_files/mnemonics.png
+   :scale: 60%
