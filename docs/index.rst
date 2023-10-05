@@ -29,7 +29,7 @@ User Guide
 
 For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <simple_quickstart>`.
 
-    * Installation
+    * :doc:`Installation <installation>`
     * :doc:`API <api>`
 
 .. toctree::
