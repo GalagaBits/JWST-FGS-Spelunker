@@ -13,12 +13,11 @@ authors:
     orcid: 0000-0001-9513-1449
     affiliation: 2
 affiliations:
- - name: Department of Astronomy, University of Florida
- P.O. Box 112055, Gainesville, FL, USA
+ - name: Department of Astronomy, University of Florida P.O. Box 112055, Gainesville, FL, USA
    index: 1
  - name: Space Telescope Science Institute, 3700 San Martin Drive, Baltimore, MD 21218, USA
    index: 2
-date: 11 November 2023
+date: 14 November 2023
 bibliography: paper.bib
 ---
 
