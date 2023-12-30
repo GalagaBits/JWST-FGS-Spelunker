@@ -151,9 +151,23 @@ class load:
 
         self.fontsize = 14
         
+        
         if pid != 'None':
             self.download(pid, obs_num=obs_num, visit=visit, visit_group=visit_group, parallel_sequence_id=parallel_sequence_id,
                           activity_number=activity_number, exposure_number=exposure_number, dir_seg=dir_seg, guider=guider, calib_level=calib_level, save=save, token = token)
+            
+            self.pid = pid
+
+            if obs_num == 'None':
+                self.obs_num = None
+            else:
+                self.obs_num = obs_num
+
+            if visit == 'None':
+                self.visit = None
+            else:
+                self.visit = visit
+            
 
     def stitcher(self, fg_timeseries):
         '''
@@ -509,7 +523,7 @@ class load:
         for i in fg_table['sliced_directory']:
             visit_group_col.append(int(i[14:16]))
             parallel_sequence_id_col.append(int(i[16]))
-            activity_num.append(int(i[17:19]))
+            activity_num.append(str(i[17:19]))
             exposure_number_col.append(int(i[20:25]))
 
             if 'seg' in i:
@@ -550,7 +564,7 @@ class load:
                 fg_table = fg_table[mask5]
 
         if activity_number != 'None':
-                mask6 = fg_table['activity_number'] == int(activity_number)
+                mask6 = fg_table['activity_number'] == str(activity_number)
                 fg_table = fg_table[mask6]
 
         if exposure_number != 'None':
@@ -735,31 +749,181 @@ class load:
         return master_table
     
 
-    def readfile(self, filename):
+    def readfile(self, pid, obs_num='None', visit='None', visit_group='None', parallel_sequence_id='None', 
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None',):
         '''
         This function opens a singular FG-GS guidestar FITS and writes attributes for ``self.fg_array``, ``self.fg_time``, and ``self.flux``. Note that if a program ID
         is previously loaded using ``load``, the attributes already created will be overwritten. Currently, ``readfile`` does not create ``fg_table`` and ``object_properties``
         attributes.
         '''
 
-        fg2 = datamodels.open(filename)
+        pid = str(pid)
 
-        all_times = np.linspace(fg2.meta.guidestar.data_start, 
-                                fg2.meta.guidestar.data_end, 
-                                fg2.data.shape[0])
+        self.pid = pid
+
+        if obs_num == 'None':
+            obs_num = '***'
+        else:
+            obs_num = str(obs_num).zfill(3)
+
+            self.obs_num = obs_num
+
+        if visit == 'None':
+            visit = '***'
+        else:
+            visit = str(visit).zfill(3)  
+
+            self.visit = visit  
         
-        all_fluxes = np.nansum(fg2.data, axis = (1,2))
+        fg_raw = sorted(glob.glob(self.directory+'/mastDownload/JWST/'+'**/jw0'+pid+obs_num+visit+'**_gs-fg_**cal.fits'))
+
+        if len(fg_raw) == 0:
+            print('\t Could not find any files with these parameters.')
+            raise Exception('No files were read for program '+str(pid))
+
+        print(fg_raw)
+        fg = []
+        sliced_directory = []
+
+        for i in fg_raw:
+                fg.append(i.rsplit('/')[-1])
+                sliced_directory.append(i.split('/')[-2])
+
+        fg_table = Table()
+
+        fg_table['filenames'] = fg
+        print(fg_table['filenames'])
+        fg_table['sliced_directory'] = sliced_directory
+
+        obs_num_col = []
+        visit_col = []
+
+        visit_group_col = []
+        parallel_sequence_id_col = []
+        activity_num = []
+        exposure_number_col = []
+        dir_segment_col = []
+        guider_col = []
+
+        for i in fg_table['filenames']:
+                obs_num_col.append(int(i[7:10]))
+                visit_col.append(int(i[10:13]))
+        # for i in fg_table['sliced_directory']:
+        #     visit_group_col.append(int(i[14:16]))
+        #     parallel_sequence_id_col.append(int(i[16]))
+        #     activity_num.append(int(i[17:19]))
+        #     exposure_number_col.append(int(i[20:25]))
+
+        #     if 'seg' in i:
+        #         dir_segment_col.append(int(i[29:32]))
+        #     else:
+        #         dir_segment_col.append(0)
+        #     if 'guider' in i:
+        #         guider_col.append(int(i[32]))
+        #     else:
+        #         guider_col.append(0)
+
+        # fg_table['visit_group'] = visit_group_col
+        # fg_table['parallel_sequence_id'] = parallel_sequence_id_col
+        # fg_table['activity_number'] = activity_num
+        # fg_table['exposure_number'] = exposure_number_col
+        # fg_table['dir_seg'] = dir_segment_col
+        # fg_table['guider'] = guider_col        
+
+        fg_table['obs_num'], fg_table['visit'] = obs_num_col, visit_col
+
+        if obs_num != '***' and visit != '***':
+                mask2 = fg_table['obs_num'] == int(obs_num)
+                fg_table = fg_table[mask2]
+
+                mask3 = fg_table['visit'] == int(visit)
+                fg_table = fg_table[mask3]
+
+        elif obs_num != '***':
+                mask2 = fg_table['obs_num'] == int(obs_num)
+
+        f_slash = []
+        mastDownload_dir = []
+        for i in range(len(fg_table['filenames'])):
+            f_slash.append('/')
+            mastDownload_dir.append(self.directory+'/mastDownload/JWST/')
+
+        print(fg_table['sliced_directory'])
+        print(f_slash)
+        print(fg_table['filenames'])
+
+        reformed_directory = np.char.add(np.char.add(fg_table['sliced_directory'], f_slash), fg_table['filenames'])
+        fg_table['reformed_directory'] = np.char.add(mastDownload_dir, reformed_directory)
+
+        gs_id = []
+        guidestar_time = []
+        object_fg = []
+
+        self.fg_datamodel = datamodels.open(list(fg_table['reformed_directory']))
+
+        for file in self.fg_datamodel:
+            gs_id.append(file.meta.guidestar.gs_id)
+            guidestar_time.append(file.meta.guidestar.data_start)
+            object_fg.append(file)
+            
+
+        fg_table['gs_id'] = gs_id
+        fg_table['guidestar_time'] = guidestar_time
+        fg_table['object_fg'] = object_fg
+        # Reads in all fits files from reformed_directory
+        #fg1 = datamodels.open(list(reformed_directory))
+
+        _ = fg_table.sort(['guidestar_time'])
+
+        self.fg_datamodel = list(fg_table['object_fg'])
+        self.fg_table = fg_table
+
+        self.fg_timeseries = [fn for fn in self.fg_datamodel]
+
+        all_times = []
+        all_fluxes = []
         
-        fg_array, fg_time, fg_flux = fg2.data, all_times, all_fluxes
+        for i in self.fg_datamodel:
+            all_times.append( np.linspace( i.meta.guidestar.data_start, 
+                               i.meta.guidestar.data_end, 
+                               i.data.shape[0])
+                )
+            all_fluxes.append( np.nansum( i.data, axis = (1,2) ) )
 
-        fg_array, fg_time, fg_flux = self.negative_flux_preprocessing(fg_array, fg_time, fg_flux)
+        ## Preprocessing
 
-        self.fg_array = fg_array
-        self.fg_time = fg_time
-        self.fg_flux = fg_flux
-        self.fg_datamodel = fg2
-        self.fg_table = None
-        self.object_properties = None
+        # https://stackoverflow.com/a/3844833
+        # If all elements in a list are the same, pass.
+        if len(set(fg_table['gs_id'])) != 1:
+
+            fg_time = self.stitcher(all_times)
+            fg_flux = self.stitcher(all_fluxes)
+            fg_array = self.stitcher(self.fg_timeseries)
+
+            fg_array, fg_time, fg_flux = self.negative_flux_preprocessing(fg_array, fg_time, fg_flux)
+
+        else:
+
+            norm_array, norm_flux = self.normalization_flux_preprocessing()
+
+            fg_time = self.stitcher(all_times)
+
+            fg_array, fg_time, fg_flux = self.negative_flux_preprocessing(norm_array, fg_time, norm_flux)
+
+        data_table = Table()
+        data_table['spatial'] = fg_array
+        data_table['time'] = fg_time
+        data_table['flux'] = fg_flux
+
+        _ = data_table.sort(['time'])
+
+        self.fg_array = data_table['spatial']
+        self.fg_time = data_table['time']
+        self.fg_flux = data_table['flux']
+        self.photometry_mask = np.ones([data_table['spatial'].shape[1], data_table['spatial'].shape[2]])
+
+        self.fg_table = self.table()
+        self.object_properties = self.object_properties_func()
 
     def time_to_sec(self, fg_time):
         '''
@@ -1294,9 +1458,8 @@ class load:
 
         return ax
    
-    def guidestar_plot(self, fov = None):
+    def guidestar_plot(self,):
         '''
-<<<<<<< HEAD
         Using astroplan, the guidestars within a given program ID are overplotted on reference stars from the Digitized Sky Survey (DSS). During a program ID, if multiple guidestars
         are used, a line is created between the positions of the guidestar.
 
@@ -1304,17 +1467,6 @@ class load:
         -------
 
             This function returns a matplotlib ``axes`` object of the guidestar plot. Additionally, the function outputs guidestar track plot.
-=======
-        Function that generates guidestar plots. If a single target is present, the default FOV is of 30 arcmin. If many targets, FOV 
-        is calculated from the dispersion of target coordinates. This can be all overriden by the input `fov` (in arcsecs).
-
-        Input
-        -----
-
-        fov : float
-            (Optional) Field of view for the plot in arcmins; default is 30 arcmin, unless there are multiple targets, in which case a FOV is estimated by 
-            default based on their distances from each other.
->>>>>>> develop
         '''
         coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
         target = SkyCoord(np.mean(coords.ra),np.mean(coords.dec),unit='deg')
@@ -1326,16 +1478,6 @@ class load:
 
         fov_radius = np.mean(distance)*u.deg + 2.5*np.std(distance)*u.deg
         fov_radius = 4 * u.deg if fov_radius > 4 * u.deg else fov_radius
-
-        if fov is None:
-
-            if fov_radius.value == 0.:
-
-                fov_radius = (30. / 60.) * u.deg
-
-        else:
-
-            fov_radius = fov * u.deg
 
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
         ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=fov_radius,)
@@ -1586,7 +1728,10 @@ class load:
                 table = self.gaussfit_results
                 time = self.fg_time
 
-        time_t, gs_xmean, gs_ymean = time, table['x_mean'].value, table['y_mean'].value
+        table['time'] = time
+        table = table[~np.isnan(table['amplitude'])]
+
+        time_t, gs_xmean, gs_ymean = table['time'].value, table['x_mean'].value, table['y_mean'].value
         gs_xstddev, gs_ystddev = table['x_stddev'].value, table['y_stddev'].value
         gs_theta, gs_amplitude = table['theta'].value, table['amplitude'].value
         gs_offset = table['offset'].value
@@ -1604,6 +1749,9 @@ class load:
         fig, ax = plt.subplots(7,1, figsize=(12,16), dpi=200)
 
         fig.tight_layout()
+
+        fig.suptitle('PID ' + str(self.pid) + ' — ' + str(self.obs_num) + ' — ' + str(self.visit) + ' — ' + 
+                     str(self.object_properties['guidestar_catalog_id'][0]), fontsize = self.fontsize)
 
         ax[0].semilogx(1/frequency_sub0, power_sub0, linewidth=.2, color='black', alpha=0.6)
         ax[1].semilogx(1/frequency_sub1, power_sub1, linewidth=.2, color='black', alpha=0.6)
@@ -1645,10 +1793,16 @@ class load:
         self.pgram_offset = pgram_table['frequency_offset'], pgram_table['power_offset']
 
         if save:
-            periodogram_dir = 'periodograms'
-            if not os.path.exists(self.directory+'/'+periodogram_dir):
-                os.makedirs(self.directory+'/'+periodogram_dir)
-            table.write(self.directory+'/'+periodogram_dir+'/'+str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
+
+            base_fname = self.object_properties['guidestar_catalog_id'][0] +\
+                    '_'+str(self.object_properties['int_start'][0])
+            
+            fig.savefig(self.directory+'/'+base_fname+'_pgram_results.png')
+
+            # periodogram_dir = 'periodograms'
+            # if not os.path.exists(self.directory+'/'+periodogram_dir):
+            #     os.makedirs(self.directory+'/'+periodogram_dir)
+            # table.write(self.directory+'/'+periodogram_dir+'/'+str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
         
         return ax
 
@@ -1842,7 +1996,7 @@ class load:
 
             header += '# Column 0: Time (JD-2400000.5)\n'
             header += '# Column 1: Total flux (Counts)\n'
-            
+
             if self.gaussfit_results is not None:
 
                 header += '# Column 2: Gaussian Amplitude (counts) \n'
@@ -1864,7 +2018,7 @@ class load:
 
                 else:
 
-                    fout.write('{0:.12f} {1:.5f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f}\n'.format(self.fg_time[j], self.fg_flux[j], 
+                    fout.write('{0:.12f} {1:.5f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f} \n'.format(self.fg_time[j], self.fg_flux[j], 
                                                                                                                    self.gaussfit_results['amplitude'].value[j],
                                                                                                                    self.gaussfit_results['x_mean'].value[j],
                                                                                                                    self.gaussfit_results['y_mean'].value[j],
@@ -1875,3 +2029,58 @@ class load:
                                                                                                                    ))
 
             fout.close()
+
+        if self.pgram_results is not None:
+
+            header = '# spelunker guidestar periodogram results\n'+\
+                    '# ---------------------------\n#\n' 
+
+            for i in range( len(self.object_properties['guidestar_catalog_id']) ):
+
+                base_fname = self.object_properties['guidestar_catalog_id'][i] +\
+                            '_'+str(self.object_properties['int_start'][0]) + '_pgram' +'.txt'
+
+                header += '# Guidestar ID: {0:} | RA: {1:.6f}, DEC: {2:.6f}\n'.format(self.object_properties['guidestar_catalog_id'][i], \
+                                                                                    self.object_properties['ra'][i], \
+                                                                                    self.object_properties['dec'][i])
+                if suffix is not None:
+
+                    base_fname = suffix + '_' +  base_fname
+
+                header += '# Column 0: Gaussian Amplitude frequency \n'
+                header += '# Column 1: Gaussian Amplitude power \n'
+                header += '# Column 2: Gaussian X location frequency \n'
+                header += '# Column 3: Gaussian X location power \n'
+                header += '# Column 4: Gaussian Y location frequency \n'
+                header += '# Column 5: Gaussian Y location power \n'
+                header += '# Column 6: Gaussian stdev X frequency \n'
+                header += '# Column 7: Gaussian stdev X power \n'
+                header += '# Column 8: Gaussian stdev Y frequency \n'
+                header += '# Column 9: Gaussian stdev Y power \n'
+                header += '# Column 10: Gaussian theta frequency\n'
+                header += '# Column 11: Gaussian theta power\n'
+                header += '# Column 12: Background counts frequency \n'
+                header += '# Column 13: Background counts power\n'
+
+                fout = open(self.directory+'/'+base_fname, 'w')
+                fout.write(header)
+
+                for j in range( len(self.pgram_results) ):
+                        fout.write('{0:.12f} {1:.12f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f}\n'.format( 
+                                                                                                                    self.pgram_results['frequency_amplitude'].value[j],
+                                                                                                                    self.pgram_results['power_amplitude'].value[j],
+                                                                                                                    self.pgram_results['frequency_x_mean'].value[j],
+                                                                                                                    self.pgram_results['power_x_mean'].value[j],
+                                                                                                                    self.pgram_results['frequency_y_mean'].value[j],
+                                                                                                                    self.pgram_results['power_y_mean'].value[j],
+                                                                                                                    self.pgram_results['frequency_x_stddev'].value[j],
+                                                                                                                    self.pgram_results['power_x_stddev'].value[j],
+                                                                                                                    self.pgram_results['frequency_y_stddev'].value[j],
+                                                                                                                    self.pgram_results['power_y_stddev'].value[j],
+                                                                                                                    self.pgram_results['frequency_theta'].value[j],
+                                                                                                                    self.pgram_results['power_theta'].value[j],
+                                                                                                                    self.pgram_results['frequency_offset'].value[j],
+                                                                                                                    self.pgram_results['power_offset'].value[j],
+                                                                                                                    ))
+
+                fout.close()
