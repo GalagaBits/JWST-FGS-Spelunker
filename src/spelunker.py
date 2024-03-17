@@ -284,16 +284,7 @@ class load:
 
         '''
 
-        neg_elements = []
-        for idx ,i in enumerate(fg_flux):
-            if i < 0:
-                neg_elements.append(idx)
-
-        idx_array = np.arange(len(fg_flux))
-        bool_mask = np.full(len(fg_flux), True)
-
-        for i in neg_elements:
-            bool_mask[i] = False
+        bool_mask = fg_flux >= 0
 
         fg_array = fg_array[bool_mask]
         fg_time = fg_time[bool_mask]
