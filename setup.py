@@ -23,5 +23,5 @@ setup(name='spelunker',
       requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray'],
       install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray', 'wheel'],
       keywords='guidestars',
-      python_requires='>=3.0',
+      python_requires='>=3.10',
       zip_safe=False)
