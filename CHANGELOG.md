@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+## [1.1.1] - 2023-03-17 (Current release)
+- Changed `python_requires` to 3.10.
+- Removed dashboard.py
+- Small optimizations to the source code.
+- Added jwstuser to dependencies list.
+
 
 ## [1.0.3] - (Unreleased)
 ### Added
@@ -14,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed bug on `guidestar_plot()` which didn't work for single targets.
 
-## [1.0.2] - 2023-09-01 (Current release)
+## [1.0.2] - 2023-09-01 
 ### Added
 - Photometry can now be optimized with a mask. `spk.optimize_photometry()` does the trick via an automatic mask generation; 
   a manual mask can also be passed instead via `spk.optimize_photometry(mask = mask)`. TODO: handle optimal masks for 
