@@ -7,3 +7,4 @@ astropy
 astroplan
 matplotlib
 ray
+sphinx_rtd_theme
