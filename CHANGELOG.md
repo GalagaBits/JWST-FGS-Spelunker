@@ -4,12 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
-## [1.1.1] - 2023-03-17 (Current release)
+
+## [1.1.4] - 2023-03-18 (Current release)
+
+- Updates to `object_properties_func`.
+
+## [1.1.3] - 2023-03-17
+
+- Updates to `object_properties_func`.
+
+## [1.1.2] - 2023-03-17 
+
+- Updates to `object_properties_func`.
+
+## [1.1.1] - 2023-03-17 
 - Changed `python_requires` to 3.10.
 - Removed dashboard.py
 - Small optimizations to the source code.
 - Added jwstuser to dependencies list.
-- Changes to object properties table: Instead of GAIAdr1sourceID, and GAIAdr2sourceID, only GAIAdr3sourceID will be listed. There were some changes in the source Spelunker uses to get the GAIA ID, that being https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx... The parameters GAIAdr1sourceID and GAIAdr2sourceID no longer exist and has been replaced by GAIAdr3sourceID.
+- Changes to object properties table: Instead of GAIAdr1sourceID, and GAIAdr2sourceID, only GAIAdr3sourceID will be listed. There were some changes in the source Spelunker uses to get the GAIA ID, that being https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx... The parameters GAIAdr1sourceID and GAIAdr2sourceID no longer exist and has been replaced by GAIAdr3sourceID. 
+
+- Updated installation guide to include `jwstuser` instructions.
+- Changed the readthdocs theme to be more user friendly
 
 
 ## [1.0.3] - (Unreleased)
