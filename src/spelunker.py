@@ -1742,7 +1742,7 @@ class load:
         fig.tight_layout()
 
         fig.suptitle('PID ' + str(self.pid) + ' — ' + str(self.obs_num) + ' — ' + str(self.visit) + ' — ' + 
-                        dstr(self.object_properties['guidestar_catalog_id'][0]), fontsize = self.fontsize)
+                        str(self.object_properties['guidestar_catalog_id'][0]), fontsize = self.fontsize)
 
         ax[0].semilogx(1/frequency_sub0, power_sub0, linewidth=.2, color='black', alpha=0.6)
         ax[1].semilogx(1/frequency_sub1, power_sub1, linewidth=.2, color='black', alpha=0.6)
