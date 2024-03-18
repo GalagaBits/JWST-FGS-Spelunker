@@ -24,5 +24,5 @@ Additonally, you can refer to the `GitHub repository <https://github.com/GalagaB
 JWST User Toolkit (`jwstuser`)
 ******************************
 
-To use the `mnemonics` engineering telemetry features of Spelunker, the python toolkit `jwstuser` will need to be installed as well.
-Follow the instructions on `https://github.com/spacetelescope/jwstuser <https://github.com/spacetelescope/jwstuser>`_ to install `jwstuser`.
+To use the `mnemonics` engineering telemetry features of Spelunker, the python toolkit ``jwstuser`` will need to be installed as well.
+Follow the instructions on `https://github.com/spacetelescope/jwstuser <https://github.com/spacetelescope/jwstuser>`_ to install ``jwstuser``.
