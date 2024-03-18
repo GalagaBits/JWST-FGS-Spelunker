@@ -1,5 +1,4 @@
 from ._version import __version__
-__all__ = ['spelunker', 'dashboard']
+__all__ = ['spelunker']
 
 from .spelunker import *
-from .dashboard import *
