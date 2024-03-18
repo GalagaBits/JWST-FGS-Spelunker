@@ -697,8 +697,8 @@ class load:
 
                 row.append(self.fg_table['ra'][idx])
                 row.append(self.fg_table['dec'][idx])
-                row.append(self.fg_table['TmassJMag'][idx])
-                row.append(self.fg_table['TmassHMag'][idx])
+                row.append(self.fg_table['TmassJmag'][idx])
+                row.append(self.fg_table['TmassHmag'][idx])
 
                 object_table.loc[idx] = (row)
 
