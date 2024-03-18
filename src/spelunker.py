@@ -674,7 +674,7 @@ class load:
         function.
         '''
 
-        object_table = pd.DataFrame(columns=['guidestar_catalog_id', 'gaiadr1ID','gaiadr2ID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
+        object_table = pd.DataFrame(columns=['guidestar_catalog_id','GAIAdr3sourceID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
 
         for idx, gs_id in enumerate(self.fg_table['gs_id']):
 
@@ -683,8 +683,7 @@ class load:
             if gs_id not in list(object_table['guidestar_catalog_id']):
 
                 row.append(self.fg_table['gs_id'][idx])
-                row.append(self.fg_table['GAIAdr1sourceID'][idx])
-                row.append(self.fg_table['GAIAdr2sourceID'][idx])
+                row.append(self.fg_table['GAIAdr3sourceID'][idx])
 
                 all_times = []
                 all_times.append( np.linspace( self.fg_datamodel[idx].meta.guidestar.data_start, 
@@ -1524,7 +1523,7 @@ class load:
 
         if not jwstuser_installed:
             raise ImportError("jwstuser needs to be installed before using the mnemonics function. Visit https://github.com/spacetelescope/jwstuser for installation instructions.")
-        if self.mast_api_token == None:
+        if self.mast_api_token is None:
             raise ImportError('The mast_api_token is not set. To set the token, use self.mast_api_token = token.')
 
         self.EDB = engdb.EngineeringDatabase(mast_api_token = self.mast_api_token)

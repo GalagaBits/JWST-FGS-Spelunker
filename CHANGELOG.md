@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed dashboard.py
 - Small optimizations to the source code.
 - Added jwstuser to dependencies list.
+- Changes to object properties table: Instead of GAIAdr1sourceID, and GAIAdr2sourceID, only GAIAdr3sourceID will be listed. There were some changes in the source Spelunker uses to get the GAIA ID, that being https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx... The parameters GAIAdr1sourceID and GAIAdr2sourceID no longer exist and has been replaced by GAIAdr3sourceID.
 
 
 ## [1.0.3] - (Unreleased)
