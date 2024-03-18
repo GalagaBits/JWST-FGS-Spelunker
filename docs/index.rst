@@ -3,7 +3,7 @@ Spelunker
 
 .. image:: spelunker.png
     :align: center
-    :scale: 8%
+    :scale: 7%
 
 ``spelunker`` is a package that assists and finds technical anomalies on the JWST and stellar properties from guidestars. This pipeline includes tools for
 conveniently handling guidestar data products and provides methods for investigating its potential in scientific and technical observations.
