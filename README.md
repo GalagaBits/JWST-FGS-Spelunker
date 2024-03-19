@@ -82,6 +82,7 @@ For more information on the tools under `spelunker` and how to get started, visi
 - [Pixel centroid changes and mnemonics](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/examples/pixel_centroid_mnemonics.ipynb)
 - [TSOS Guidestar Demo](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/fgs-spelunker-and-tsos.ipynb)
 
+This software is currently under development on [GitHub](https://github.com). To report bugs or to send feature requests, send us an email or [open an issue](https://github.com/GalagaBits/JWST-FGS-Spelunker/issues) on GitHub.
 
 ## Licence and attribution
 

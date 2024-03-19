@@ -53,9 +53,9 @@ Tutorials
     * Pixel Centroid Mnemonics
     * Using ``spelunker`` to study :doc:`JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
 
+This software is currently under development on [GitHub](https://github.com). To report bugs or to send feature requests, send us an email or [open an issue](https://github.com/GalagaBits/JWST-FGS-Spelunker/issues) on GitHub.
+
 License & Attribution
 =====================
 
 Copyright (c) 2023 Derod Deal & Nestor Espinoza under the `MIT License <https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE>`_.
-
-* :ref:`modindex`
