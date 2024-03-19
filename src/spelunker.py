@@ -1473,6 +1473,8 @@ class load:
         fov_radius = np.mean(distance)*u.deg + 2.5*np.std(distance)*u.deg
         fov_radius = 4 * u.deg if fov_radius > 4 * u.deg else fov_radius
 
+        if fov_radius.value == 0: fov_radius = 2*u.deg # from https://github.com/GalagaBits/JWST-FGS-Spelunker/issues/19
+
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
         ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=fov_radius,)
 
