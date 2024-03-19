@@ -25,4 +25,4 @@ jobs:
         run: pip install spelunker  
 
       - name: Run general_test.py
-        run: python general_test.py  
+        run: python testing/general_test.py
