@@ -48,7 +48,7 @@ minutes of this PID:
    plt.ylabel('Counts')
 
 .. image:: simple_guidestar_files/timeseries.png
-   :width: 300pt
+   :width: 500pt
    :align: center
 
 .. raw:: html
