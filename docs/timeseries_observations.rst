@@ -7,4 +7,3 @@ Our package ``Spelunker`` can perform TSOs of guidestar data.
    :maxdepth: 1
 
     Using ``spelunker`` to study JWST Time Series Observations <user/fgs-spelunker-and-tsos>
-    Optimizing photometry with pixel level decorrelation (PLD) <optimizing_photometry>
