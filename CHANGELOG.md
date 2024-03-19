@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.6] - 2023-03-18 (Current release)
+
+- Fixed an issue where the searching the guidestar catalog with certain guidestars IDs will not be found, thus breaking `spelunker.load`. 
+
 ## [1.1.5] - 2023-03-18 (Current release)
 
 - Updates to `object_properties_func`.

@@ -724,8 +724,11 @@ class load:
         meta_table = Table()
 
         for gs_id in self.fg_table['gs_id']:
-            data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+gs_id+'&format=csv', skiprows=[0])
-            
+            try:
+                data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+gs_id+'&format=csv', skiprows=[0])
+            except:
+                print('Could not search for guidestar ID ' + str(gs_id) +'. It is probably no longer in the following catalog: https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+str(gs_id)+'&format=csv')
+
             for k in data.keys():
                 meta_table[k] = [data[k].values[0]]
 
