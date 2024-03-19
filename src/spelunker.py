@@ -726,13 +726,14 @@ class load:
         for gs_id in self.fg_table['gs_id']:
             try:
                 data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+gs_id+'&format=csv', skiprows=[0])
+                for k in data.keys():
+                    meta_table[k] = [data[k].values[0]]
+                meta_table_df.loc[len(meta_table_df)] = (list(meta_table[0]))
             except:
-                print('Could not search for guidestar ID ' + str(gs_id) +'. It is probably no longer in the following catalog: https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+str(gs_id)+'&format=csv')
-
-            for k in data.keys():
-                meta_table[k] = [data[k].values[0]]
-
-            meta_table_df.loc[len(meta_table_df)] = (list(meta_table[0]))
+                print('Could not search for guidestar ID ' + str(gs_id)+'. It is probably no longer in the following catalog: https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+str(gs_id)+'&format=csv')
+                empty_strings = [''] * len(names)
+                empty_strings[0] = str(gs_id)
+                meta_table_df.loc[len(meta_table_df)] = empty_strings
 
 
         master_meta_table = Table.from_pandas(meta_table_df)
