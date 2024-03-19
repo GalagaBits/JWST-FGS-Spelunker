@@ -19,7 +19,7 @@ setup(name='spelunker',
       license='MIT',
       packages=['spelunker'],
       package_dir={'spelunker': 'src'},
-      install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray', 'jwstuser@git+https://github.com/spacetelescope/jwstuser.git', 'wheel'],
+      install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray', 'wheel'],
       keywords='guidestars',
       python_requires='>=3.10',
       zip_safe=False)

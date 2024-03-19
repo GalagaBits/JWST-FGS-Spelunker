@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.7] - 2023-03-19 (Current release)
+## [1.1.8] - 2023-03-19 (Current release)
+
+- Added `if fov_radius.value == 0: fov_radius = 2*u.deg` to `spelunker.load.guidestar_plot` as recommended by @hdiamondlowe from issue #19.
+- Added GitHub actions for `general_test.py`.
+
+## [1.1.7] - 2023-03-19
 
 - Added `jwstuser` to `setup.py`.
 
