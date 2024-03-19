@@ -5,3 +5,4 @@ Optimizing Guidestar Photometry
 
 .. autoclass:: spelunker.load.optimize_photometry
    :members:
+   :noindex:
