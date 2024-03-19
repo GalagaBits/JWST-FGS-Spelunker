@@ -60,8 +60,15 @@ minutes of this PID:
    </p>
 
 (See below on more information that can be extracted, including fitting
-2D gaussians to each FGS integration!). We can even make a plot of the
-tracked guidestars within this Program ID:
+2D gaussians to each FGS integration!). 
+
+We can even make a plot of the tracked guidestars within this Program ID. Within 
+a selected Program ID, multiple guidestars could be used for each observation. Each 
+star or object comes from the Guide Star Catalog (GSC) and is pre-selected depending on 
+`telescope pointing and suitability of the star <https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-guide-stars>`_. 
+In the generated figure from ``spk.guidestar_plot``, the guidestar positions (marked with an X) 
+in the given Program ID are plotted from the *START* to the end of the program. A 
+line (``gs track``) is traced between each guidestar to order each used target overtime.
 
 .. code:: python
 

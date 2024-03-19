@@ -49,7 +49,9 @@ plt.ylabel('Counts')
     <img src="plots/timeseries.png"  width=100% height=80%>
 </p>
 
-(See below on more information that can be extracted, including fitting 2D gaussians to each FGS integration!). We can even make a plot of the tracked guidestars within this Program ID:
+(See below on more information that can be extracted, including fitting 2D gaussians to each FGS integration!). 
+
+We can even make a plot of the tracked guidestars within this Program ID. Within a selected Program ID, multiple guidestars could be used for each observation. Each star or object comes from the Guide Star Catalog (GSC) and is pre-selected depending on [telescope pointing and suitability of the star](https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-guide-stars). In the generated figure from `spk.guidestar_plot`, the guidestar positions (marked with an X) in the given Program ID are plotted from the *START* to the end of the program. A line (`gs track`) is traced between each guidestar to order each used target overtime.
 
 ```python
 spk.guidestar_plot()
@@ -58,7 +60,9 @@ spk.guidestar_plot()
     <img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/guidestar_positions.png"  width=80% height=80%>
 </p>
 
-Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or to identify if the FGS tracks a new guidestar [if the `jwstuser` package is also installed](https://github.com/spacetelescope/jwstuser/):
+
+
+Mnemonics from JWST technical events can be overplotted on any timeseries, such as high-gain antenna (HGA) movement or to identify if the FGS tracks a new guidestar [if the `jwstuser` package is also installed](https://github.com/spacetelescope/jwstuser/). Here, use `spk.mnemonics` to access engineering telemetry for `SA_ZHAGUPST` as a matplotlib `axes` object:
 
 ```python
 import matplotlib.pyplot as plt
@@ -67,13 +71,16 @@ spk.mast_api_token = 'insert a token from auth.MAST here'
 
 fig, ax = plt.subplots(figsize=(12,4),dpi=200)
 
-ax = spk.mnemonics_local('GUIDESTAR')
-ax = spk.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9) 
+ax = spk.mnemonics_local('GUIDESTAR') # plots when the JWST tracks onto a new guidestars as a vertical line
+ax = spk.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9) # plots the start and end of high gain antenna movement
+
 ax.plot(spk.fg_time, spk.fg_flux)
 plt.legend(loc=3)
 plt.xlim(60067.84, 60067.9)
 plt.show()
 ```
+
+
 <img src="https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/plots/mnemonics.png">
 
 For more information on the tools under `spelunker` and how to get started, visit the [quickstart guide](https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/notebooks/fgs-spelunker_quickstart.ipynb) or checkout our [readthedocs](https://jwst-fgs-spelunker.readthedocs.io). Get acquainted with `spelunker` with the following example notebooks:
