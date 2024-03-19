@@ -38,14 +38,18 @@ minutes of this PID:
    import matplotlib.pyplot as plt
 
    # Convert times from MJD to minutes:
-   plt.plot( ( spk.fg_time - spk.fg_time[0] ) * 24 * 60, spk.fg_flux )
+   fig, ax = plt.subplots(figsize=(6,2), dpi=200)
+
+   plt.plot( ( spk.fg_time - spk.fg_time[0] ) * 24 * 60, spk.fg_flux, color='black', linewidth=0.2 )
 
    plt.xlim(0,10)
+   plt.ylim(830000,950000)
    plt.xlabel('Time from start (minutes)')
    plt.ylabel('Counts')
 
 .. image:: simple_guidestar_files/timeseries.png
-   :scale: 60%
+   :width: 300pt
+   :align: center
 
 .. raw:: html
 
