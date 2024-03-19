@@ -57,3 +57,5 @@ License & Attribution
 =====================
 
 Copyright (c) 2023 Derod Deal & Nestor Espinoza under the `MIT License <https://github.com/GalagaBits/JWST-FGS-Spelunker/blob/main/LICENSE>`_.
+
+* :ref:`modindex`
