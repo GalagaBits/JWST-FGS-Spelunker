@@ -1462,7 +1462,9 @@ class load:
 
             This function returns a matplotlib ``axes`` object of the guidestar plot. Additionally, the function outputs guidestar track plot.
         '''
-        coords = SkyCoord(self.object_properties['ra'], self.object_properties['dec'], unit='deg')
+        filted_properties = self.object_properties[self.object_properties['ra'].astype(bool)]
+
+        coords = SkyCoord(filted_properties['ra'], filted_properties['dec'], unit='deg')
         target = SkyCoord(np.mean(coords.ra),np.mean(coords.dec),unit='deg')
 
         distance = []
@@ -1470,8 +1472,8 @@ class load:
             distance.append(np.sqrt(  (target.ra.value - coord.ra.value)**2
                                 + (target.dec.value - coord.dec.value)**2  ))
 
-        fov_radius = np.mean(distance)*u.deg + 2.5*np.std(distance)*u.deg
-        fov_radius = 4 * u.deg if fov_radius > 4 * u.deg else fov_radius
+        fov_radius = 0.5*np.mean(distance)*u.deg + 1*np.std(distance)*u.deg
+        fov_radius = 3 * u.deg if fov_radius > 3 * u.deg else fov_radius
 
         if fov_radius.value == 0: fov_radius = 2*u.deg # from https://github.com/GalagaBits/JWST-FGS-Spelunker/issues/19
 
@@ -1480,8 +1482,8 @@ class load:
 
         ax1.set_axis_off()
 
-        ax.scatter(coords.ra, coords.dec,  color='darkorange', marker='x', s=100, linewidth=1.5, transform=ax.get_transform('fk5'), label='guidestars')
-        ax.plot(coords.ra, coords.dec,  color='gold', linewidth=1, transform=ax.get_transform('fk5'), label='gs track')
+        ax.scatter(coords.ra, coords.dec,  color='darkorange',marker='$\u25EF$', s=160, linewidth=0.5, alpha=0.4, transform=ax.get_transform('fk5'), label='guidestars')
+        ax.plot(coords.ra, coords.dec,  color='orange', linewidth=1.2, alpha = 0.3, transform=ax.get_transform('fk5'), label='gs track')
         ax.text(coords.ra[0].value, coords.dec[0].value, s='start   ', horizontalalignment='right' , verticalalignment='center', weight='bold', transform=ax.get_transform('fk5'),)
 
         ax.set_title("Guidestar positions — "+str(self.pid))

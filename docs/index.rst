@@ -42,7 +42,7 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <sim
    Quickstart <simple_quickstart>
    Time Series Observations (TSO) <timeseries_observations>
    Engineering Telemetry <engineering_telemetry>
-   Spelunker Tools <user/fgs-spelunker_quickstart>
+   Exploring Spelunker tools and features <user/fgs-spelunker_quickstart>
    API <api>
 
 
