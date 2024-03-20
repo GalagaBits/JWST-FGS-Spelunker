@@ -1,4 +1,4 @@
-Spelunker Guidestar Tools
+Exploring Spelunker tools and features
 ========================
 
 --------------

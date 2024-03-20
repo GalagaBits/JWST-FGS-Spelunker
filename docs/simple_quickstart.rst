@@ -89,7 +89,10 @@ line (``gs track``) is traced between each guidestar to order each used target o
 Mnemonics from JWST technical events can be overplotted on any
 timeseries, such as high-gain antenna (HGA) movement or to identify if
 the FGS tracks a new guidestar if the `jwstuser package is also
-installed <https://github.com/spacetelescope/jwstuser/>`_.
+installed <https://github.com/spacetelescope/jwstuser/>`_.  Here, use 
+`spk.mnemonics` to access engineering telemetry for `SA_ZHAGUPST` as 
+a matplotlib `axes` object:
+
 
 .. code:: python
 
@@ -101,8 +104,9 @@ installed <https://github.com/spacetelescope/jwstuser/>`_.
 
    fig, ax = plt.subplots(figsize=(12,4),dpi=200)
 
-   ax = spk.mnemonics_local('GUIDESTAR')
-   ax = spk.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9) 
+   ax = spk.mnemonics_local('GUIDESTAR') # plots when the JWST tracks onto a new guidestars as a vertical line
+   ax = spk.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9) # plots the start and end of high gain antenna movement
+   
    ax.plot(spk.fg_time, spk.fg_flux)
    plt.legend(loc=3)
    plt.xlim(60067.84, 60067.9)
