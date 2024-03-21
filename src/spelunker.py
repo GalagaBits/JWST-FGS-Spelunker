@@ -1472,7 +1472,7 @@ class load:
             distance.append(np.sqrt(  (target.ra.value - coord.ra.value)**2
                                 + (target.dec.value - coord.dec.value)**2  ))
 
-        fov_radius = 0.5*np.mean(distance)*u.deg + 1*np.std(distance)*u.deg
+        fov_radius = 1*np.mean(distance)*u.deg + 1*np.std(distance)*u.deg
         fov_radius = 3 * u.deg if fov_radius > 3 * u.deg else fov_radius
 
         if fov_radius.value == 0: fov_radius = 2*u.deg # from https://github.com/GalagaBits/JWST-FGS-Spelunker/issues/19
