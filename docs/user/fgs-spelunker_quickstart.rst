@@ -334,7 +334,7 @@ object of a given timeseries.
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_35_0.png
-   :scale: 50%
+   :width: 800pt
 
 Within guidestar data, changes in the PSF can impact the observed flux
 of the star. Certain events might see changes in all fitted parameters.
@@ -349,7 +349,7 @@ position, brightness, and FWHM overtime.
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_37_0.png
-   :scale: 50%
+   :width: 800pt
 
 Periodograms
 ------------
@@ -376,13 +376,26 @@ figure with the same method.
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_41_0.png
-   :scale: 50%
+   :width: 800pt
 
 To get the frequency and power for each fitted parameter, use
-``spk.pgram_{parameter}``. > Available parameters: > -
-``spk.pgram_amplitude`` > - ``spk.pgram_x_mean`` > -
-``spk.pgram_y_mean`` > - ``spk.pgram_x_stddev`` > -
-``spk.pgram_y_stddev`` > - ``spk.pgram_theta`` > - ``spk.pgram_offset``
+``spk.pgram_{parameter}``. 
+
+Available parameters: 
+
+- ``spk.pgram_amplitude`` 
+
+- ``spk.pgram_x_mean``
+  
+- ``spk.pgram_y_mean``
+  
+- ``spk.pgram_x_stddev``
+  
+- ``spk.pgram_y_stddev``
+  
+- ``spk.pgram_theta``
+  
+- ``spk.pgram_offset``
 
 .. code:: python
 
@@ -410,13 +423,16 @@ changes in flux or other guidestar properties. We can overlay these
 events onto fitted parameters using ``mnemonics`` and
 ``mnemonics_plot``. You will need a MAST API token to use ``mnemonics``,
 as well as the ``jwstuser`` package: 
+
 - https://auth.mast.stsci.edu/docs/
 (MAST API TOKEN) 
 - https://github.com/spacetelescope/jwstuser/tree/main
 (jwstuser)
 
    Current supported mnemonics: 
+
    - *SA_ZHGAUPST* (high-gain antenna),
+
    - *INIS_FWMTRCURR* (NIRISS Filter Wheel Motor Current).
 
 There are thousands of different mnemonics to explore on https://mast.stsci.edu/viz/api/v0.1/info/mnemonics. Use `spk.mnemonics` to try
@@ -448,7 +464,7 @@ the mnemonics you are interested in comparing with any JWST data, not just guide
 
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_47_1.png
-   :scale: 50%
+   :width: 800pt
 
 If you do have a MAST API token, you will have access to any program under that token.
 
@@ -497,7 +513,7 @@ spatial timeseries and a parameter, use
 
 
 .. image:: fgs-spelunker_quickstart_files/movie.gif
-   :scale: 40%
+   :width: 800pt
 
 Getting tables
 --------------
