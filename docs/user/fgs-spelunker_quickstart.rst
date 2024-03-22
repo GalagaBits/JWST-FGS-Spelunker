@@ -6,7 +6,7 @@ Exploring Spelunker tools and features
 **Authors:** Derod Deal (dealderod@ufl.edu), Néstor Espinoza
 (nespinoza@stsci.edu) \| **Last update:** July 24, 2023
 
-**Program version:** ver. 1.0.1
+**Program version:** ver. 1.1.9
 
 The JWST telescope carries four different instruments: NIRCam, NIRSpec,
 MIRI and FGS/NIRISS — the latter containing the Fine Guidance Sensor
@@ -40,13 +40,6 @@ Getting started
 To get started with FGS Spelunker, first call ``spelunker.load`` into a
 variable while setting a given Program ID.
 
-.. code:: ipython3
-
-    import os
-    import sys
-    os.chdir('/Users/ddeal/JWST-Treasure-Chest/')
-    sys.path.append('/Users/ddeal/JWST-FGS-Spelunker/JWST-FGS-spk-main/src/')
-
 .. code:: python
 
    import spelunker
@@ -54,7 +47,7 @@ variable while setting a given Program ID.
 
 Calling load without the pid parameter ``spelunker.load()`` will
 initialize ``spelunker`` without downloading any of the files. This is
-useful if you already have timeseries arrays to work with.
+useful if you already have guidestar FITS available locally.
 
 Downloading data
 ----------------
@@ -69,7 +62,7 @@ saved. You can define your own directory by using ``dir=``.
    exclusive access period or are available publicly
    (https://jwst-docs.stsci.edu/accessing-jwst-data/jwst-data-retrieval/data-access-policy#DataAccessPolicy-Exclusiveaccessperiod).
 
-.. code:: ipython3
+.. code:: python
 
     import spelunker
     spk = spelunker.load(dir='/Users/ddeal/JWST-Treasure-Chest/', pid='1534')
@@ -112,7 +105,7 @@ directory and create a 2D array of the guidestar data as well as an
 array of time and a flux timeseries. The same parameters work with
 ``spelunker.load``.
 
-.. code:: ipython3
+.. code:: python
 
     spk2 = spelunker.load(pid=1534, obs_num='2', visit='1', calib_level=2)
     spk2.download(1534, obs_num='2', visit='2', calib_level=2) # This overwrites the object data in spk2 with data from the input parameters
@@ -153,7 +146,7 @@ and flux arrays for all FITS files images under the specified Program
 ID. Use the attributes ``spk.fg_array``, ``spk.fg_time``, and
 ``spk.fg_flux`` to access the arrays.
 
-.. code:: ipython3
+.. code:: python
 
     spk2.fg_array.shape, spk2.fg_time.shape, spk2.fg_flux.shape
 
@@ -172,15 +165,19 @@ parameter, ``spk.download`` will automatically stitch the data from the
 files into an array based on the date and time for each file, along with
 the time and flux arrays.
 
-FGS Spelunker can also handle single fits files already stored locally
+FGS Spelunker can also handle guidestar FITS already stored locally
 by using:
 
 .. code:: python
 
-   spk2.readfile('/Users/ddeal/Spelunker-older/JWST-Treasure-Chest-2023/mastDownload/JWST/jw01534001001_03101_00001_guider1/jw01534001001_gs-fg_2022340000825_cal.fits')
+   spk2 = spelunker.load()
+   spk2.readfile(pid=1534)
 
-   Currently, ``spk.readfile()`` does not support the folling
-   attributes: - ``fg_table``, - ``object_properties``.
+
+Any files under the initialized directory and specified Program ID, observation number, and visit number will be loaded into `spk2`.
+
+    `spelunker.load.readfile` now has access to the same attributes as `spelunker.load.download`. So, using `spk.object_properties` and `spk.fg_table`
+    will work.
 
 Spatial fitting guide stars
 ---------------------------
@@ -206,7 +203,7 @@ all guidestar fine guidence products).
 
    spk.gauss2d_fit() # ncpus sets the number of cpu cores your computer has. Defaults to 4 cores.
 
-.. code:: ipython3
+.. code:: python
 
     # We are going to limit the amount of frames that we input into gauss2d_fit and other methods
     # since the gauss2d_fit can take a few houts for very large arrays.
@@ -214,7 +211,7 @@ all guidestar fine guidence products).
     spk.fg_flux = spk.fg_flux[0:10000]
     spk.fg_time = spk.fg_time[0:10000]
 
-.. code:: ipython3
+.. code:: python
 
     table_gauss_fit = spk.gauss2d_fit(ncpus=6) 
 
@@ -228,7 +225,7 @@ The ``gauss2d_fit`` function outputs an astropy table, which can bee
 accessed with the ``spk.gaussfit_results`` attribute. If ``gauss2d_fit``
 fails to fit a frame, it will return ``nan`` for that frame.
 
-.. code:: ipython3
+.. code:: python
 
     spk.gaussfit_results
 
@@ -278,11 +275,11 @@ the x and y pixel locations and standard deviations as an astropy table
 using centroid and variance calculations. To perform quick fitting, run
 ``quick_fit`` with an appropriate array.
 
-.. code:: ipython3
+.. code:: python
 
     table_quick_fit = spk.quick_fit()
 
-.. code:: ipython3
+.. code:: python
 
     spk.quickfit_results
 
@@ -327,7 +324,7 @@ We can plot a timeseries of a given parameter or flux from guidestars.
 The method ``timeseries_binned_plot`` will generate a matplotlib axes
 object of a given timeseries.
 
-.. code:: ipython3
+.. code:: python
 
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize = (12,4), dpi=200)
@@ -345,7 +342,7 @@ In this case, subplots of each parameter will provide more information
 to the user about the event, giving them the change of guidestar
 position, brightness, and FWHM overtime.
 
-.. code:: ipython3
+.. code:: python
 
     ax = spk.timeseries_list_plot()
 
@@ -372,7 +369,7 @@ each fitted parameter, use ``periodogram``. The periodograms for each
 given parameter from a fit can be conveniently plotted in a single
 figure with the same method.
 
-.. code:: ipython3
+.. code:: python
 
     ax = spk.periodogram()
 
@@ -387,7 +384,7 @@ To get the frequency and power for each fitted parameter, use
 ``spk.pgram_y_mean`` > - ``spk.pgram_x_stddev`` > -
 ``spk.pgram_y_stddev`` > - ``spk.pgram_theta`` > - ``spk.pgram_offset``
 
-.. code:: ipython3
+.. code:: python
 
     freq = spk.pgram_x_mean[0] # periodogram frequency
     power = spk.pgram_x_mean[1] # periodogram power
@@ -412,27 +409,33 @@ high gain antenna or filter changes in NIRCAM can cause noticeable
 changes in flux or other guidestar properties. We can overlay these
 events onto fitted parameters using ``mnemonics`` and
 ``mnemonics_plot``. You will need a MAST API token to use ``mnemonics``,
-as well as the ``jwstuser`` package. - https://auth.mast.stsci.edu/docs/
-(MAST API TOKEN) - https://github.com/spacetelescope/jwstuser/tree/main
+as well as the ``jwstuser`` package: 
+- https://auth.mast.stsci.edu/docs/
+(MAST API TOKEN) 
+- https://github.com/spacetelescope/jwstuser/tree/main
 (jwstuser)
 
-   Current supported mnemonics: *SA_ZHGAUPST* (high-gain antenna),
-   *INIS_FWMTRCURR* (NIRISS Filter Wheel Motor Current).
+   Current supported mnemonics: 
+   - *SA_ZHGAUPST* (high-gain antenna),
+   - *INIS_FWMTRCURR* (NIRISS Filter Wheel Motor Current).
 
-.. code:: ipython3
+There are thousands of different mnemonics to explore on https://mast.stsci.edu/viz/api/v0.1/info/mnemonics. Use `spk.mnemonics` to try
+the mnemonics you are interested in comparing with any JWST data, not just guidestars from the FGS.
+
+.. code:: python
 
     spk2 = spelunker.load('/Users/ddeal/JWST-Treasure-Chest/', pid=1534)
 
 
 
-.. code:: ipython3
+.. code:: python
 
     spk2.mast_api_token = 'enter_mast_token_id_here' # input mast_api token here!
     
     fig, ax = plt.subplots(figsize=(12,4),dpi=200)
     
-    ax = spk2.mnemonics_local('GUIDESTAR')
-    ax = spk2.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9)
+    ax = spk2.mnemonics_local('GUIDESTAR') # plots when the JWST tracks onto a new guidestars as a vertical line
+    ax = spk2.mnemonics('SA_ZHGAUPST', 60067.84, 60067.9) # plots the start and end of high gain antenna movement
     
     ax.plot(spk2.fg_time, spk2.fg_flux)
     plt.legend(loc=3)
@@ -447,6 +450,12 @@ as well as the ``jwstuser`` package. - https://auth.mast.stsci.edu/docs/
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_47_1.png
    :scale: 50%
 
+If you do have a MAST API token, you will have access to any program under that token.
+
+If you do not have access to a MAST API token, you can only download and use publicly available Program IDs. 
+However, with the readfile function, you can use fine guidance files you already have downloaded locally, 
+and with the current version, with no drawbacks. 
+
 Animations
 ----------
 
@@ -460,7 +469,7 @@ spatial timeseries and a parameter, use
    You may have to install ``ffmpeg`` on your computer to get ``mp4``
    formats.
 
-.. code:: ipython3
+.. code:: python
 
     plt.plot(spk2.fg_flux[2600:3100])
 
@@ -476,7 +485,7 @@ spatial timeseries and a parameter, use
 
 .. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_50_1.png
 
-.. code:: ipython3
+.. code:: python
 
     spk2.flux_spatial_timelapse_animation(start=2600,stop=3100,) # to save an animation with a filename, use *filename=*. Defaults to movie.gif
 
@@ -487,7 +496,7 @@ spatial timeseries and a parameter, use
 
 
 
-.. image:: fgs-spelunker_quickstart_files/fgs-spelunker_quickstart_51_1.png
+.. image:: fgs-spelunker_quickstart_files/movie.gif
    :scale: 40%
 
 Getting tables
@@ -500,7 +509,7 @@ data from the filename including ``visit_group``,
 in each file is also included, as well as filter magnitudes and other
 stellar properties.
 
-.. code:: ipython3
+.. code:: python
 
     spk.fg_table # We can simply call this attribute after using spk.download() to obtain our table!
 
@@ -511,7 +520,7 @@ We can obtain a neat DataFrame of each tracked guidestar, which gives us
 information such as the intergation start times and galactic
 coordinates.
 
-.. code:: ipython3
+.. code:: python
 
     spk.object_properties
 
