@@ -4,7 +4,7 @@ Exploring Spelunker tools and features
 --------------
 
 **Authors:** Derod Deal (dealderod@ufl.edu), Néstor Espinoza
-(nespinoza@stsci.edu) \| **Last update:** July 24, 2023
+(nespinoza@stsci.edu) \| **Last update:** January 22, 2024
 
 **Program version:** ver. 1.1.9
 
@@ -174,9 +174,9 @@ by using:
    spk2.readfile(pid=1534)
 
 
-Any files under the initialized directory and specified Program ID, observation number, and visit number will be loaded into `spk2`.
+Any files under the initialized directory and specified Program ID, observation number, and visit number will be loaded into ``spk2``.
 
-    `spelunker.load.readfile` now has access to the same attributes as `spelunker.load.download`. So, using `spk.object_properties` and `spk.fg_table`
+    ``spelunker.load.readfile`` now has access to the same attributes as ``spelunker.load.download``. So, using ``spk.object_properties`` and ``spk.fg_table``
     will work.
 
 Spatial fitting guide stars
