@@ -118,7 +118,7 @@ class load:
         '''
         The initalization function for ``load``. This function reads the current directory and initalizes essential attributes.
         '''
-
+        
         self.init_dir = os.getcwd()
 
         created_dir = "spelunker_outputs"
@@ -146,6 +146,7 @@ class load:
 
         self.gaussfit_results = None
         self.quickfit_results = None
+        self.pgram_results = None
 
         self.object_properties = None
 
@@ -324,7 +325,7 @@ class load:
         table['fg_time'] = fg_time
         table['fg_flux'] = fg_flux
 
-        sort_table = table.sort(['fg_time'])
+        table.sort(['fg_time'])
 
         return np.array(table['fg_array']), np.array(table['fg_time']), np.array(table['fg_flux'])
 
@@ -377,6 +378,12 @@ class load:
 
             Observations.login(token=token)
 
+        if token is None:
+
+            if self.mast_api_token is not None:
+
+                Observations.login(token=self.mast_api_token)
+
         self.pid = pid
 
         if obs_num == 'None' and visit != 'None':
@@ -384,23 +391,24 @@ class load:
 
         print("Connecting with astroquery...")
         
+
+        matched_obs = Observations.query_criteria(
+            obs_collection = 'JWST',
+            proposal_id=str(pid),
+        )
+        
+        data_products = [Observations.get_product_list(obs) for obs in matched_obs]
+        data_products = vstack(data_products)
+
+        products = Observations.filter_products(data_products,
+                    productType=["AUXILIARY",],
+                    extension="fits",
+                    productSubGroupDescription = "GS-FG",
+                    dataproduct_type='image'
+        )
+
         if obs_num != 'None' and visit != 'None':
-            matched_obs = Observations.query_criteria(
-                obs_collection = 'JWST',
-                proposal_id=str(pid),
-            )
-            
-            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
-            data_products = vstack(data_products)
 
-            products = Observations.filter_products(data_products,
-                        productType=["AUXILIARY",],
-                        extension="fits",
-                        productSubGroupDescription = "GS-FG",
-                        dataproduct_type='image'
-            )
-
-            
             obs_num_col = []
             visit_col = []
 
@@ -418,23 +426,8 @@ class load:
 
             mask3 = productsx['visit'] == int(visit)
             productsx = productsx[mask3]
-            
 
         elif obs_num != 'None':
-            matched_obs = Observations.query_criteria(
-                obs_collection = 'JWST',
-                proposal_id=str(pid),
-            )
-
-            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
-            data_products = vstack(data_products)
-
-            products = Observations.filter_products(data_products,
-                        productType=["AUXILIARY",],
-                        extension="fits",
-                        productSubGroupDescription = "GS-FG",
-                        dataproduct_type='image'
-            )
 
             obs_num_col = []
 
@@ -449,22 +442,7 @@ class load:
             mask2 = productsx['obs_num'] == int(obs_num)
             productsx = productsx[mask2]
 
-
         else:
-            matched_obs = Observations.query_criteria(
-                obs_collection = 'JWST',
-                proposal_id=str(pid),
-                )
-
-            data_products = [Observations.get_product_list(obs) for obs in matched_obs]
-            data_products = vstack(data_products)
-
-            products = Observations.filter_products(data_products,
-                                    productType=["AUXILIARY",],
-                                    extension="fits",
-                                    productSubGroupDescription = "GS-FG",
-                                    dataproduct_type='image'
-                                    )
         
             # Filter table to only include data with calib_level = 2
             mask = products['calib_level'] == int(calib_level)
@@ -1242,29 +1220,35 @@ class load:
         '''
 
 
-        cpixels = 0
-        flat_mi = frame.flatten()
+        # cpixels = 0
+        # flat_mi = frame.flatten()
         
-        values = np.array([])
-        while cpixels < npixels:
-            max_val = np.max(flat_mi)
-            idx = np.where(flat_mi == max_val)[0]
-            values = np.append(values, flat_mi[idx])
-            flat_mi = np.delete(flat_mi,idx)
-            cpixels += len(idx)
+        # values = np.array([])
+        # while cpixels < npixels:
+        #     max_val = np.max(flat_mi)
+        #     idx = np.where(flat_mi == max_val)[0]
+        #     values = np.append(values, flat_mi[idx])
+        #     flat_mi = np.delete(flat_mi,idx)
+        #     cpixels += len(idx)
             
-        # With these values, now fill the mask:
-        mask = np.zeros(frame.shape)
-        mask_idxs = np.array([])
-        mask_idys = np.array([])
+        # # With these values, now fill the mask:
+        # mask = np.zeros(frame.shape)
+        # mask_idxs = np.array([])
+        # mask_idys = np.array([])
         
-        for i in range(len(values)):
-            idx = np.where(frame == values[i])
-            mask_idxs = np.append(mask_idxs,idx[0][0])
-            mask_idys = np.append(mask_idys,idx[1][0])
-            mask[idx] = 1.
+        # for i in range(len(values)):
+        #     idx = np.where(frame == values[i])
+        #     mask_idxs = np.append(mask_idxs,idx[0][0])
+        #     mask_idys = np.append(mask_idys,idx[1][0])
+        #     mask[idx] = 1.
             
-        return mask
+        # return mask
+
+        mask = np.zeros_like(frame.flatten())
+        good_inds = np.argsort(frame.flatten(), axis=None)[-npixels:]
+        mask[good_inds] = 1
+
+        return mask.reshape(frame.shape)
 
     def bin_data(self, time, y, n_bin):
         '''
@@ -1311,12 +1295,12 @@ class load:
             This function will output a plot of the binned flux timeseries. Additionally, the functions returns the timeseries as a matplotlib ``axes`` object.
         '''
 
-        if type(fg_flux) and type(fg_time) == str:
+        if type(fg_flux) == str and type(fg_time) == str:
             if fg_time and fg_flux == 'None':
                 fg_time = self.fg_time
                 fg_flux = self.fg_flux
 
-        if start_time and end_time != 'None':
+        if start_time != 'None' and end_time != 'None':
             start_time_idx = np.abs(fg_time - start_time).argmin() # https://www.geeksforgeeks.org/find-the-nearest-value-and-the-index-of-numpy-array/
             end_time_idx = np.abs(fg_time - end_time).argmin()
 
@@ -1383,12 +1367,12 @@ class load:
         
         '''
 
-        if type(fg_time) and type(table) == str:
+        if type(fg_time) == str and type(table) == str:
             if table and fg_time == 'None':
                 table = self.gaussfit_results
                 fg_time = self.fg_time
 
-        if start_time and end_time != 'None':
+        if start_time != 'None' and end_time != 'None':
             start_time_idx = np.abs(fg_time - start_time).argmin()
             end_time_idx = np.abs(fg_time - end_time).argmin()
             fg_time = fg_time[start_time_idx:end_time_idx]
@@ -1472,7 +1456,7 @@ class load:
             distance.append(np.sqrt(  (target.ra.value - coord.ra.value)**2
                                 + (target.dec.value - coord.dec.value)**2  ))
 
-        fov_radius = 1*np.mean(distance)*u.deg + 1*np.std(distance)*u.deg
+        fov_radius = 0.5*np.mean(distance)*u.deg + 1*np.std(distance)*u.deg
         fov_radius = 3 * u.deg if fov_radius > 3 * u.deg else fov_radius
 
         if fov_radius.value == 0: fov_radius = 2*u.deg # from https://github.com/GalagaBits/JWST-FGS-Spelunker/issues/19
@@ -1721,8 +1705,8 @@ class load:
 
         '''
 
-        if type(time) and type(table) == str:
-            if table and time == 'None':
+        if type(time) == str and type(table) == str:
+            if table == 'None' and time == 'None':
                 table = self.gaussfit_results
                 time = self.fg_time
 
@@ -1903,8 +1887,8 @@ class load:
             The animation saves as a specified file, either as ``.mp4`` or ``.gif``.
 
         '''
-        if type(fg_flux) and type(fg_array) and type(fg_time) == str:
-            if fg_array and fg_flux == 'None':
+        if type(fg_flux) == str and type(fg_array) == str and type(fg_time) == str:
+            if fg_array == 'None' and fg_flux == 'None':
                 fg_array = self.fg_array
                 fg_flux = self.fg_flux
                 fg_time = self.fg_time
@@ -2080,5 +2064,46 @@ class load:
                                                                                                                     self.pgram_results['frequency_offset'].value[j],
                                                                                                                     self.pgram_results['power_offset'].value[j],
                                                                                                                     ))
+
+                fout.close()
+
+        if self.quickfit_results is not None:
+
+            header = '# spelunker guidestar quickfit results\n'+\
+                    '# ---------------------------\n#\n' 
+
+            for i in range( len(self.object_properties['guidestar_catalog_id']) ):
+
+                base_fname = self.object_properties['guidestar_catalog_id'][i] +\
+                            '_'+str(self.object_properties['int_start'][0]) + '_quickfit' +'.txt'
+
+                header += '# Guidestar ID: {0:} | RA: {1:.6f}, DEC: {2:.6f}\n'.format(self.object_properties['guidestar_catalog_id'][i], \
+                                                                                    self.object_properties['ra'][i], \
+                                                                                    self.object_properties['dec'][i])
+                if suffix is not None:
+
+                    base_fname = suffix + '_' +  base_fname
+
+                header += '# Column 2: Quickfit Amplitude (counts) \n'
+                header += '# Column 3: Quickfit X location (pix) \n'
+                header += '# Column 4: Quickfit Y location (pix) \n'
+                header += '# Column 5: Quickfit stdev X (pix) \n'
+                header += '# Column 6: Quickfit stdev Y (pix) \n'
+                header += '# Column 7: Quickfit theta (degs)\n'
+                header += '# Column 8: Background counts \n'
+
+                fout = open(self.directory+'/'+base_fname, 'w')
+                fout.write(header)
+
+                for j in range( len(self.quickfit_results) ):
+                    fout.write('{0:.12f} {1:.5f} {2:.12f} {3:.12f} {4:.12f} {5:.12f} {6:.12f} {7:.12f} {8:.12f} \n'.format(self.fg_time[j], self.fg_flux[j], 
+                                                                                                                   self.quickfit_results['amplitude'].value[j],
+                                                                                                                   self.quickfit_results['x_mean'].value[j],
+                                                                                                                   self.quickfit_results['y_mean'].value[j],
+                                                                                                                   self.quickfit_results['x_stddev'].value[j],
+                                                                                                                   self.quickfit_results['y_stddev'].value[j],
+                                                                                                                   self.quickfit_results['theta'].value[j],
+                                                                                                                   self.quickfit_results['offset'].value[j]
+                                                                                                                   ))
 
                 fout.close()
