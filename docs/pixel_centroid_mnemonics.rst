@@ -1,13 +1,18 @@
 Pixel centroid changes and mnemonics \| PID 2079 Example
 ========================================================
 
+For this example, we will use the JWST engineering telemetry database to overplot mnemonmics and events over our timeseries. 
+Mnemonics are useful in detecting anomalies in guidestar data and differentiating technical events on the JWST from the guidestar flux. 
+We will use PID 2079, observation number 4, and visit number 1 and find out if there are any technical anomalies in our data using Spelunker.
+
 .. code:: ipython3
 
-    import sys
-    sys.path.append('/Users/ddeal/JWST-FGS-Spelunker/JWST-FGS-Spelunker-main/src/')
     import spelunker
     
     spk = spelunker.load('/Users/ddeal/JWST-Treasure-Chest/', pid=2079, obs_num=4, visit=1)
+
+
+You will need to input your MAST API Token to access JWST Engineering Telemetry and mnemonics.
 
 .. code:: ipython3
 
@@ -78,15 +83,17 @@ flux timeseries for the guidestar in the program.
     import matplotlib.pyplot as plt
     
     fig, ax = plt.subplots(figsize=(12,4), dpi=200)
+
+    spk.optimize_photometry()
+
     ax = spk.timeseries_binned_plot(spk.fg_time, spk.fg_flux)
 
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_6_0.png
-   :scale: 50%
+   :scale: 40%
 
-We can see that there are chucks of data points that largely changes in
-flux for each chunk. Lets see how the obserbed properties of the target
+We can see that the timeseries is broken up into sepeate pieces. Lets see how the obserbed properties of the target
 changes overtime. We fitted gaussians to each frame using
 ``spk.gauss2d_fit`` and saved the outpput as an astropy table ``dat``
 file, so we can load the table here.
@@ -127,7 +134,7 @@ centroid plots.
 
     fig, ax = plt.subplots(figsize=(12,6), dpi=200)
     
-    ax.plot(spk.fg_time, gaussfit_table['x_mean'], linewidth=.8)
+    ax.scatter(spk.fg_time, gaussfit_table['x_mean'], s=0.5, alpha=0.2)
     ax.set_ylabel('pixel')
     ax.set_xlabel('time (mjd)')
     ax.set_title('x_mean')
@@ -145,7 +152,7 @@ centroid plots.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_11_1.png
-   :scale: 50%
+   :scale: 40%
 
 We can see there is multiple events happening. First off, there are
 certain breaks between the timeseries, which indicates the time where
@@ -189,7 +196,7 @@ into the event on the right and apply mnemonics.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_13_1.png
-   :scale: 50%
+   :scale: 40%
 
 We can clearly see that some of the centroid movement can be attributed
 to the high-gain antenna (HGA) and even events from the NIRISS Filter
@@ -206,7 +213,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_16_0.png
-   :scale: 70%
+   :scale: 50%
 
 .. code:: ipython3
 
@@ -221,7 +228,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_17_1.png
-   :scale: 50%
+   :scale: 40%
 
 .. image:: pixel_centroid_mnemonics_files/1541movie.gif
-   :scale: 50%
+   :scale: 40%
