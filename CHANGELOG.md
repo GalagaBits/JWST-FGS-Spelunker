@@ -5,40 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.9] - 2023-03-19 (Current release)
+## [1.1.10] - 2024-04-16 (Current release)
+
+- Added ability to control number of bins in `timeseries_binned_plot.
+- Changed Python requirements.
+
+## [1.1.9] - 2024-03-19
 
 - Changes and improvements to `spelunker.load.guidestar_plot`.
 
-## [1.1.8] - 2023-03-19
+## [1.1.8] - 2024-03-19
 
 - Added `if fov_radius.value == 0: fov_radius = 2*u.deg` to `spelunker.load.guidestar_plot` as recommended by @hdiamondlowe from issue #19.
 - Added GitHub actions for `general_test.py`.
 
-## [1.1.7] - 2023-03-19
+## [1.1.7] - 2024-03-19
 
 - Added `jwstuser` to `setup.py`.
 
-## [1.1.6] - 2023-03-18
+## [1.1.6] - 2024-03-18
 
 - Fixed an issue where the searching the guidestar catalog with certain guidestars IDs will not be found, thus breaking `spelunker.load`. 
 
-## [1.1.5] - 2023-03-18
+## [1.1.5] - 2024-03-18
 
 - Updates to `object_properties_func`.
 
-## [1.1.4] - 2023-03-18
+## [1.1.4] - 2024-03-18
 
 - Updates to `object_properties_func`.
 
-## [1.1.3] - 2023-03-17
+## [1.1.3] - 2024-03-17
 
 - Updates to `object_properties_func`.
 
-## [1.1.2] - 2023-03-17 
+## [1.1.2] - 2024-03-17 
 
 - Updates to `object_properties_func`.
 
-## [1.1.1] - 2023-03-17 
+## [1.1.1] - 2024-03-17 
 - Changed `python_requires` to 3.10.
 - Removed dashboard.py
 - Small optimizations to the source code.
