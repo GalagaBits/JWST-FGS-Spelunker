@@ -47,78 +47,10 @@ class load:
 
                 >>> spk = spelunker.load(pid=1534,obs_num='2',token='abcdefg1234567')
 
-    :param dir: (optional, string)
-        The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
-        If ignored, "load" will save the current directory as an attribute for use with other functions.
-
-    :param pid: (optional, int or string)
-        An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
-        with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
-        to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
-        within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
-        the function ``download`` given ``pid`` and the following parameters. For example:
+    Parameters
+    ----------
                 
-                >>> spk = spelunker.load()
-                >>> spk.download(pid=1534)
-
-    :param obs_num: (optional, int or string)
-        The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
-        number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
-        
-    :param visit: (optional, int or string)
-        The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
-        before downloading all files.
-
-    :param visit_group: (optional, int or string)
-        The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
-        data to only include files with the given visit group before loading the data into the object.
-
-    :param parallel_sequence_id: (optional, int or string)
-        The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
-        will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
-
-    :param activity_number: (optional, int or string)
-        The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
-        data to only include files with the given activity number before loading the data into the object.
-
-    :param exposure_number: (optional, int or string)
-        The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
-        data to only include files with the given exposure number before loading the data into the object.
-
-    :param dir_seg: (optional, int or string)
-        The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
-        files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
-        into the object.
-
-    :param guider: (optional, int or string)
-        Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
-        header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
-        the data is loaded into the object.
-
-    :param calib_level: (optional, int or string)
-        The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
-        parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
-        files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
-
-    :param save: (optional, boolean)
-        Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
-        ignored, ``save`` will default to false.
-
-
-    :param token: (optional, string)
-        This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
-        as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
-        exclusive rights will not be loaded.
-    """
-
-
-    def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False, token = None):
-
-        '''
-        The initalization function for ``load``. This function reads the current directory and initalizes essential attributes.
-
-        param dir: (optional, string)
+        :param dir: (optional, string)
             The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
             If ignored, "load" will save the current directory as an attribute for use with other functions.
 
@@ -180,6 +112,79 @@ class load:
             This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
             as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
             exclusive rights will not be loaded.
+    """
+
+
+    def __init__(self, dir='None', pid='None', obs_num='None',  visit='None', visit_group='None', parallel_sequence_id='None', 
+                 activity_number='None', exposure_number='None', dir_seg='None', guider='None', calib_level=2, save=False, token = None):
+
+        '''
+        The initalization function for ``load``. This function reads the current directory and initalizes essential attributes.
+
+        Parameters
+
+            param dir: (optional, string)
+                The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+                If ignored, "load" will save the current directory as an attribute for use with other functions.
+
+            :param pid: (optional, int or string)
+                An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+                with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+                to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+                within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+                the function ``download`` given ``pid`` and the following parameters. For example:
+                        
+                        >>> spk = spelunker.load()
+                        >>> spk.download(pid=1534)
+
+            :param obs_num: (optional, int or string)
+                The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+                number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+                
+            :param visit: (optional, int or string)
+                The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+                before downloading all files.
+
+            :param visit_group: (optional, int or string)
+                The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+                data to only include files with the given visit group before loading the data into the object.
+
+            :param parallel_sequence_id: (optional, int or string)
+                The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+                will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+
+            :param activity_number: (optional, int or string)
+                The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+                data to only include files with the given activity number before loading the data into the object.
+
+            :param exposure_number: (optional, int or string)
+                The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+                data to only include files with the given exposure number before loading the data into the object.
+
+            :param dir_seg: (optional, int or string)
+                The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+                files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+                into the object.
+
+            :param guider: (optional, int or string)
+                Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+                header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+                the data is loaded into the object.
+
+            :param calib_level: (optional, int or string)
+                The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
+                parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
+                files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+
+            :param save: (optional, boolean)
+                Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
+                ignored, ``save`` will default to false.
+
+
+            :param token: (optional, string)
+                This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
+                as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
+                exclusive rights will not be loaded.
         '''
         
         self.init_dir = os.getcwd()
@@ -459,68 +464,71 @@ class load:
         function also creates a working directory within the current directory to download selected FITS files and save results and plots. Additionally, the guidestar is
         processed and packaged into objects including the timeseries of guidiesstars, time and spatial arrays, and guidestar properties.
 
-        :param dir: (optional, string)
-            The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
-            If ignored, "load" will save the current directory as an attribute for use with other functions.
+        Parameters
+        ----------
 
-        :param pid: (optional, int or string)
-            An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
-            with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
-            to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
-            within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
-            the function ``download`` given ``pid`` and the following parameters. For example:
-                    
-                    >>> spk = spelunker.load()
-                    >>> spk.download(pid=1534)
+            :param dir: (optional, string)
+                The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+                If ignored, "load" will save the current directory as an attribute for use with other functions.
 
-        :param obs_num: (optional, int or string)
-            The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
-            number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
-            
-        :param visit: (optional, int or string)
-            The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
-            before downloading all files.
+            :param pid: (optional, int or string)
+                An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+                with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+                to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+                within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+                the function ``download`` given ``pid`` and the following parameters. For example:
+                        
+                        >>> spk = spelunker.load()
+                        >>> spk.download(pid=1534)
 
-        :param visit_group: (optional, int or string)
-            The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
-            data to only include files with the given visit group before loading the data into the object.
+            :param obs_num: (optional, int or string)
+                The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+                number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+                
+            :param visit: (optional, int or string)
+                The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+                before downloading all files.
 
-        :param parallel_sequence_id: (optional, int or string)
-            The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
-            will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+            :param visit_group: (optional, int or string)
+                The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+                data to only include files with the given visit group before loading the data into the object.
 
-        :param activity_number: (optional, int or string)
-            The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
-            data to only include files with the given activity number before loading the data into the object.
+            :param parallel_sequence_id: (optional, int or string)
+                The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+                will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
 
-        :param exposure_number: (optional, int or string)
-            The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
-            data to only include files with the given exposure number before loading the data into the object.
+            :param activity_number: (optional, int or string)
+                The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+                data to only include files with the given activity number before loading the data into the object.
 
-        :param dir_seg: (optional, int or string)
-            The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
-            files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
-            into the object.
+            :param exposure_number: (optional, int or string)
+                The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+                data to only include files with the given exposure number before loading the data into the object.
 
-        :param guider: (optional, int or string)
-            Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
-            header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
-            the data is loaded into the object.
+            :param dir_seg: (optional, int or string)
+                The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+                files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+                into the object.
 
-        :param calib_level: (optional, int or string)
-            The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
-            parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
-            files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+            :param guider: (optional, int or string)
+                Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+                header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+                the data is loaded into the object.
 
-        :param save: (optional, boolean)
-            Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
-            ignored, ``save`` will default to false.
+            :param calib_level: (optional, int or string)
+                The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
+                parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
+                files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+
+            :param save: (optional, boolean)
+                Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
+                ignored, ``save`` will default to false.
 
 
-        :param token: (optional, string)
-            This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
-            as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
-            exclusive rights will not be loaded.        
+            :param token: (optional, string)
+                This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
+                as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
+                exclusive rights will not be loaded.        
 
         Returns
         -------
@@ -904,53 +912,56 @@ class load:
         is previously loaded using ``load``, the attributes already created will be overwritten. Currently, ``readfile`` does not create ``fg_table`` and ``object_properties``
         attributes.
 
-        :param dir: (optional, string)
-            The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
-            If ignored, "load" will save the current directory as an attribute for use with other functions.
+        Parameters
+        ----------
 
-        :param pid: (optional, int or string)
-            An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
-            with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
-            to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
-            within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
-            the function ``download`` given ``pid`` and the following parameters. For example:
-                    
-                    >>> spk = spelunker.load()
-                    >>> spk.download(pid=1534)
+            :param dir: (optional, string)
+                The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+                If ignored, "load" will save the current directory as an attribute for use with other functions.
 
-        :param obs_num: (optional, int or string)
-            The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
-            number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
-            
-        :param visit: (optional, int or string)
-            The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
-            before downloading all files.
+            :param pid: (optional, int or string)
+                An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+                with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+                to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+                within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+                the function ``download`` given ``pid`` and the following parameters. For example:
+                        
+                        >>> spk = spelunker.load()
+                        >>> spk.download(pid=1534)
 
-        :param visit_group: (optional, int or string)
-            The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
-            data to only include files with the given visit group before loading the data into the object.
+            :param obs_num: (optional, int or string)
+                The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+                number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+                
+            :param visit: (optional, int or string)
+                The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+                before downloading all files.
 
-        :param parallel_sequence_id: (optional, int or string)
-            The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
-            will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+            :param visit_group: (optional, int or string)
+                The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+                data to only include files with the given visit group before loading the data into the object.
 
-        :param activity_number: (optional, int or string)
-            The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
-            data to only include files with the given activity number before loading the data into the object.
+            :param parallel_sequence_id: (optional, int or string)
+                The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+                will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
 
-        :param exposure_number: (optional, int or string)
-            The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
-            data to only include files with the given exposure number before loading the data into the object.
+            :param activity_number: (optional, int or string)
+                The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+                data to only include files with the given activity number before loading the data into the object.
 
-        :param dir_seg: (optional, int or string)
-            The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
-            files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
-            into the object.
+            :param exposure_number: (optional, int or string)
+                The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+                data to only include files with the given exposure number before loading the data into the object.
 
-        :param guider: (optional, int or string)
-            Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
-            header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
-            the data is loaded into the object.
+            :param dir_seg: (optional, int or string)
+                The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+                files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+                into the object.
+
+            :param guider: (optional, int or string)
+                Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+                header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+                the data is loaded into the object.
 
         Returns
         -------
@@ -1754,7 +1765,7 @@ class load:
         return ax
 
 
-    def mnemonics(self, mnemonic, start, end):
+    def mnemonics(self, mnemonic, start, end, plot=True):
         '''
         Accesses JWST MAST for JWST technical mnemonics. This function searches for engineering telemetry from the Engineering Database (EDB) for
         a given time range in mjd. Currently, there are two mnemonics that are supported:
@@ -1776,6 +1787,9 @@ class load:
 
             end : float
                 (Mandatory) The end time in mjd, which is the end of time range to search for mnemonic events.
+
+            plot : boolean
+                (Optional) Turn on or off the ability to plot.
 
         Returns
         -------
@@ -1825,54 +1839,61 @@ class load:
 
             self.mnemonics_event_hga = (event_time, event_code)
 
-            if event_time != []:
-                # https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
-                def pairwise(iterable):
-                    a = iter(iterable)
-                    return zip(a, a)
+            if plot:
+                if event_time != []:
+                    # https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
+                    def pairwise(iterable):
+                        a = iter(iterable)
+                        return zip(a, a)
 
-                ax = plt.subplot()
 
-                for x_time, y_time in pairwise(event_time):
-                    ax.axvspan(x_time, y_time, alpha=0.3)
-                    ax.axvline(x_time,color='g',)
-                    ax.axvline(y_time, color='r',)
 
-                ax.axvline(x_time, color='g', label='hga_start')
-                ax.axvline(y_time, color='r', label='hga_stop')
+                    ax = plt.subplot()
 
-                return ax
-            elif event_time == []:
-                print('No HGA events found. Returning a blank plot.')
-                ax = plt.subplot()
-                return ax
+                    for x_time, y_time in pairwise(event_time):
+                        ax.axvspan(x_time, y_time, alpha=0.3)
+                        ax.axvline(x_time,color='g',)
+                        ax.axvline(y_time, color='r',)
+
+                    ax.axvline(x_time, color='g', label='hga_start')
+                    ax.axvline(y_time, color='r', label='hga_stop')
+
+                    return ax
+                elif event_time == []:
+                    print('No HGA events found. Returning a blank plot.')
+                    ax = plt.subplot()
+                    return ax
         
         elif mnemonic == 'INIS_FWMTRCURR':
 
-            ax = plt.subplot()
+            
             action = self.EDB.timeseries(mnemonic, start.iso, end.iso)
             self.mnemonics_event_nisfil = action
 
             action_times = action.time
             action_t = Time(action_times, scale='utc')
+            
+            if plot:
+                ax = plt.subplot()
+                ax.plot(action_t.mjd, action.value, color='goldenrod', label='NIRISS Filter Wheel Motor Current')
 
-            ax.plot(action_t.mjd, action.value, color='goldenrod', label='NIRISS Filter Wheel Motor Current')
-
-            return ax
+                return ax
         
         else:
-            ax = plt.subplot()
+            
             action = self.EDB.timeseries(mnemonic, start.iso, end.iso)
             self.mnemonics_event = action
 
             action_times = action.time
             action_t = Time(action_times, scale='utc')
 
-            ax.plot(action_t.mjd, action.value, label=mnemonic,)
+            if plot:
+                ax = plt.subplot()
+                ax.plot(action_t.mjd, action.value, label=mnemonic,)
 
-            return ax     
+                return ax     
        
-    def mnemonics_local(self, mnemonic,):
+    def mnemonics_local(self, mnemonic, plot=True):
         '''
         There are 'local mnemonics' from the attribute ``fg_table`` that the function accesses. This function returns information such as the guidestar ID and
         filename as a mnemonic with a timestamp for which each event has occurred. A MAST API token is not required and will not impact functionality. Currently,
@@ -1886,6 +1907,9 @@ class load:
 
             mnemonic : string
                 (Mandatory) A string that includes one of the two supported local mnemonics.
+
+            plot : boolean
+                (Optional) Turn on or off the ability to plot.
 
         Returns
         -------
@@ -1914,14 +1938,15 @@ class load:
 
             self.guidestar_mnemonics = (event_time, event_code)
 
-            ax = plt.subplot()
-            trans = transforms.blended_transform_factory(ax.transData, ax.transAxes) #https://stackoverflow.com/a/63153806
+            if plot:
+                ax = plt.subplot()
+                trans = transforms.blended_transform_factory(ax.transData, ax.transAxes) #https://stackoverflow.com/a/63153806
 
-            for (x, y) in zip(self.guidestar_mnemonics[0], self.guidestar_mnemonics[1]):
-                ax.axvline(x, color='lightgreen',)
-                ax.text(x, 0.9, s=y, transform=trans, clip_on=True)
-            ax.axvline(self.guidestar_mnemonics[0][0], color='lightgreen', label='guidestar')
-            return ax
+                for (x, y) in zip(self.guidestar_mnemonics[0], self.guidestar_mnemonics[1]):
+                    ax.axvline(x, color='lightgreen',)
+                    ax.text(x, 0.9, s=y, transform=trans, clip_on=True)
+                ax.axvline(self.guidestar_mnemonics[0][0], color='lightgreen', label='guidestar')
+                return ax
         
         elif mnemonic == 'FILENAME':
             for (time, filename) in zip(self.fg_table['guidestar_time'],self.fg_table['filenames']):
@@ -1930,20 +1955,21 @@ class load:
 
             self.filename_mnemonics = (event_time, event_code)
 
-            ax = plt.subplot()
-            trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
+            if plot:
+                ax = plt.subplot()
+                trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
 
-            for idx, (x, y) in enumerate(zip(self.filename_mnemonics[0], self.filename_mnemonics[1])):
-                ax.axvline(x, color='brown',)
+                for idx, (x, y) in enumerate(zip(self.filename_mnemonics[0], self.filename_mnemonics[1])):
+                    ax.axvline(x, color='brown',)
 
-                ax.text(x, 0.75, s=str(' '+y[0:20]),transform=trans, clip_on=True, rotation=5, wrap=True)
-                ax.text(x, 0.7, s=str(' '+y[20:42]),transform=trans, clip_on=True, rotation=5, wrap=True)
+                    ax.text(x, 0.75, s=str(' '+y[0:20]),transform=trans, clip_on=True, rotation=5, wrap=True)
+                    ax.text(x, 0.7, s=str(' '+y[20:42]),transform=trans, clip_on=True, rotation=5, wrap=True)
 
-            ax.axvline(self.filename_mnemonics[0][0], color='brown', label='filename')
-                
-            return ax
+                ax.axvline(self.filename_mnemonics[0][0], color='brown', label='filename')
+                    
+                return ax
 
-    def periodogram(self, table='None', time='None', save=False):
+    def periodogram(self, table='None', time='None', save=False, plot=True):
         '''
         Creates Lomb-Scargle periodogram plots for all fitted Gaussian or quick fit parameters.
 
@@ -1959,8 +1985,10 @@ class load:
                 (Optional) The guidestar time array. If ignored, the fg_time will be taken from ``self.fg_time``.
 
             save : boolean
-                (Optional) This parameter will determine whether or not to save the output periodogram table as a ``.dat`` data file. If ignored, ``periodogram`` will not
-                save as a data file.
+                (Optional) This parameter will determine whether or not to save the output periodogram as a png. 
+
+            plot : boolean
+                (Optional) Turn on or off the ability to plot.
             
         Returns
         -------
@@ -2006,32 +2034,6 @@ class load:
         frequency_sub5, power_sub5 = LombScargle(time_t, gs_theta).autopower(samples_per_peak=5)
         frequency_sub6, power_sub6 = LombScargle(time_t, gs_offset).autopower(samples_per_peak=5)
 
-        fig, ax = plt.subplots(7,1, figsize=(12,16), dpi=200)
-
-        fig.tight_layout()
-
-        fig.suptitle('PID ' + str(self.pid) + ' — ' + str(self.obs_num) + ' — ' + str(self.visit) + ' — ' + 
-                        str(self.object_properties['guidestar_catalog_id'][0]), fontsize = self.fontsize)
-
-        ax[0].semilogx(1/frequency_sub0, power_sub0, linewidth=.2, color='black', alpha=0.6)
-        ax[1].semilogx(1/frequency_sub1, power_sub1, linewidth=.2, color='black', alpha=0.6)
-        ax[2].semilogx(1/frequency_sub2, power_sub2, linewidth=.2, color='black', alpha=0.6)
-        ax[3].semilogx(1/frequency_sub3, power_sub3, linewidth=.2, color='black', alpha=0.6)
-        ax[4].semilogx(1/frequency_sub4, power_sub4, linewidth=.2, color='black', alpha=0.6)
-        ax[5].semilogx(1/frequency_sub5, power_sub5, linewidth=.2, color='black', alpha=0.6)
-        ax[6].semilogx(1/frequency_sub6, power_sub6, linewidth=.2, color='black', alpha=0.6)
-
-        ax[0].text(0.99,0.9,'amplitude',transform=ax[0].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[1].text(0.99,0.9,'x_mean',transform=ax[1].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[2].text(0.99,0.9,'y_mean',transform=ax[2].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[3].text(0.99,0.9,'x_stddev',transform=ax[3].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[4].text(0.99,0.9,'y_stddev',transform=ax[4].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[5].text(0.99,0.9,'theta',transform=ax[5].transAxes, horizontalalignment='right', fontweight='bold')
-        ax[6].text(0.99,0.9,'offset',transform=ax[6].transAxes, horizontalalignment='right', fontweight='bold')
-        
-        ax[3].set_ylabel('Power', fontsize = self.fontsize)
-        ax[6].set_xlabel('Period (s)', fontsize = self.fontsize)
-
         pgram_table = Table()
 
         pgram_table['frequency_amplitude'], pgram_table['power_amplitude'] = frequency_sub0, power_sub0
@@ -2052,19 +2054,43 @@ class load:
         self.pgram_theta = pgram_table['frequency_theta'], pgram_table['power_theta']
         self.pgram_offset = pgram_table['frequency_offset'], pgram_table['power_offset']
 
-        if save:
+        if plot:
 
-            base_fname = self.object_properties['guidestar_catalog_id'][0] +\
-                    '_'+str(self.object_properties['int_start'][0])
+            fig, ax = plt.subplots(7,1, figsize=(12,16), dpi=200)
+
+            fig.tight_layout()
+
+            fig.suptitle('PID ' + str(self.pid) + ' — ' + str(self.obs_num) + ' — ' + str(self.visit) + ' — ' + 
+                            str(self.object_properties['guidestar_catalog_id'][0]), fontsize = self.fontsize)
+
+            ax[0].semilogx(1/frequency_sub0, power_sub0, linewidth=.2, color='black', alpha=0.6)
+            ax[1].semilogx(1/frequency_sub1, power_sub1, linewidth=.2, color='black', alpha=0.6)
+            ax[2].semilogx(1/frequency_sub2, power_sub2, linewidth=.2, color='black', alpha=0.6)
+            ax[3].semilogx(1/frequency_sub3, power_sub3, linewidth=.2, color='black', alpha=0.6)
+            ax[4].semilogx(1/frequency_sub4, power_sub4, linewidth=.2, color='black', alpha=0.6)
+            ax[5].semilogx(1/frequency_sub5, power_sub5, linewidth=.2, color='black', alpha=0.6)
+            ax[6].semilogx(1/frequency_sub6, power_sub6, linewidth=.2, color='black', alpha=0.6)
+
+            ax[0].text(0.99,0.9,'amplitude',transform=ax[0].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[1].text(0.99,0.9,'x_mean',transform=ax[1].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[2].text(0.99,0.9,'y_mean',transform=ax[2].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[3].text(0.99,0.9,'x_stddev',transform=ax[3].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[4].text(0.99,0.9,'y_stddev',transform=ax[4].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[5].text(0.99,0.9,'theta',transform=ax[5].transAxes, horizontalalignment='right', fontweight='bold')
+            ax[6].text(0.99,0.9,'offset',transform=ax[6].transAxes, horizontalalignment='right', fontweight='bold')
             
-            fig.savefig(self.directory+'/'+base_fname+'_pgram_results.png')
+            ax[3].set_ylabel('Power', fontsize = self.fontsize)
+            ax[6].set_xlabel('Period (s)', fontsize = self.fontsize)
 
-            # periodogram_dir = 'periodograms'
-            # if not os.path.exists(self.directory+'/'+periodogram_dir):
-            #     os.makedirs(self.directory+'/'+periodogram_dir)
-            # table.write(self.directory+'/'+periodogram_dir+'/'+str(self.pid)+'_'+periodogram_dir+'.dat', format='ascii', overwrite=True)
-        
-        return ax
+
+            if save:
+
+                base_fname = self.object_properties['guidestar_catalog_id'][0] +\
+                        '_'+str(self.object_properties['int_start'][0])
+                
+                fig.savefig(self.directory+'/'+base_fname+'_pgram_results.png')
+            
+            return ax
 
 
     '''
