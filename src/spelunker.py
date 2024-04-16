@@ -117,6 +117,69 @@ class load:
 
         '''
         The initalization function for ``load``. This function reads the current directory and initalizes essential attributes.
+
+        param dir: (optional, string)
+            The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+            If ignored, "load" will save the current directory as an attribute for use with other functions.
+
+        :param pid: (optional, int or string)
+            An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+            with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+            to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+            within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+            the function ``download`` given ``pid`` and the following parameters. For example:
+                    
+                    >>> spk = spelunker.load()
+                    >>> spk.download(pid=1534)
+
+        :param obs_num: (optional, int or string)
+            The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+            number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+            
+        :param visit: (optional, int or string)
+            The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+            before downloading all files.
+
+        :param visit_group: (optional, int or string)
+            The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+            data to only include files with the given visit group before loading the data into the object.
+
+        :param parallel_sequence_id: (optional, int or string)
+            The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+            will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+
+        :param activity_number: (optional, int or string)
+            The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+            data to only include files with the given activity number before loading the data into the object.
+
+        :param exposure_number: (optional, int or string)
+            The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+            data to only include files with the given exposure number before loading the data into the object.
+
+        :param dir_seg: (optional, int or string)
+            The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+            files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+            into the object.
+
+        :param guider: (optional, int or string)
+            Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+            header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+            the data is loaded into the object.
+
+        :param calib_level: (optional, int or string)
+            The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
+            parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
+            files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+
+        :param save: (optional, boolean)
+            Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
+            ignored, ``save`` will default to false.
+
+
+        :param token: (optional, string)
+            This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
+            as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
+            exclusive rights will not be loaded.
         '''
         
         self.init_dir = os.getcwd()
@@ -298,6 +361,11 @@ class load:
         Normalize star counts from guidestar datamodel objects. This function takes the data from the guidestar objects and divides it by the median of the
         guidestar data for each frame.
 
+        Parameters
+        ----------
+        
+            No parameters, but this function takes the self.fg_timeseries as an input.
+
         Returns
         -------
             
@@ -318,6 +386,24 @@ class load:
     def time_sort_preprocessing(self, fg_array, fg_time, fg_flux):
         '''
         Sorts the three arrays by ascending order of the values in ``fg_time``, regardless of filename or file order.
+
+        Parameters
+        ----------
+
+            fg_array : np.array
+                (Mandatory) The spatial array of guidestar data. This must have a shape of (X, 8, 8), with X being the number of elements in the array.
+
+            fg_time : np.array
+                (Mandatory) The time array of guidestar data. This must have a shape of (X,), with X being the number of elements in the array.
+
+            fg_flux : np.array
+                (Mandatory) The flux array of guidestar data. This must have a shape of (X,), with X being the number of elements in the array.
+
+        Returns
+        -------
+
+            Three numpy arrays that are sorted by ``fg_time`` in ascending order.
+
         '''
 
         table = Table()
@@ -338,6 +424,17 @@ class load:
     def duplicate_rm(self, products):
         '''
         Remove duplicate filenames in a table.
+
+        Parameters
+        ----------
+            products : astropy table
+                (Mandatory) The data products given from astroquery.
+
+        Returns
+        -------
+            An astropy table that with all duplicate elements removed.
+
+
         '''
 
         # Used *not in* statement from https://www.dataquest.io/blog/how-to-remove-duplicates-from-a-python-list/
@@ -361,6 +458,69 @@ class load:
         This function downloads FG-GS FITS for a given program ID, observtion number, visit number, and other parameters described as parameters in the ``load`` class. The
         function also creates a working directory within the current directory to download selected FITS files and save results and plots. Additionally, the guidestar is
         processed and packaged into objects including the timeseries of guidiesstars, time and spatial arrays, and guidestar properties.
+
+        :param dir: (optional, string)
+            The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+            If ignored, "load" will save the current directory as an attribute for use with other functions.
+
+        :param pid: (optional, int or string)
+            An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+            with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+            to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+            within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+            the function ``download`` given ``pid`` and the following parameters. For example:
+                    
+                    >>> spk = spelunker.load()
+                    >>> spk.download(pid=1534)
+
+        :param obs_num: (optional, int or string)
+            The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+            number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+            
+        :param visit: (optional, int or string)
+            The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+            before downloading all files.
+
+        :param visit_group: (optional, int or string)
+            The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+            data to only include files with the given visit group before loading the data into the object.
+
+        :param parallel_sequence_id: (optional, int or string)
+            The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+            will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+
+        :param activity_number: (optional, int or string)
+            The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+            data to only include files with the given activity number before loading the data into the object.
+
+        :param exposure_number: (optional, int or string)
+            The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+            data to only include files with the given exposure number before loading the data into the object.
+
+        :param dir_seg: (optional, int or string)
+            The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+            files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+            into the object.
+
+        :param guider: (optional, int or string)
+            Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+            header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+            the data is loaded into the object.
+
+        :param calib_level: (optional, int or string)
+            The calibration level can be specified as a Python ``int`` or ``string``. This parameter determines the calibration level for the FG-GS FITS. The only inputs for this
+            parameter are 1, and 2, referring to higher stages of calibration with the JWST pipeline. Inputting the observation number will filter the auxiliary FITS to only include the
+            files with the given calibration level before downloading all files. If ``calib_level`` is ignored, the calibration level will default to 2.
+
+        :param save: (optional, boolean)
+            Python ``boolean`` that either saves Gaussian fit, periodogram results, and other useful data automatically or does not save results except for the downloaded data. If 
+            ignored, ``save`` will default to false.
+
+
+        :param token: (optional, string)
+            This parameter takes a Python ``string`` of a given MAST API token. This is required for certain functions, such as accessing JWST mnemonics and technical information, as well
+            as program IDs with exclusive rights. If ignored, a blank MAST API token attribute will be created and access to JWST mnemonics will be limited and any program ID marked with
+            exclusive rights will not be loaded.        
 
         Returns
         -------
@@ -650,6 +810,17 @@ class load:
         '''
         This function neatly packages useful stellar properties of guidestars in a specified program ID from the ``self.fg_table``, created from running the ``download``
         function.
+
+        Parameters
+        ----------
+        
+            No function parameters, but takes the `self.fg_table`, `self.fg_datamodel`, and `self.stitcher` attributes as inputs.
+
+        Returns
+        -------
+
+            This function returns a table with the guidestar or object properties.
+
         '''
 
         object_table = pd.DataFrame(columns=['guidestar_catalog_id','GAIAdr3sourceID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
@@ -685,6 +856,11 @@ class load:
     def table(self,):
         '''
         This function takes the guidestar ID from ``self.fg_table`` and adds essential information to a new table such as stellar properties, GAIA IDs, and magnitudes.
+
+        Parameters
+        ----------
+        
+            No function parameters, but takes the `self.fg_table` attribute as an input.
 
         Returns
         -------
@@ -727,6 +903,64 @@ class load:
         This function opens a singular FG-GS guidestar FITS and writes attributes for ``self.fg_array``, ``self.fg_time``, and ``self.flux``. Note that if a program ID
         is previously loaded using ``load``, the attributes already created will be overwritten. Currently, ``readfile`` does not create ``fg_table`` and ``object_properties``
         attributes.
+
+        :param dir: (optional, string)
+            The parameter "dir" allows the user to change the directory of the script. Changing the directory dictates where the class loads, creates folders, and save data and results.
+            If ignored, "load" will save the current directory as an attribute for use with other functions.
+
+        :param pid: (optional, int or string)
+            An Python ``int`` or ``string`` of the Program ID for a given JWST program (i.e.: 1296, '1296'). Program IDs that are publicly avaliable are able to be accessed. Program IDs 
+            with exclusive rights will not be accessible unless the user has a MAST API token containing the rights to the program ID. The MAST API token must be entered with param "token"
+            to use programs marked with exclusive rights. The program ID needs to be entered to use all of functions in "load". However, the pid can be ignored to use specific functions
+            within the class, though functionality will be severely limited. You can also forgo inputting the program ID to create a 'blank' object, then later input data for a pid using
+            the function ``download`` given ``pid`` and the following parameters. For example:
+                    
+                    >>> spk = spelunker.load()
+                    >>> spk.download(pid=1534)
+
+        :param obs_num: (optional, int or string)
+            The integer or string of the observation number of a program ID. Inputting the observation number will filter the auxiliary FITS to only include the files with the given
+            number before downloading all files. Note that when you specifify the observation number, you must also input the ``pid``. 
+            
+        :param visit: (optional, int or string)
+            The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
+            before downloading all files.
+
+        :param visit_group: (optional, int or string)
+            The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
+            data to only include files with the given visit group before loading the data into the object.
+
+        :param parallel_sequence_id: (optional, int or string)
+            The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
+            will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
+
+        :param activity_number: (optional, int or string)
+            The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
+            data to only include files with the given activity number before loading the data into the object.
+
+        :param exposure_number: (optional, int or string)
+            The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
+            data to only include files with the given exposure number before loading the data into the object.
+
+        :param dir_seg: (optional, int or string)
+            The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
+            files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
+            into the object.
+
+        :param guider: (optional, int or string)
+            Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
+            header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
+            the data is loaded into the object.
+
+        Returns
+        -------
+
+            The ``readfile`` function creates attributes for frame by frame flux timeseries of a guidestar, as well as a time array, and spatial array. Other data that are
+            created as attributes includes a table of the metadata for a selected program ID and object properties, which includes stellar properties of guidestars present
+            within the program. Other attributes are created and recorded using the processed guidestar data, such as ``self.datamodel`` that stores the objects for the JWST 
+            datamodel for each opened FITS and ``self.photometry_mask``. Example usage:
+
+                        >>> self.fg_array; self.fg_flux; self.fg_time; self.object_properties
         '''
 
         pid = str(pid)
@@ -900,6 +1134,13 @@ class load:
     def time_to_sec(self, fg_time):
         '''
         This function converts the values in ``fg_time`` from mjd epoch time to elapsed guidestar time in seconds.
+
+        Parameters
+        ----------
+
+            fg_time : np.array
+                (Mandatory) The guidestar time array.
+
 
         Returns
         -------
@@ -1171,6 +1412,16 @@ class load:
         '''
         Creates scaling to convert time from seconds to minutes, hours, or mjd based on the elapsed time.
 
+        Parameters
+        ----------
+
+            fg_time : np.array
+                (Mandatory) The guidestar time array.
+
+            fg_time_sec : np.array
+                (Mandatory) The guidestar time array in seconds.
+
+
         Returns
         -------
 
@@ -1204,7 +1455,7 @@ class load:
 
     def get_mask(self, frame, npixels):
         '''
-        A speficied number of pixels with the highest counts in a given frame are gathered within a mask.
+        A specified number of pixels with the highest counts in a given frame are gathered within a mask.
 
         Parameters
         ----------
@@ -1253,6 +1504,24 @@ class load:
     def bin_data(self, time, y, n_bin):
         '''
         Bins a timeseries given a number of bins. 
+
+        Parameters
+        ----------
+
+            time : np.array
+                (Mandatory) The time arrary that will be binned.
+            
+            y : np.array
+                (Mandatory) The y output that will be binned to the time (usually a flux array from a timeseries).
+
+            n_bin : int
+                (Mandatory) Number of bins to bin the timeseries.
+
+        Returns
+        -------
+
+            A binned timeseries in a tuple with elements `time_bins`, `y_bins`, and `y_err_bins`.
+
         '''
 
         # Stolen from juliet: https://github.com/nespinoza/juliet/blob/master/juliet/utils.py
@@ -1440,6 +1709,12 @@ class load:
         '''
         Using astroplan, the guidestars within a given program ID are overplotted on reference stars from the Digitized Sky Survey (DSS). During a program ID, if multiple guidestars
         are used, a line is created between the positions of the guidestar.
+
+        Parameters
+        ----------
+
+            No function parameters, but this function takes in `self.object_properties` as an input.
+
 
         Returns
         -------
