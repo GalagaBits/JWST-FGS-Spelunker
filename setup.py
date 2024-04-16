@@ -21,5 +21,5 @@ setup(name='spelunker',
       package_dir={'spelunker': 'src'},
       install_requires=['numpy','scipy', 'pandas', 'jwst', 'astroquery', 'astropy','astroplan','matplotlib', 'ray', 'wheel'],
       keywords='guidestars',
-      python_requires='>=3.10',
+      python_requires='<3.12',
       zip_safe=False)

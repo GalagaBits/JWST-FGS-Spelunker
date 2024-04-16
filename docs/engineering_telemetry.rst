@@ -7,4 +7,3 @@ Engineering Telemetry (Mnemonics)
    :maxdepth: 1
 
    Overlaying mnemonics with Gaussian fitted centriods <pixel_centroid_mnemonics>
-   Guidestar targets <guidestar_targets>

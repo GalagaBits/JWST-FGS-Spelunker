@@ -1160,7 +1160,8 @@ class load:
     def gauss2d_fit(self, fg_array='None', ncpus=4, save=False):
         '''
         This function applies a spatial gaussian fit to ``self.fg_array`` for guidestar data. The Gaussian parameters include amplitude, centriods, stddev, theta,
-        and offset. Additionally, the function ``gauss2d_fit`` will automatically apply ``ray`` parallel processing. For each frame in ``self.fg_array``, a gaussian
+        and offset. Amplitude represents the brightness in counts measured by the Gaussian fit, centriods are the x and y pixels measured, stddev is the standard deviations of the 
+        pixels in the x and y coordinates, and theta is the orientation of the Gaussian fit. Additionally, the function ``gauss2d_fit`` will automatically apply ``ray`` parallel processing. For each frame in ``self.fg_array``, a gaussian
         (which is defined with the function ``gauss2d_fit``), is fit using ``scipy.optimize.curve_fit``.
 
         Parameters
@@ -1537,7 +1538,7 @@ class load:
             
         return np.array(time_bins), np.array(y_bins), np.array(y_err_bins)
     
-    def timeseries_binned_plot(self, fg_time='None', fg_flux='None', start_time='None', end_time='None'):
+    def timeseries_binned_plot(self, fg_time='None', fg_flux='None', start_time='None', end_time='None', n_bins=96):
         '''
         Creates a matplotlib plot of the guidestar flux timeseries along with the binned flux timeseries.
 
@@ -1558,6 +1559,8 @@ class load:
                 (Optional) A specified right bound for the time component of the timeseries. The float must in the modified julian day (mjd) format. The ``end_time``
                 represents when the timeseries will end in the created plot.
 
+            n_bins : int
+                (Optional) Controls the number of bins for the plotted timeseries.
         Returns
         -------
 
@@ -1583,7 +1586,7 @@ class load:
 
         norm_flux = fg_flux/ np.nanmedian(fg_flux)
 
-        tbin, ybin, ybinerr = self.bin_data(time_scaled, norm_flux, n_bin = 96)
+        tbin, ybin, ybinerr = self.bin_data(time_scaled, norm_flux, n_bin = n_bins)
         ax.plot(time_scaled, norm_flux, color = 'black', alpha = 0.1)
         ax.errorbar(tbin, ybin, ybinerr, fmt = 'o', 
              mfc = 'white', mec = 'black', ecolor = 'black', elinewidth = 1, alpha=0.8)
@@ -1604,13 +1607,13 @@ class load:
         Parameters
         ----------
 
-            fg_time : np.array
-                (Optional) The guidestar time array. If ignored, the fg_time will be taken from ``self.fg_time``.
-
             table : np.array
                 (Optional) Here, the user can input either the Gaussian fitting results of the quick fitting results as an astropy table. Note that the table has to have exactly
                 seven columns with ordered columns representing amplitude, x_mean, y_mean, x_stddev, y_stddev, theta, and offset. If ignored, the fg_time will be taken from 
                 ``self.gaussfit_results``.
+
+            fg_time : np.array
+                (Optional) The guidestar time array. If ignored, the fg_time will be taken from ``self.fg_time``.
 
             start_time : float
                 (Optional) A specified left bound for the time component of the timeseries plots. The float must in the modified julian day (mjd) format. The ``start_time``
