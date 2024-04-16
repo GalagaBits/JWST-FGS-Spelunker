@@ -4,26 +4,26 @@ Using ``spelunker`` to study JWST Time Series Observations (TSOs)
 --------------
 
 **Authors:** Néstor Espinoza (nespinoza@stsci.edu), Derod Deal
-(dealderod@ufl.edu) \| **Last update:** July 25, 2023
+(dealderod@ufl.edu) \| **Last update:** Apr 16, 2024
 
-**Program version:** ver. 0.5.3
+**Program version:** ver. 1.1.9
 
 JWST Time Series Observations (TSOs) are multi-integration exposures
-typically targetted at exploring time-varying phenomena: from
-exoplanetary transits to accreeting material in distant objects.
+typically targeted at exploring time-varying phenomena: from
+exoplanetary transits to accreting material in distant objects.
 Guidestar data such as the one ``spelunker`` can query can become very
 helpful at exploring this data; this tutorial provides an introduction
 on how to use the ``spelunker`` products to analyze it.
 
-1. The case of HAT-P-14b NIRISS/SOSS observations
-=================================================
+1. The case of HAT-P-14 b NIRISS/SOSS observations
+==================================================
 
 The first dataset we will be analyzing below comes from an exoplanetary
 transit obtained by `Program ID
 1541 <https://www.stsci.edu/jwst/science-execution/program-information?id=1541>`__
 (PI: Espinoza). This dataset was already introduced in `Albert et
 al. (2023) <https://arxiv.org/abs/2306.04572>`__, and consisted of a
-transit observation of the exoplanet HAT-P-14~b, which was used to test
+transit observation of the exoplanet HAT-P-14 b, which was used to test
 the sensitivity and stability of the NIRISS/SOSS instrument during
 commissioning.
 
@@ -36,14 +36,32 @@ To start the analysis, let’s load some libraries:
     
     import spelunker
 
-1.1 Exploring the transit event of HAT-P-14b
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code:: ipython3
 
-Let’s first load and plot the NIRISS/SOSS HAT-P-14~b data:
+    spelunker.__version__
+
+
+
+
+.. parsed-literal::
+
+    '1.1.9'
+
+
+
+1.1 Exploring the transit event of HAT-P-14 b
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Let’s first load and plot the NIRISS/SOSS HAT-P-14 b dataset. This is a
+lightcurve that was obtained using the ``transitspectroscopy`` pipeline
+(`Espinoza, 2022 <https://zenodo.org/records/6960924#.YutMaezMLUI>`__,
+and which can be obtained from the ``spelunker`` Github repository
+`here <https://raw.githubusercontent.com/GalagaBits/JWST-FGS-Spelunker/main/notebooks/data/hp14_lightcurve.dat>`__;
+we extract the time, flux and error on the flux from this data file:
 
 .. code:: ipython3
 
-    t, f, ferr = np.loadtxt('hp14_lightcurve.dat', unpack = True, usecols = (0,1,2))
+    t, f, ferr = np.loadtxt('data/hp14_lightcurve.dat', unpack = True, usecols = (0,1,2))
 
 .. code:: ipython3
 
@@ -64,23 +82,15 @@ Let’s first load and plot the NIRISS/SOSS HAT-P-14~b data:
     plt.yticks(fontsize=16)
     
     plt.xlim(np.min(time_since_start), np.max(time_since_start))
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 6.09976451843977)
-
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_4_1.png
 
-
 All right. This time-series shows a nice transit event from about hour
-2.5 since exposure start, all the way until about hour 5. Aside from the
-transit event, however, there is an evident oscillation in the data,
+2.75 since exposure start, all the way until about hour 5. Aside from
+the transit event, however, there is an evident oscillation in the data,
 which is evident if we do a zoom to the first three hours of data:
 
 .. code:: ipython3
@@ -104,19 +114,12 @@ which is evident if we do a zoom to the first three hours of data:
     
     plt.xlim(np.min(time_since_start), 3)
     plt.ylim(-500, 500)
-
-
-
-
-.. parsed-literal::
-
-    (-500.0, 500.0)
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_6_1.png
-
 
 The light curve has at least two oscillation patterns. One is a
 long-term one, on which the light curve seems to rise at about hour 0.5
@@ -133,7 +136,13 @@ guidestar data to find this out.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let’s use ``spelunker`` to load the guidestar data for this Program
-ID/observation/visit:
+ID/observation/visit. To get these values, one can explore the Program
+Information webpage for the program
+`here <https://www.stsci.edu/jwst/science-execution/program-information?id=1541>`__
+and click on the `“Visit Status Information”
+page <https://www.stsci.edu/jwst/science-execution/program-information?id=1541>`__
+that will present this data to a user. In our case, this dataset
+corresponds to PID 1541, observation number 1 and visit 1:
 
 .. code:: ipython3
 
@@ -166,14 +175,7 @@ Let’s check the time-series of the guidestar data:
     plt.yticks(fontsize=16)
     
     plt.xlim(np.min(time_since_start), np.max(time_since_start))
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 6.09976451843977)
-
+    plt.show()
 
 
 
@@ -181,8 +183,10 @@ Let’s check the time-series of the guidestar data:
 
 
 The raw photometry from the guidestar varies by a lot more than our
-target star. Let’s bin the FGS time-series to the same cadence as the
-science time-series. To this end, let’s write a function that does this:
+target star due to random noise in the very high cadence JWST FGS data.
+Let’s bin the FGS time-series to the same cadence as the science
+time-series, which will allow us to see more structure in the data. To
+this end, let’s write a function that does this:
 
 .. code:: ipython3
 
@@ -238,19 +242,11 @@ science time-series. To this end, let’s write a function that does this:
     
     plt.ylim(-10000, 10000)
     plt.xlim(np.min(time_since_start), 3)
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 3.0)
-
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_14_1.png
-
 
 This actually resembles the science time-series quite nicely, although
 at a different amplitude. Let’s plot both on the same figure:
@@ -275,14 +271,8 @@ at a different amplitude. Let’s plot both on the same figure:
     
     plt.xlim(np.min(time_since_start), 3)
     plt.ylim(-500, 500)
-
-
-
-
-.. parsed-literal::
-
-    (-500.0, 500.0)
-
+    
+    plt.show()
 
 
 
@@ -299,7 +289,10 @@ other features that could be correlated with instrumental systematics.
 ``spelunker`` can also fit Gaussians to each of the 2D FG frames, and
 extract more precise parameters than the simple “crude” photometry
 described above. This takes a while (a few minutes), so we need to be a
-bit patient:
+bit patient. Note there’s a series of messages that appear below — these
+come from ``ray``, a multi-processing library ``spelunker`` uses in the
+background. None of the errors are important for our particular
+application.
 
 .. code:: ipython3
 
@@ -347,8 +340,8 @@ Let’s plot all of those parameters for the entire duration of the TSO:
         
         plt.xlim(np.min(time_since_start), np.max(time_since_start))
         plt.ylim(median-3*std,median+5*std)
-
-
+    
+    plt.show()
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_22_0.png
 
@@ -416,22 +409,21 @@ function that standarizes our regressors:
     
     plt.xlim(np.min(time_since_start), 3)
     plt.ylim(-500, 500)
-
-
-
-
-.. parsed-literal::
-
-    (-500.0, 500.0)
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_25_1.png
 
-
 Very nice correlation between variables! Also, note how the x-standard
-deviation detects what appears to be a small tilt event:
+deviation detects what appears to be a small “tilt event” —
+`un-commanded changes of the primary mirror
+segments <https://jwst-docs.stsci.edu/methods-and-roadmaps/jwst-time-series-observations/jwst-time-series-observations-noise-sources#JWSTTimeSeriesObservationsNoiseSources-%22Tilt%22events>`__,
+believed to happen due to release of stored stresses in the mirror
+(`Lajoie et al.,
+2023 <https://www.stsci.edu/files/live/sites/www/files/home/jwst/documentation/technical-documents/_documents/JWST-STScI-008497.pdf>`__)
+— and which manifest as abrupt PSF position and shape changes:
 
 .. code:: ipython3
 
@@ -447,19 +439,12 @@ deviation detects what appears to be a small tilt event:
     plt.yticks(fontsize=16)
     plt.ylim(0.7025,0.7115)
     plt.xlim(np.min(time_since_start), np.max(time_since_start))
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 6.09976451843977)
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_27_1.png
-
 
 Seeing this from the actual TSO is quite difficult, because the tilt
 event happened *just* during ingress:
@@ -492,20 +477,8 @@ event happened *just* during ingress:
     plt.ylabel('$\sigma_X$ (pix)', fontsize = 18, color = 'tomato')
     
     plt.yticks(fontsize=16, color = 'tomato')
-
-
-
-
-.. parsed-literal::
-
-    (array([0.702, 0.704, 0.706, 0.708, 0.71 , 0.712]),
-     [Text(1, 0.7020000000000001, '0.702'),
-      Text(1, 0.7040000000000001, '0.704'),
-      Text(1, 0.7060000000000001, '0.706'),
-      Text(1, 0.7080000000000001, '0.708'),
-      Text(1, 0.7100000000000001, '0.710'),
-      Text(1, 0.7120000000000001, '0.712')])
-
+    
+    plt.show()
 
 
 
@@ -521,11 +494,16 @@ ERS observations of WASP-39 b with NIRSpec/G395H.
 
 Let’s repeat the analysis for the transit WASP-39 b with NIRSpec/G395H.
 Let’s study the NRS1 lightcurve presented in `Alderson et
-al. (2023) <https://www.nature.com/articles/s41586-022-05591-3>`__:
+al. (2023) <https://www.nature.com/articles/s41586-022-05591-3>`__. This
+lightcurve, as the one for HAT-P-14 b introduced above, was also
+generated using the ``transitspectroscopy`` pipeline — we have uploaded
+this to this Github repository as well
+`here <https://raw.githubusercontent.com/GalagaBits/JWST-FGS-Spelunker/main/notebooks/data/w39_lightcurve.dat>`__.
+We extract the time, flux and error on the flux:
 
 .. code:: ipython3
 
-    t, f, ferr = np.loadtxt('w39_lightcurve.dat', unpack = True, usecols = (0,1,2))
+    t, f, ferr = np.loadtxt('data/w39_lightcurve.dat', unpack = True, usecols = (0,1,2))
 
 .. code:: ipython3
 
@@ -546,19 +524,12 @@ al. (2023) <https://www.nature.com/articles/s41586-022-05591-3>`__:
     plt.yticks(fontsize=16)
     
     plt.xlim(np.min(time_since_start), np.max(time_since_start))
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 8.256138402968645)
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_32_1.png
-
 
 Note that break in the transit light curve? That’s a tilt event. One
 that ``spelunker`` can also detect! Let’s run the ``spelunker`` magic
@@ -576,7 +547,6 @@ This, in particular, is observation number 3, visit 1:
     Current working directory for spelunker: /Users/nespinoza/github/JWST-FGS-Spelunker/notebooks/spelunker_outputs
     
     Connecting with astroquery...
-
 
 Let’s explore the guidestar (binned) photometry:
 
@@ -599,19 +569,12 @@ Let’s explore the guidestar (binned) photometry:
     plt.yticks(fontsize=16)
     
     plt.xlim(np.min(time_since_start), np.max(time_since_start))
-
-
-
-
-.. parsed-literal::
-
-    (0.0, 8.256138402968645)
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_37_1.png
-
 
 Oh my. It’s not only one, but perhaps…two, three tilt events?:
 
@@ -642,31 +605,12 @@ Oh my. It’s not only one, but perhaps…two, three tilt events?:
     
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16, color = 'tomato')
-
-
-
-
-.. parsed-literal::
-
-    (array([-100000.,  -80000.,  -60000.,  -40000.,  -20000.,       0.,
-              20000.,   40000.,   60000.,   80000.,  100000.]),
-     [Text(1, -100000.0, '−100000'),
-      Text(1, -80000.0, '−80000'),
-      Text(1, -60000.0, '−60000'),
-      Text(1, -40000.0, '−40000'),
-      Text(1, -20000.0, '−20000'),
-      Text(1, 0.0, '0'),
-      Text(1, 20000.0, '20000'),
-      Text(1, 40000.0, '40000'),
-      Text(1, 60000.0, '60000'),
-      Text(1, 80000.0, '80000'),
-      Text(1, 100000.0, '100000')])
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_39_1.png
-
 
 Very interesting. Let’s explore the gaussian fits to the data:
 
@@ -713,30 +657,18 @@ Let’s go right away to the X standard deviation:
     plt.ylabel('$\sigma_X$ (pix)', fontsize = 18, color = 'tomato')
     
     plt.yticks(fontsize=16, color = 'tomato')
-
-
-
-
-.. parsed-literal::
-
-    (array([0.662, 0.664, 0.666, 0.668, 0.67 , 0.672]),
-     [Text(1, 0.662, '0.662'),
-      Text(1, 0.664, '0.664'),
-      Text(1, 0.666, '0.666'),
-      Text(1, 0.668, '0.668'),
-      Text(1, 0.67, '0.670'),
-      Text(1, 0.672, '0.672')])
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_45_1.png
 
-
 Very interesting! The “tilt” event is beautifully detected by the
 guidestar data. Best of all, we can see the event at any resolution we
-want thanks to it. Let’s write a function that can bin the data at any
-temporal resolution so we can see this in action:
+want thanks to it, because the FGS data has much higher tempoeral
+resolution that the TSO data itself. Let’s write a function that can bin
+the data at any temporal resolution so we can see this in action:
 
 .. code:: ipython3
 
@@ -791,31 +723,17 @@ temporal resolution so we can see this in action:
     plt.ylabel('$\sigma_X$ (pix)', fontsize = 18, color = 'tomato')
     
     plt.yticks(fontsize=16, color = 'tomato')
-
-
-
-
-.. parsed-literal::
-
-    (array([0.66 , 0.662, 0.664, 0.666, 0.668, 0.67 , 0.672, 0.674, 0.676]),
-     [Text(1, 0.66, '0.660'),
-      Text(1, 0.662, '0.662'),
-      Text(1, 0.664, '0.664'),
-      Text(1, 0.666, '0.666'),
-      Text(1, 0.668, '0.668'),
-      Text(1, 0.67, '0.670'),
-      Text(1, 0.672, '0.672'),
-      Text(1, 0.674, '0.674'),
-      Text(1, 0.676, '0.676')])
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_48_1.png
 
-
 Interestingly, in this case, the Y-standard deviation samples the event
-even better:
+even better, when considering the amplitude of the “jump” in this time
+series to the overall scatter of the time-series for the Y-standard
+deviation itself, :math:`\sigma_Y`:
 
 .. code:: ipython3
 
@@ -854,20 +772,8 @@ even better:
     plt.ylabel('$\sigma_Y$ (pix)', fontsize = 18, color = 'cornflowerblue')
     
     plt.yticks(fontsize=16, color = 'cornflowerblue')
-
-
-
-
-.. parsed-literal::
-
-    (array([0.58, 0.59, 0.6 , 0.61, 0.62, 0.63]),
-     [Text(1, 0.5800000000000001, '0.58'),
-      Text(1, 0.5900000000000001, '0.59'),
-      Text(1, 0.6000000000000001, '0.60'),
-      Text(1, 0.6100000000000001, '0.61'),
-      Text(1, 0.6200000000000001, '0.62'),
-      Text(1, 0.6300000000000001, '0.63')])
-
+    
+    plt.show()
 
 
 
@@ -916,23 +822,17 @@ positions:
     plt.ylabel('$Y$ (pix)', fontsize = 18, color = 'cornflowerblue')
     
     plt.yticks(fontsize=16, color = 'cornflowerblue')
-
-
-
-
-.. parsed-literal::
-
-    (array([3.71 , 3.715, 3.72 , 3.725, 3.73 , 3.735, 3.74 ]),
-     [Text(1, 3.71, '3.710'),
-      Text(1, 3.715, '3.715'),
-      Text(1, 3.72, '3.720'),
-      Text(1, 3.725, '3.725'),
-      Text(1, 3.73, '3.730'),
-      Text(1, 3.735, '3.735'),
-      Text(1, 3.74, '3.740')])
-
+    
+    plt.show()
 
 
 
 .. image:: fgs-spelunker-and-tsos_files/fgs-spelunker-and-tsos_52_1.png
 
+
+It is this availability of derived products from the FGS frames what
+makes this data so rich and powerful when compared against science data.
+In particular, the different ways in which different FGS parameters
+might correlate with the science data might be useful to decorrelate the
+science time-series itself, which might help correcting for events such
+as the ones showcased above.
