@@ -35,6 +35,9 @@ spk = spelunker.load(pid=1534)
 
 Through efficient parallelization processes, the pipeline can use this data to extract photometry in seconds and point-spread function information from all frames within a selected Program ID in minutes. Data loaded within the package allows for many possible analyses relevant to existing science programs and to perform science with the JWST FGS guide star data. In addition, ``spelunker`` provides visualization and analysis tools to study these products in detail, including the incorporation of JWST engineering telemetry, which can be used to put the JWST FGS data products in context with other observatory variables that might help explain data patterns both in the primary science data products and on the JWST FGS data itself. The library also cross-references, tracks and stores guide star metadata for the user. This metadata includes information such as the GAIA ID of the guide star, coordinates, and magnitudes, among others.
 
+![A snippet from the guidestar timeseries from Cycle 1 GO Program ID 1803. **Top** — The guidestar timeseries of PID 1803 after loading it into ``spelunker`` using ``timeseries_binned_plot``. **Bottom** — The same timeseries after applying pixel level decorrelation (PLD) using ``optimize_photometry`` [@deming_spitzer_2015]. \label{fig:guidestar_1803}](pid1803-001-001_optimize.png)
+
+
 # Acknowledgements
 
 We would like to thank the Space Telescope Science Institute and the National Astronomy Consortium for the opportunity to develop this project. In particular, we acknowledge funding and support from the 2023 version of the Space Astronomy Summer Program (SASP) at STScI that made it possible for the authors to work together on this project.
