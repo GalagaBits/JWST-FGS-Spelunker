@@ -34,7 +34,6 @@ The James Webb Space Telescope [@gardner_james_2023] produces some of the highes
 
 ![A snippet from the guidestar timeseries from Cycle 1 GO Program ID 1803, observation 1, and visit 1. **Top** — The guidestar timeseries of PID 1803 after loading it into ``spelunker`` using ``timeseries_binned_plot``. The timeseries uses the sum of counts in each guidestar fine guidence (GS-FG) frame. The data has no significant features. **Middle** — The same timeseries after applying pixel level decorrelation [PLD, @deming_spitzer_2015] using ``optimize_photometry``. There are now prominent decreases in flux which were previously unseen with the raw timeseries data. **Bottom** — Gaussian fitted x pixel coordinate and y pixel coordinate for each frame in this section of timeseries data. The guidestar shifts around in this timeseries, likely highlighting the functions of the ACS. \label{fig:guidestar_1803}](timeseries_plot.png)
 
-![There are seven parameters `gauss2d_fit` measures: amplitude (counts of the guidestar), x pixel coordinate, y pixel coordinate, the x and y standard deviations, theta (orientation of the Gaussian model), and the offset (the background counts). This diagram visualizes what each parameter represents on the Gaussian model. \label{fig:Gaussian_diagram}](Gaussian_diagram.png)
 
 # Overview of Spelunker
 
@@ -48,11 +47,15 @@ Spelunker uses ``astroquery`` and MAST [@marston_overview_2018] to find and down
 
 - **``gauss2d_fit``**
 
+![There are seven parameters `gauss2d_fit` measures: amplitude (counts of the guidestar), x pixel coordinate, y pixel coordinate, the x and y standard deviations, theta (orientation of the Gaussian model), and the offset (the background counts). This diagram visualizes what each parameter represents on the Gaussian model. \label{fig:Gaussian_diagram}](Gaussian_diagram.png)
+
 - **``mnemonics``**
 
 - **``periodogram``**
 
 - **``optimize_photometry``**
+
+
 # Acknowledgements
 
 We would like to thank the Space Telescope Science Institute and the National Astronomy Consortium for the opportunity to develop this project. In particular, we acknowledge funding and support from the 2023 version of the Space Astronomy Summer Program (SASP) at STScI that made it possible for the authors to work together on this project. 
