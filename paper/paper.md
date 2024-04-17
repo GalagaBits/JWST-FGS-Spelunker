@@ -21,25 +21,25 @@ date: 14 November 2023
 bibliography: paper.bib
 ---
 
+
+# Summary
+
+``spelunker`` is a Python library that provides several tools for analyzing and visualizing JWST NIRISS FGS guide star data products. The library can download guide star data from the Mikulski Archive for Space Telescopes [@marston_overview_2018] for any given Program ID in a single line of code. Through efficient parallelization processes, the pipeline can use this data to extract photometry in seconds and point-spread function information from all frames within a selected Program ID in minutes. Data loaded within the package allows for many possible analyses relevant to existing science programs and to perform science with the JWST FGS guide star data. 
+
+In addition, ``spelunker`` provides visualization and analysis tools to study these products in detail, including the incorporation of JWST engineering telemetry, which can be used to put the JWST FGS data products in context with other observatory variables that might help explain data patterns both in the primary science data products and on the JWST FGS data itself. The library also cross-references, tracks and stores guide star metadata for the user. This metadata includes information such as the GAIA ID of the guide star, coordinates, and magnitudes, among others.
+
 # Statement of need
 
 The James Webb Space Telescope [@gardner_james_2023] produces some of the highest sensitivity imaging of the cosmos across all instruments. One of them, the NIRISS Fine Guidance Sensor [@doyon_jwst_2012], provides guide star imaging with a passband of 0.6 to 5 microns through two separate channels, each with a $2.3’ \times 2.3’$ field of view (FOV) and a sampling rate of 64 ms—data that is taken in parallel and is thus available for every JWST observing program. While the onboard system uses guidestars to guide the attitude control system (ACS) which stabilizes the observatory, the astronomical community can also use the data products associated with these 64 ms cadence images as science products. Usages range from studying guide star photometry in search of transient phenomena to using this data to identify and investigate technical anomalies that might occur during scientific observations with the rest of the JWST instruments. Despite this wide range of possible usages, these data products are not straightforward to manipulate and analyze, and there is no publicly available package to download, investigate, and research guidestar data. ``spelunker`` is a Python library that was developed to enable access to these guide star data products and their analysis.
 
-# Summary
-
-``spelunker`` is a Python library that provides several tools for analyzing and visualizing JWST NIRISS FGS guide star data products. The library can download guide star data from the Mikulski Archive for Space Telescopes [@marston_overview_2018] for any given Program ID in a single line of code:
-
-```python
-spk = spelunker.load(pid=1534)
-```
-
-Through efficient parallelization processes, the pipeline can use this data to extract photometry in seconds and point-spread function information from all frames within a selected Program ID in minutes. Data loaded within the package allows for many possible analyses relevant to existing science programs and to perform science with the JWST FGS guide star data. In addition, ``spelunker`` provides visualization and analysis tools to study these products in detail, including the incorporation of JWST engineering telemetry, which can be used to put the JWST FGS data products in context with other observatory variables that might help explain data patterns both in the primary science data products and on the JWST FGS data itself. The library also cross-references, tracks and stores guide star metadata for the user. This metadata includes information such as the GAIA ID of the guide star, coordinates, and magnitudes, among others.
-
 ![A snippet from the guidestar timeseries from Cycle 1 GO Program ID 1803. **Top** — The guidestar timeseries of PID 1803 after loading it into ``spelunker`` using ``timeseries_binned_plot``. **Bottom** — The same timeseries after applying pixel level decorrelation (PLD) using ``optimize_photometry`` [@deming_spitzer_2015]. \label{fig:guidestar_1803}](pid1803-001-001_optimize.png)
+
+![There are seven parameters `gauss2d_fit` measures: amplitude (counts of the guidestar), x pixel coordinate, y pixel coordinate, the x and y standard deviations, theta (orientation of the Gaussian model), and the offset (the background counts). This diagram visualizes what each parameter represents on the Gaussian model. \label{fig:Gaussian_diagram}](Gaussian_diagram.png)
+
 
 
 # Acknowledgements
 
-We would like to thank the Space Telescope Science Institute and the National Astronomy Consortium for the opportunity to develop this project. In particular, we acknowledge funding and support from the 2023 version of the Space Astronomy Summer Program (SASP) at STScI that made it possible for the authors to work together on this project.
+We would like to thank the Space Telescope Science Institute and the National Astronomy Consortium for the opportunity to develop this project. In particular, we acknowledge funding and support from the 2023 version of the Space Astronomy Summer Program (SASP) at STScI that made it possible for the authors to work together on this project. 
 
 # References
