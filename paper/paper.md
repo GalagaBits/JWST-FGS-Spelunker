@@ -50,7 +50,8 @@ Spelunker uses ``astroquery`` and MAST [@marston_overview_2018] to find and down
 
 ![There are seven parameters `gauss2d_fit` measures: amplitude (counts of the guidestar), x pixel coordinate, y pixel coordinate, the x and y standard deviations, theta (orientation of the Gaussian model), and the offset (the background counts). This diagram visualizes what each parameter represents on the Gaussian model. \label{fig:Gaussian_diagram}](Gaussian_diagram.png)
 
-- **``mnemonics``**
+- **``mnemonics``** Users can access JWST engineering telemetry and mnemonics using the ``mnemonics`` function. With a MAST API token, any mmnemoic is accessible. High-gain antenna (HGA) movement and NIRISS filter wheel current are two examples of events that can be use to overplot on science data to identify technical events on the telescope. Anomalies detection in guidestar data or data from NIRISS, NIRCAM, NIRSpec, and MIRI is one of the main abilities of this function.
+
 
 - **``periodogram``**
 
