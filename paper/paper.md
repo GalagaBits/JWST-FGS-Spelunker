@@ -36,8 +36,23 @@ The James Webb Space Telescope [@gardner_james_2023] produces some of the highes
 
 ![There are seven parameters `gauss2d_fit` measures: amplitude (counts of the guidestar), x pixel coordinate, y pixel coordinate, the x and y standard deviations, theta (orientation of the Gaussian model), and the offset (the background counts). This diagram visualizes what each parameter represents on the Gaussian model. \label{fig:Gaussian_diagram}](Gaussian_diagram.png)
 
+# Overview of Spelunker
 
+``spelunker`` allows anyone to download and ultilze fine guidence guidestar data from the JWST. Users can use the following lines of code to download GS-FG data into an object:
 
+```python
+spk = spelunker.load(pid=1534)
+```
+
+Spelunker uses ``astroquery`` and MAST [@marston_overview_2018] to find and download GS-FG FITS files. There are several functions that can manipulate and analyze guidestar data:
+
+- **``gauss2d_fit``**
+
+- **``mnemonics``**
+
+- **``periodogram``**
+
+- **``optimize_photometry``**
 # Acknowledgements
 
 We would like to thank the Space Telescope Science Institute and the National Astronomy Consortium for the opportunity to develop this project. In particular, we acknowledge funding and support from the 2023 version of the Space Astronomy Summer Program (SASP) at STScI that made it possible for the authors to work together on this project. 
