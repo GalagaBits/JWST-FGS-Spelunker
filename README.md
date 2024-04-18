@@ -8,7 +8,7 @@
 
 `spelunker` is a package that assists on studying JWST FGS/NIRISS guidestar data. Check out our [readthedocs](https://jwst-fgs-spelunker.readthedocs.io) for detailed documentation.
 
-HTML: <a href="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e"><img src="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e/status.svg"></a>
+<a href="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e"><img src="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e/status.svg"></a>
 
 ## Statement of need
 
