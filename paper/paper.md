@@ -58,7 +58,7 @@ spk = spelunker.load(pid=1534)
 
 With the mentioned tools, ``spelunker`` utilizes object oriented programming (OOP) to store handy variables and ``spelunker`` outputs, for instance, 1D and 2D timeseries, guidestar time arrays, and JWST datamodels. Running ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` will store their outputs in accessible attributes. Useful properties of the guidestar are stored in these attributes (for instance, guidestar galactic coordinates, GAIA ID, and stellar magnitudes).
 
-There are various plotting and visualization tools integrated into ``spelunker``'s workflow. One useful function is ``timeseries_binned_plot``, which automatically plots a binned timeseries. The functions ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` have ``matplotlib`` axes returned for straightforward plotting. Of course, users have the option to use the guidestar data and results from attributes to generate plots and visualizations. 
+There are various plotting and visualization tools integrated into ``spelunker``'s workflow. One useful function is ``timeseries_binned_plot``, which automatically plots a binned timeseries. The functions ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` have ``matplotlib`` axes returned for straightforward plotting. Animations of spatial timeseries are another visualization tool covered under ``spelunker``. Of course, users have the option to use the guidestar data and results from attributes to generate plots. 
 
 
 # Acknowledgements
