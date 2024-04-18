@@ -49,7 +49,7 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <sim
 Tutorials
 =========
 
-    * `Pixel Centroid Mnemonics <pixel_centroid_mnemonics>``
+    * :doc:`Pixel Centroid Mnemonics <pixel_centroid_mnemonics>`
     * Using ``spelunker`` to study :doc:`JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
 
 License & Attribution
