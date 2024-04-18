@@ -43,7 +43,7 @@ The James Webb Space Telescope [@gardner_james_2023] produces some of the highes
 spk = spelunker.load(pid=1534)
 ```
 
-Spelunker uses ``astroquery`` and MAST [@marston_overview_2018] to find and download GS-FG FITS files. There are several functions that can manipulate and analyze guidestar data:
+``spelunker`` uses ``astroquery`` and MAST [@marston_overview_2018] to find and download GS-FG FITS files. There are several functions that can manipulate and analyze guidestar data:
 
 - **``gauss2d_fit``** A spatial Gaussian fit is applied to each of the frames loaded into the `spk` object. The Gaussian will fit the amplitude, pixel coordinates, pixel standard deviations, the model's orientation, and the background offset. A diagram of Gaussian fitting parameters is shown in \autoref{fig:Gaussian_diagram}. The Gaussian measurements are then stored in ``spk.gaussfit_results`` as an astropy table. Fitting spatial Gaussians to your guidestar data can allow you to reveal technical anomalies that might be confused with science data from NIRISS or other JWST instruments and within the Guidestar flux timeseries (see \autoref{fig:guidestar_1803}).
 
@@ -55,6 +55,10 @@ Spelunker uses ``astroquery`` and MAST [@marston_overview_2018] to find and down
 - **``periodogram``** This function uses the Lomb-Scarle periodogram [@lomb_least-squares_1976, scargle_studies_1982] to detect periodicities in guidestar Gaussian fits. Periods in Gaussian fitted parameters like x and y pixel coordinates highlight systematics for an entire PID.
 
 - **``optimize_photometry``** ``optimize_photometry`` uses pixel-level decorrelation [PLD;@deming_spitzer_2015] to optimize raw guidestar data loaded from ``spelunker``. \autoref{fig:guidestar_1803} demonstrates that ``optimize_photometry`` reveals more information from guidestar timeseries than a guidestar timeseries produced by the sum of counts in each frame.
+
+With the mentioned tools, ``spelunker`` utilizes object oriented programming (OOP) to store handy variables and ``spelunker`` outputs, for instance, 1D and 2D timeseries, guidestar time arrays, and JWST datamodels. Running ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` will store their outputs in accessible attributes. Useful properties of the guidestar are stored in these attributes (for instance, guidestar galactic coordinates, GAIA ID, and stellar magnitudes).
+
+There are various plotting and visualization tools integrated into ``spelunker``'s workflow. One useful function is ``timeseries_binned_plot``, which automatically plots a binned timeseries. The functions ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` have ``matplotlib`` axes returned for straightforward plotting. Of course, users have the option to use the guidestar data and results from attributes to generate plots and visualizations. 
 
 
 # Acknowledgements
