@@ -52,9 +52,9 @@ spk = spelunker.load(pid=1534)
 
 - **``mnemonics``** Users can access JWST engineering telemetry and mnemonics using the ``mnemonics`` function. With a MAST API token, any mnemonic is accessible. High-gain antenna (HGA) movement and NIRISS filter wheel current are two examples of events that overplot science data to identify technical events on the telescope. Anomalies detection in guidestar data or data from NIRISS, NIRCAM, NIRSpec, and MIRI is one of the primary abilities of this function.
 
-- **``periodogram``** This function uses the Lomb-Scarle periodogram [@lomb_least-squares_1976, scargle_studies_1982] to detect periodicities in guidestar Gaussian fits. Periods in Gaussian fitted parameters like x and y pixel coordinates highlight systematics for an entire PID.
+- **``periodogram``** This function uses the Lomb-Scarle periodogram [@lomb_least-squares_1976, @scargle_studies_1982] to detect periodicities in guidestar Gaussian fits. Periods in Gaussian fitted parameters like x and y pixel coordinates highlight systematics for an entire PID.
 
-- **``optimize_photometry``** ``optimize_photometry`` uses pixel-level decorrelation [PLD;@deming_spitzer_2015] to optimize raw guidestar data loaded from ``spelunker``. \autoref{fig:guidestar_1803} demonstrates that ``optimize_photometry`` reveals more information from guidestar timeseries than a guidestar timeseries produced by the sum of counts in each frame.
+- **``optimize_photometry``** ``optimize_photometry`` uses pixel-level decorrelation [PLD; @deming_spitzer_2015] to optimize raw guidestar data loaded from ``spelunker``. \autoref{fig:guidestar_1803} demonstrates that ``optimize_photometry`` reveals more information from guidestar timeseries than a guidestar timeseries produced by the sum of counts in each frame.
 
 With the mentioned tools, ``spelunker`` utilizes object oriented programming (OOP) to store handy variables and ``spelunker`` outputs, for instance, 1D and 2D timeseries, guidestar time arrays, and JWST datamodels. Running ``gauss2d_fit``, ``periodogram``, and ``mnemonics`` will store their outputs in accessible attributes. Useful properties of the guidestar are stored in these attributes (for instance, guidestar galactic coordinates, GAIA ID, and stellar magnitudes).
 
