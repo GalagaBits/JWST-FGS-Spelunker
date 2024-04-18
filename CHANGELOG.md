@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.10] - 2024-04-16 (Current release)
+## [1.1.11] - 2024-04-17 (Current release)
+
+- Improvements and enhancements.
+
+## [1.1.10] - 2024-04-16
 
 - Added ability to control number of bins in `timeseries_binned_plot.
 - Changed Python requirements.
