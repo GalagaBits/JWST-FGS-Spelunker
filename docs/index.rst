@@ -40,16 +40,16 @@ For a quick start on how to use spelunker, go to the :doc:`Quickstart guide <sim
    Index <self>
    Installation <installation>
    Quickstart <simple_quickstart>
+   Exploring Spelunker tools and features <user/fgs-spelunker_quickstart>
    Time Series Observations (TSO) <timeseries_observations>
    Engineering Telemetry <engineering_telemetry>
-   Exploring Spelunker tools and features <user/fgs-spelunker_quickstart>
    API <api>
 
 
 Tutorials
 =========
 
-    * Pixel Centroid Mnemonics <pixel_centroid_mnemonics>
+    * `Pixel Centroid Mnemonics <pixel_centroid_mnemonics>``
     * Using ``spelunker`` to study :doc:`JWST Time Series Observations (TSOs) <user/fgs-spelunker-and-tsos>`.
 
 License & Attribution
