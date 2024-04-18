@@ -228,7 +228,7 @@ guidestar for another event.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_17_1.png
-   :scale: 40%
+   :scale: 60%
 
 .. image:: pixel_centroid_mnemonics_files/1541movie.gif
-   :scale: 40%
+   :scale: 30%
