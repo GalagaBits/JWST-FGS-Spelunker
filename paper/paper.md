@@ -52,7 +52,7 @@ spk = spelunker.load(pid=1534)
 
 - **``mnemonics``** Users can access JWST engineering telemetry and mnemonics using the ``mnemonics`` function. With a MAST API token, any mnemonic is accessible. High-gain antenna (HGA) movement and NIRISS filter wheel current are two examples of events that overplot science data to identify technical events on the telescope. Anomalies detection in guidestar data or data from NIRISS, NIRCAM, NIRSpec, and MIRI is one of the primary abilities of this function.
 
-- **``periodogram``** This function uses the Lomb-Scarle periodogram [@lomb_least-squares_1976,@scargle_studies_1982] to detect periodicities in guidestar Gaussian fits. Periods in Gaussian fitted parameters like x and y pixel coordinates highlight systematics for an entire PID.
+- **``periodogram``** This function uses the Lomb-Scarle periodogram (@lomb_least-squares_1976,@scargle_studies_1982) to detect periodicities in guidestar Gaussian fits. Periods in Gaussian fitted parameters like x and y pixel coordinates highlight systematics for an entire PID.
 
 - **``optimize_photometry``** ``optimize_photometry`` extracts the highest SNR pixels to optimize raw guidestar photometry loaded from ``spelunker``. \autoref{fig:guidestar_1803} demonstrates that ``optimize_photometry`` reveals more information from guidestar timeseries than a guidestar timeseries produced by the sum of counts in each frame.
 
