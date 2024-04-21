@@ -10,7 +10,7 @@ First, load the program ID. The download for this PID is long, we are using `spk
 
 .. code:: ipython3
 
-import spelunker
+    import spelunker
 
     spk = spelunker.load()
     spk.readfile(pid=2079, obs_num=4, visit=1)

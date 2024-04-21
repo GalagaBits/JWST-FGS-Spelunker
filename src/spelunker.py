@@ -905,8 +905,7 @@ class load:
         return master_table
     
 
-    def readfile(self, pid, obs_num='None', visit='None', visit_group='None', parallel_sequence_id='None', 
-                 activity_number='None', exposure_number='None', dir_seg='None', guider='None',):
+    def readfile(self, pid, obs_num='None', visit='None',):
         '''
         This function opens a singular FG-GS guidestar FITS and writes attributes for ``self.fg_array``, ``self.fg_time``, and ``self.flux``. Note that if a program ID
         is previously loaded using ``load``, the attributes already created will be overwritten. Currently, ``readfile`` does not create ``fg_table`` and ``object_properties``
@@ -936,32 +935,6 @@ class load:
             :param visit: (optional, int or string)
                 The visit parameter requires a Python ``int`` or ``string``. Inputting the visit number will fillter the auxiliary FITS to only include the files with the given parameter
                 before downloading all files.
-
-            :param visit_group: (optional, int or string)
-                The visit group parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``vist_group`` will filter the
-                data to only include files with the given visit group before loading the data into the object.
-
-            :param parallel_sequence_id: (optional, int or string)
-                The parallel sequence ID parameter requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``parallel_sequence_id`` 
-                will filter the data to only include files with the given parallel sequence ID before loading the data into the object.
-
-            :param activity_number: (optional, int or string)
-                The activity number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``activity_number`` will filter the
-                data to only include files with the given activity number before loading the data into the object.
-
-            :param exposure_number: (optional, int or string)
-                The exposure_number requires either a ``int`` or ``string``. After the FITS files downloads for a corresponding program ID, specifying ``exposure_number`` will filter the
-                data to only include files with the given exposure number before loading the data into the object.
-
-            :param dir_seg: (optional, int or string)
-                The segment number requires a Python ``int`` or ``string``. Specifying the segment number will include guidestar FITS with only the input number in the header if the segmented
-                files has 'seg' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before the data is loaded
-                into the object.
-
-            :param guider: (optional, int or string)
-                Similarly to `dir_seg`, the guider number requires a Python ``int`` or ``string``. Specifying the guider number will include guidestar FITS with only the input number in the 
-                header if the files has 'guider' within the naming scheme for the filename. This parameter will filter associated program ID FITS after downloading has completed and before 
-                the data is loaded into the object.
 
         Returns
         -------
@@ -1015,16 +988,17 @@ class load:
         obs_num_col = []
         visit_col = []
 
-        visit_group_col = []
-        parallel_sequence_id_col = []
-        activity_num = []
-        exposure_number_col = []
-        dir_segment_col = []
-        guider_col = []
+        # visit_group_col = []
+        # parallel_sequence_id_col = []
+        # activity_num = []
+        # exposure_number_col = []
+        # dir_segment_col = []
+        # guider_col = []
 
         for i in fg_table['filenames']:
                 obs_num_col.append(int(i[7:10]))
                 visit_col.append(int(i[10:13]))
+    
         # for i in fg_table['sliced_directory']:
         #     visit_group_col.append(int(i[14:16]))
         #     parallel_sequence_id_col.append(int(i[16]))
