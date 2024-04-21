@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
@@ -1231,7 +1232,7 @@ class load:
                                         np.nanmedian(guess['x_stddev']),np.nanmedian(guess['y_stddev']),np.nanmedian(guess['theta']),np.nanmedian(guess['offset'])])
             
             rows5_obj = []
-            for idx, data in enumerate(fg_array):
+            for data in tqdm(fg_array):
                 datar = data.ravel()
                 zodical_light = np.nanmedian(data[0:3,5:8])
                 coords = np.where(data==datar.max())
@@ -1243,7 +1244,7 @@ class load:
                 rows5_obj.append(popt)
 
             rows5 = []
-            for idx, i in enumerate(rows5_obj):
+            for i in tqdm(rows5_obj):
                 popt3 = ray.get(i)
                 rows5.append([popt3[0], popt3[1],popt3[2],popt3[3],popt3[4],popt3[5],popt3[6]])                
 
