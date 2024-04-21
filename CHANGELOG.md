@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [1.1.12] - 2024-04-21 (Current release)
+## [1.1.13] - 2024-04-21 (Current release)
+
+- Added Gaussian fit progress bar from @taylorbell57 pull request.
+
+## [1.1.12] - 2024-04-21
 
 - Improvements and enhancements.
 
