@@ -5,18 +5,26 @@ For this example, we will use the JWST engineering telemetry database to overplo
 Mnemonics are useful in detecting anomalies in guidestar data and differentiating technical events on the JWST from the guidestar flux. 
 We will use PID 2079, observation number 4, and visit number 1 and find out if there are any technical anomalies in our data using Spelunker.
 
+First, load the program ID. The download for this PID is long, we are using `spk.readfile` to load in the files that are already in the directory.
+
+
 .. code:: ipython3
 
-    import spelunker
-    
-    spk = spelunker.load('/Users/ddeal/JWST-Treasure-Chest/', pid=2079, obs_num=4, visit=1)
+import spelunker
 
+    spk = spelunker.load()
+    spk.readfile(pid=2079, obs_num=4, visit=1)
+
+    '''
+    Use spelunker.load here instead of `spk.readfile` to download the files.
+    '''
+    #spk = spelunker.load(pid=2079, obs_num=4, visit=1)
 
 You will need to input your MAST API Token to access JWST Engineering Telemetry and mnemonics.
 
 .. code:: ipython3
 
-    spk.mast_api_token = 'enter_mast_token_id_here'
+    spk.mast_api_token = 'MAST_API_TOKEN'
 
 Lets look at how many guidestars this program uses.
 
@@ -91,17 +99,15 @@ flux timeseries for the guidestar in the program.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_6_0.png
-   :scale: 40%
+   :width: 800pt
 
-We can see that the timeseries is broken up into sepeate pieces. Lets see how the obserbed properties of the target
-changes overtime. We fitted gaussians to each frame using
-``spk.gauss2d_fit`` and saved the outpput as an astropy table ``dat``
-file, so we can load the table here.
+We can see that the timeseries is broken up into sepeate pieces. Lets see how the pixel cooridinates, pixel standard deviation and Gaussian fitted amplitude of the guidestar changes overtime. We fitted gaussians to each frame using `spk.gauss2d_fit` and saved the outpput as an astropy table `dat` file, so we can load the table here.
 
 .. code:: ipython3
 
     from astropy.io import ascii
-    gaussfit_table = ascii.read('/Users/ddeal/Spelunker-older/JWST-Treasure-Chest-2023/pid2079_observation04_visit1.dat')
+    gaussfit_table = ascii.read('/Users/galagabits/Developer/FGS-Spelunker/JWST-FGS-Spelunker/notebooks/examples/data/pid2079_observation04_visit1_short.dat') # Navigate to the included Gaussian results file
+    time = spk.fg_time[1300000:1900000] # The Gaussian table was cut short to fit in GitHub, so the time needs to be the same shape as well.
 
 .. code:: ipython3
 
@@ -110,7 +116,7 @@ file, so we can load the table here.
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_9_0.png
-   :scale: 40%
+   :width: 800pt
 
 
 
@@ -127,108 +133,110 @@ file, so we can load the table here.
 
 
 We can clearly see that there are some periodic changes in the centroids
-every 0.2mjd with even smaller changes within. Lets zoom into one of the
+every hour with even smaller changes within. Lets zoom into one of the
 centroid plots.
 
 .. code:: ipython3
 
+    import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots(figsize=(12,6), dpi=200)
-    
-    ax.scatter(spk.fg_time, gaussfit_table['x_mean'], s=0.5, alpha=0.2)
+
+    ax.plot(time, gaussfit_table['x_mean'])
     ax.set_ylabel('pixel')
     ax.set_xlabel('time (mjd)')
     ax.set_title('x_mean')
-    ax.set_ylim(2.15,3.4)
-    ax.set_xlim(59976.03, 59976.05)
+    ax.set_ylim(2.15,3.5)
+    ax.set_xlim(59976.331245082925, 59976.55800643445)
 
 
-
-
-.. parsed-literal::
-
-    (59976.03, 59976.05)
 
 
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_11_1.png
-   :scale: 40%
+   :width: 800pt
 
-We can see there is multiple events happening. First off, there are
-certain breaks between the timeseries, which indicates the time where
-the FGS was not observing. Everytime the FGS starts observing again, the
-flux changes, even though we know the guidestar is the same. This raises
-more investigative questions such as why does the flux change after each
-observation if we are looking at the same target? Additonally, there
-towards 59976.045 mjd, the x centroid slightly decreases within a
-fraction of a pixel. This maybe a product of the gaussian function where
-pixel sensitivity or wide PSF affects the shape of the Gaussians. There
-is also two events that occur on the ends of the timeseries. Lets zoom
-into the event on the right and apply mnemonics.
+We can see there is multiple events happening. First off, there are certain breaks between the timeseries, which indicates the time where the FGS was not observing. Everytime the FGS starts observing again, the flux changes, even though we know the guidestar is the same. This raises more investigative questions such as why does the flux change after each observation if we are looking at the same target? Let's apply mnemonics and zoom into one event.
 
 .. code:: ipython3
 
-    import matplotlib.pyplot as plt
-    
     fig, ax = plt.subplots(figsize=(12,6), dpi=200)
-    
-    ax.plot(spk.fg_time, gaussfit_table['x_mean'], linewidth=.8)
-    
-    ax = spk.mnemonics('SA_ZHGAUPST', 59976.0475, 59976.05)
-    ax1 = spk.mnemonics('INIS_FWMTRCURR', 59976.0475, 59976.05)
-    
+
+    ax.plot(time, gaussfit_table['x_mean'], alpha=1)
+
+    ax = spk.mnemonics('SA_ZHGAUPST', 59976.331245082925, 59976.55800643445)
+    ax1 = spk.mnemonics('INIS_FWMTRCURR', 59976.331245082925, 59976.55800643445)
+
     ax.legend()
-    
+
     ax.set_ylabel('pixel')
     ax.set_xlabel('time (mjd)')
     ax.set_title('x_mean')
-    ax.set_ylim(2.1,3.0)
-    ax.set_xlim(59976.0475, 59976.0495)
-
-
-
-
-.. parsed-literal::
-
-    (59976.0475, 59976.0495)
-
-
+    ax.set_ylim(2.15,3.6)
+    ax.set_xlim(59976.331245082925, 59976.55800643445)
 
 
 .. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_13_1.png
-   :scale: 40%
+   :width: 800pt
 
-We can clearly see that some of the centroid movement can be attributed
-to the high-gain antenna (HGA) and even events from the NIRISS Filter
-Wheel.
-
-Lastly, lets create a spatial animation of the timeseries for the
-guidestar for another event.
 
 .. code:: ipython3
 
-    plt.plot(gaussfit_table['x_mean'][51200:57000], linewidth=.8)
-    plt.show()
+    fig, ax = plt.subplots(figsize=(12,6), dpi=200)
 
+    ax.scatter(time, gaussfit_table['x_mean'], alpha=.8, s=2)
 
+    ax = spk.mnemonics('SA_ZHGAUPST', 59976.5, 59976.6)
+    ax1 = spk.mnemonics('INIS_FWMTRCURR', 59976.5, 59976.6)
 
-.. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_16_0.png
-   :scale: 50%
+    ax.legend()
+
+    ax.set_ylabel('pixel')
+    ax.set_xlabel('time (mjd)')
+    ax.set_title('x_mean')
+    ax.set_ylim(2.4,2.68)
+    ax.set_xlim(59976.51570, 59976.51625)
+
+.. image:: pixel_centroid_mnemonics_files/x_mean_mnemonics.png
+   :width: 800pt
 
 .. code:: ipython3
 
-    filename = '/Users/ddeal/JWST-Treasure-Chest/event1_2079_xmean.gif'
-    spk.flux_spatial_timelapse_animation(spk.fg_array[52000:53000], spk.fg_flux[52000:53000], filename=filename)
+    fig, ax = plt.subplots(figsize=(12,6), dpi=200)
 
+    ax.plot(time, gaussfit_table['x_stddev'], alpha=.8,)
 
-.. parsed-literal::
+    ax = spk.mnemonics('SA_ZHGAUPST', 59976.5, 59976.6)
 
-    2023-07-18 21:04:16,308	INFO worker.py:1636 -- Started a local Ray instance.
+    ax.legend()
 
+    ax.set_ylabel('pixel')
+    ax.set_xlabel('time (mjd)')
+    ax.set_title('x_stddev')
+    ax.set_ylim(0.6,0.8)
+    ax.set_xlim(59976.51570, 59976.51625)
 
+.. image:: pixel_centroid_mnemonics_files/x_stddev.png
+   :width: 800pt
 
-.. image:: pixel_centroid_mnemonics_files/pixel_centroid_mnemonics_17_1.png
-   :scale: 60%
+.. code:: ipython3
 
-.. image:: pixel_centroid_mnemonics_files/1541movie.gif
-   :scale: 30%
+    fig, ax = plt.subplots(figsize=(12,6), dpi=200)
+
+    ax.scatter(time, gaussfit_table['y_mean'], alpha=.8, s=2)
+
+    ax = spk.mnemonics('SA_ZHGAUPST', 59976.5, 59976.6)
+
+    ax.legend()
+
+    ax.set_ylabel('pixel')
+    ax.set_xlabel('time (mjd)')
+    ax.set_title('y_mean')
+    ax.set_ylim(2.8,3.4)
+    ax.set_xlim(59976.51570, 59976.51625)
+
+.. image:: pixel_centroid_mnemonics_files/y_mean.png
+   :width: 800pt
+
+We can clearly see that some of the centroid movement can be attributed to the high-gain antenna (HGA) and even events from the NIRISS Filter Wheel. Additionally, in the zoomed in x centroid plot, a tilt event occurs when the HGA is moving. The JWST mirror seems to "snap" and slightly change in orientation, thus causing the `x_mean` in the guidestar data to change suddenly. At this time, the `x_stddev` spikes as well. Using the changes of pixel standard devivation or guidestar PSF is useful in detecting tilt events in your data.
