@@ -1171,6 +1171,9 @@ class load:
 
 
         '''
+        ray.shutdown()
+        ray.init(ignore_reinit_error=True, num_cpus = ncpus)
+
         if type(fg_array) == str:
             if fg_array == 'None':
                 fg_array = np.array(self.fg_array)
@@ -1188,10 +1191,8 @@ class load:
             g = amplitude*np.exp( - (a*((x-xo)**2) + 2*b*(x-xo)*(y-yo) 
                                     + c*((y-yo)**2))) + offset
             return g.ravel()
-        
-        ray.shutdown()
 
-        @ray.remote(num_cpus=ncpus, max_retries=3)
+        @ray.remote(max_retries=3)
         def ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess):
             try:
                 popt, pcov = opt.curve_fit(gaussian_2d, (xx, yy), datar, p0=initial_guess, maxfev = 2000)
@@ -1200,8 +1201,6 @@ class load:
             except RuntimeError:
                 popt = [np.nan]*7
                 return popt
-    
-        ray.init(ignore_reinit_error=True, num_cpus = ncpus)
         
         x = np.linspace(0, 7, 8)
         y = np.linspace(0, 7, 8)
