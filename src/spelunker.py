@@ -1192,7 +1192,6 @@ class load:
                                     + c*((y-yo)**2))) + offset
             return g.ravel()
 
-        @ray.remote(max_retries=3)
         def ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess):
             try:
                 popt, pcov = opt.curve_fit(gaussian_2d, (xx, yy), datar, p0=initial_guess, maxfev = 2000)
@@ -1201,7 +1200,20 @@ class load:
             except RuntimeError:
                 popt = [np.nan]*7
                 return popt
-        
+
+        def fit_gaussian(data):
+
+            datar = data.ravel()
+            zodical_light = np.nanmedian(data[0:3,5:8])
+            coords = np.where(data==datar.max())
+
+            initial_guess[6] = zodical_light
+            initial_guess[1], initial_guess[2] = int(coords[1]), int(coords[0])
+
+            popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
+            
+            return popt
+
         x = np.linspace(0, 7, 8)
         y = np.linspace(0, 7, 8)
         xx, yy = np.meshgrid(x, y)
@@ -1216,13 +1228,13 @@ class load:
 
                 initial_guess = np.array([datar.max(), int(coords[1]), int(coords[0]), 1, 1, 0, zodical_light])
 
-                popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
+                popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
                 initial_guess_main_obj.append(popt)
 
             initial_guess_main = []
 
             for i in initial_guess_main_obj:
-                popt2 = ray.get(i)
+                popt2 = i
                 initial_guess_main.append([popt2[0], popt2[1],popt2[2],popt2[3],popt2[4],popt2[5],popt2[6]])
 
             guess = Table(rows=initial_guess_main, names=['amplitude','x_mean', 'y_mean', 'x_stddev', 'y_stddev', 'theta', 'offset'])
@@ -1230,18 +1242,9 @@ class load:
             initial_guess = np.array([np.nanmedian(guess['amplitude']),np.nanmedian(guess['x_mean']),np.nanmedian(guess['y_mean']),
                                         np.nanmedian(guess['x_stddev']),np.nanmedian(guess['y_stddev']),np.nanmedian(guess['theta']),np.nanmedian(guess['offset'])])
             
-            rows5_obj = []
-            for data in tqdm(fg_array):
-                datar = data.ravel()
-                zodical_light = np.nanmedian(data[0:3,5:8])
-                coords = np.where(data==datar.max())
-
-                initial_guess[6] = zodical_light
-                initial_guess[1], initial_guess[2] = int(coords[1]), int(coords[0])
-
-                popt = ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess)
-                rows5_obj.append(popt)
-
+            fit_remote = ray.remote(fit_gaussian)
+            rows5_obj = [fit_remote.remote(data) for data in tqdm(fg_array)]
+            
             rows5 = []
             for i in tqdm(rows5_obj):
                 popt3 = ray.get(i)
@@ -1254,7 +1257,7 @@ class load:
             zodical_light = np.nanmedian(data[0:3, 5:8])
             coords = np.where(data==datar.max())
             initial_guess = np.array([datar.max(), int(coords[1]), int(coords[0]), 1, 1, 0, zodical_light])
-            popt = ray.get(ray_curve_fit.remote(gaussian_2d, xx, yy, datar, initial_guess))
+            popt = ray.get(ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess))
 
             rows5 = []
             rows5.append([popt[0], popt[1], popt[2], popt[3], popt[4], popt[5], popt[6]])
