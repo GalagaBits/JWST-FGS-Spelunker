@@ -106,7 +106,7 @@ We can see that the timeseries is broken up into sepeate pieces. Lets see how th
 .. code:: ipython3
 
     from astropy.io import ascii
-    gaussfit_table = ascii.read('/Users/galagabits/Developer/FGS-Spelunker/JWST-FGS-Spelunker/notebooks/examples/data/pid2079_observation04_visit1_short.dat') # Navigate to the included Gaussian results file
+    gaussfit_table = ascii.read('./data/pid2079_observation04_visit1_short.dat') # Navigate to the included Gaussian results file
     time = spk.fg_time[1300000:1900000] # The Gaussian table was cut short to fit in GitHub, so the time needs to be the same shape as well.
 
 .. code:: ipython3
