@@ -17,6 +17,7 @@ The following packages are required:
 * astroquery
 * pandas
 * ray (required for parallel processing of Gaussian fitting)
+* tqdm
 * astroplan (optional; for use with :func:`spelunker.load.guidestar_plot`)
 
 For Python 3.12, ``ray`` fails to install with Spelunker when using ``pip install spelunker``. We recommend using Python 3.10 when installing ``ray`` and ``spelunker``.
