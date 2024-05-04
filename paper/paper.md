@@ -37,7 +37,7 @@ The James Webb Space Telescope [@gardner_james_2023] produces some of the highes
 
 # Overview of Spelunker
 
-``spelunker`` allows anyone to download and utilize fine guidence guides tar data from the JWST. Users can use the following lines of code to download GS-FG data into an object:
+``spelunker`` allows anyone to download and utilize fine guidence guide star data from the JWST. Users can use the following lines of code to download GS-FG data into an object:
 
 ```python
 spk = spelunker.load(pid=1534)
