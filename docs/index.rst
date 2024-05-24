@@ -15,8 +15,9 @@ decorrelation (PLD).
 
 The pipline is currently under development on `GitHub <https://github.com/GalagaBits/JWST-FGS-Spelunker>`_. For any bugs or requests, send us an email or `open an issue on GitHub <https://github.com/GalagaBits/JWST-FGS-Spelunker/issues>`_.
 
-[![status](https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e/status.svg)](https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e)
-
+.. image:: https://joss.theoj.org/papers/10.21105/joss.06202/status.svg
+   :target: https://doi.org/10.21105/joss.06202
+   
 .. image:: https://img.shields.io/badge/GitHub-GalagaBits%2FJWST_FGS_Spelunker-blue
    :alt: Static Badge
    :target: https://github.com/GalagaBits/JWST-FGS-Spelunker
