@@ -1208,7 +1208,7 @@ class load:
             coords = np.where(data==datar.max())
 
             initial_guess[6] = zodical_light
-            initial_guess[1], initial_guess[2] = int(coords[1]), int(coords[0])
+            initial_guess[1], initial_guess[2] = int(coords[1][0]), int(coords[0][0])
 
             popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
             

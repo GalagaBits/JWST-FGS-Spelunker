@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.18] - 2024-05-24
+
+- Fixed bug raised by issue #48 which made `spelunker` to crash.
+
 ## [1.1.17] - 2024-04-23 (Current release)
 
 - Animation functions now work properly.
