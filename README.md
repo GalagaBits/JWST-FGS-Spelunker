@@ -6,7 +6,21 @@
 
 **Authors:** Derod Deal (dealderod@ufl.edu), Néstor Espinoza (nespinoza@stsci.edu)
 
-`spelunker` is a package that assists on studying JWST FGS/NIRISS guidestar data. Check out our [readthedocs](https://jwst-fgs-spelunker.readthedocs.io) for detailed documentation.
+`spelunker` is a package that assists on studying JWST FGS/NIRISS guidestar data. Check out our [readthedocs](https://jwst-fgs-spelunker.readthedocs.io) for detailed documentation. 
+
+**If you make use of `spelunker`, please [cite our paper](https://joss.theoj.org/papers/10.21105/joss.06202) (Deal & Espinoza, 2024, JOSS, 9(97), 6202):**
+
+    @article{Deal2024, 
+             doi = {10.21105/joss.06202}, 
+             url = {https://doi.org/10.21105/joss.06202}, 
+             year = {2024}, publisher = {The Open Journal}, 
+             volume = {9}, 
+             number = {97}, 
+             pages = {6202}, 
+             author = {Derod Deal and Néstor Espinoza}, 
+             title = {Spelunker: A quick-look Python pipeline for JWST NIRISS FGS Guide Star Data}, 
+             journal = {Journal of Open Source Software} 
+    }
 
 <a href="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e"><img src="https://joss.theoj.org/papers/1547289b35b16a5d2955b20ed3945a2e/status.svg"></a>
 
