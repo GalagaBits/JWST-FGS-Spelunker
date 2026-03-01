@@ -543,22 +543,12 @@ class load:
         
         '''
 
-        # Resolve token: prefer explicit argument, fall back to stored attribute
         _token = token if token is not None else self.mast_api_token
 
         self.pid = pid
 
         if obs_num == 'None' and visit != 'None':
             raise ValueError('When a visit is identified, the obs_num needs to be identified.')
-
-        # FIX (2025): astroquery Observations (CAOM) no longer indexes JWST FGS
-        # guidestar files as retrievable products — GS-FG never appears in
-        # get_product_list results (confirmed by diagnostics, issue #51).
-        # The correct API is the JWST-specific filtered service:
-        #   Mast.Jwst.Filtered.GuideStar
-        # which is exactly what the STScI FGS Hunter tool uses.
-        # We call it directly via the MAST JSON API, then download files using
-        # the standard MAST Download endpoint — no astroquery needed.
 
         import json
         import warnings
@@ -648,14 +638,8 @@ class load:
                 f'for program {pid}.'
             )
 
-        # calib_level: GuideStar API rows don't carry calib_level;
-        # _cal.fits is always level 2 by convention — consistent with calib_level=2 default.
-
         print(f"\t Found {len(cal_rows)} GS-FG _cal.fits file(s). Downloading...")
 
-        # Download into the same mastDownload/JWST/ tree spelunker expects,
-        # placing each file in its own subdirectory named after the stem
-        # (matches the sliced_directory logic used later in the function).
         from pathlib import Path as _Path
 
         dl_base = _Path(self.directory) / "mastDownload" / "JWST"
@@ -663,7 +647,6 @@ class load:
         for row in cal_rows:
             fname = row.get("fileName", "")
             uri   = row.get("dataURI") or f"mast:JWST/product/{fname}"
-            # Build subdir name from filename stem (strip .fits)
             stem    = fname.replace("_cal.fits", "")
             dest    = dl_base / stem / fname
             if dest.exists() and dest.stat().st_size > 0:
@@ -673,8 +656,6 @@ class load:
             except Exception as exc:
                 print(f'\t Warning: download failed for {fname}: {exc}')
 
-        # Now discover what actually downloaded (same glob logic as before,
-        # but with recursive=True and proper zero-padded PID)
         lookup_directory = str(dl_base / f'**' / f'jw{pid_padded}*_gs-fg_*_cal.fits')
         fg_raw = sorted(glob.glob(lookup_directory, recursive=True))
 
@@ -711,20 +692,8 @@ class load:
                 obs_num_col.append(int(i[7:10]))
                 visit_col.append(int(i[10:13]))
 
-        # FIX: The original code parsed visit_group/parallel_seq_id/activity_number/
-        # exposure_number from the directory name using fixed character offsets that
-        # assumed a full JWST DMS exposure filename (jw{PID5}{OBS3}{VIS3}{G}{P}{AA}{EEEEE}_...).
-        # GS-FG files use a shorter naming convention: jw{PID5}{OBS3}{VIS3}_gs-fg_...
-        # so positions 13+ are '_gs-fg_...' and the fixed offsets produce garbage / crash.
-        #
-        # These fields (visit_group, parallel_seq_id, activity_number, exposure_number)
-        # are NOT encoded in gs-fg filenames at all. They are only used downstream if
-        # the user explicitly passes those filter parameters (all default to 'None').
-        # We populate them with safe sentinel values (0 / '00') so the table builds
-        # correctly; if a user does pass those filters they will simply match nothing,
-        # which is the correct behaviour for data that doesn't encode those fields.
-        _seg_re  = _re.compile(r'_seg(\d{3})')   # segment number if present
-        _guid_re = _re.compile(r'guider(\d)')    # guider number if present
+        _seg_re  = _re.compile(r'_seg(\d{3})')
+        _guid_re = _re.compile(r'guider(\d)')
 
         for i in fg_table['sliced_directory']:
             visit_group_col.append(0)
@@ -897,9 +866,6 @@ class load:
 
         '''
 
-        # FIX: Use .get() with fallback so renamed/missing catalog columns
-        # don't crash here. The table() method now ensures canonical alias
-        # columns exist, but we guard defensively here too.
         def _safe_col(table, *names):
             for n in names:
                 if n in table.colnames:
@@ -957,10 +923,6 @@ class load:
             This function returns a new table that includes the information from ``self.table`` along with the added stellar properties as a ``pandas`` table.
 
         '''
-
-        # FIX: The STScI GSC catalog (gsss.stsci.edu) periodically renames columns.
-        # We detect them at runtime and add canonical aliases (TmassJmag, TmassHmag,
-        # GAIAdr3sourceID, ra, dec) so downstream code works regardless of catalog version.
 
         def _find_col(df, *substrings):
             """Return first df column whose name contains any substring (case-insensitive)."""
@@ -1846,11 +1808,6 @@ class load:
 
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
 
-        # FIX: astroplan's plot_finder_image passes grid=grid to SkyView.get_images(),
-        # but SkyView removed the grid parameter (astroquery >= 0.4.8 / astropy >= 6.1).
-        # Confirmed: https://github.com/astropy/astroplan/issues/588
-        # We replicate plot_finder_image's core behaviour directly — fetch the DSS
-        # image via SkyView and display with WCSAxes — without the broken grid arg.
         try:
             from astropy.wcs import WCS
             from astropy.visualization.wcsaxes import WCSAxes
