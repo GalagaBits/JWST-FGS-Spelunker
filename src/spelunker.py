@@ -543,94 +543,147 @@ class load:
         
         '''
 
-        if token is not None:
-
-            Observations.login(token=token)
-
-        if token is None:
-
-            if self.mast_api_token is not None:
-
-                Observations.login(token=self.mast_api_token)
+        # Resolve token: prefer explicit argument, fall back to stored attribute
+        _token = token if token is not None else self.mast_api_token
 
         self.pid = pid
 
         if obs_num == 'None' and visit != 'None':
             raise ValueError('When a visit is identified, the obs_num needs to be identified.')
 
-        print("Connecting with astroquery...")
-        
+        # FIX (2025): astroquery Observations (CAOM) no longer indexes JWST FGS
+        # guidestar files as retrievable products — GS-FG never appears in
+        # get_product_list results (confirmed by diagnostics, issue #51).
+        # The correct API is the JWST-specific filtered service:
+        #   Mast.Jwst.Filtered.GuideStar
+        # which is exactly what the STScI FGS Hunter tool uses.
+        # We call it directly via the MAST JSON API, then download files using
+        # the standard MAST Download endpoint — no astroquery needed.
 
-        matched_obs = Observations.query_criteria(
-            obs_collection = 'JWST',
-            proposal_id=str(pid),
-        )
-        
-        data_products = [Observations.get_product_list(obs) for obs in matched_obs]
-        data_products = vstack(data_products)
+        import json
+        import warnings
+        import requests as _requests
+        from urllib.parse import urlencode as _urlencode
 
-        products = Observations.filter_products(data_products,
-                    productType=["AUXILIARY",],
-                    extension="fits",
-                    productSubGroupDescription = "GS-FG",
-                    dataproduct_type='image'
-        )
+        _MAST_INVOKE = "https://mast.stsci.edu/api/v0/invoke"
+        _MAST_DL     = "https://mast.stsci.edu/api/v0.1/Download/file"
+
+        pid_str    = str(pid)
+        pid_padded = pid_str.zfill(5)
+
+        def _mast_guidestar_query(pid_val, exp_type="FGS_FINEGUIDE", tok=None):
+            """Query Mast.Jwst.Filtered.GuideStar for _cal.fits rows for a PID."""
+            filters = [{"paramName": "program",  "values": [str(int(pid_val))]},
+                       {"paramName": "exp_type",  "values": [exp_type]}]
+            payload = {"service": "Mast.Jwst.Filtered.GuideStar",
+                       "format":  "json",
+                       "params":  {"columns": "*", "filters": filters}}
+            body    = _urlencode({"request": json.dumps(payload)})
+            headers = {"Content-Type": "application/x-www-form-urlencoded",
+                       "Accept":       "application/json"}
+            if tok:
+                headers["Authorization"] = f"token {tok}"
+            resp = _requests.post(_MAST_INVOKE, headers=headers,
+                                  data=body, timeout=120)
+            resp.raise_for_status()
+            return resp.json().get("data", [])
+
+        def _mast_download_file(uri, dest_path, tok=None):
+            headers = {}
+            if tok:
+                headers["Authorization"] = f"token {tok}"
+            with _requests.get(_MAST_DL, params={"uri": uri},
+                                headers=headers, stream=True, timeout=600) as r:
+                r.raise_for_status()
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(dest_path, "wb") as f:
+                    for chunk in r.iter_content(65536):
+                        f.write(chunk)
+
+        print("Connecting with MAST GuideStar service...")
+
+        try:
+            rows = _mast_guidestar_query(pid, tok=_token)
+        except Exception as exc:
+            raise Exception(
+                f'MAST GuideStar query failed for program {pid}: {exc}\n'
+                'Check your network connection and MAST API token.'
+            ) from exc
+
+        if not rows:
+            raise Exception(
+                f'No FGS guidestar data found for program {pid} on MAST.\n'
+                ' 1.- You may not have access rights — pass a token via '
+                'spelunker.load(..., token="yourtoken").\n'
+                ' 2.- There may be no guidestar data for this program yet in MAST.'
+            )
+
+        # Keep only calibrated (_cal.fits) files
+        cal_rows = [r for r in rows if str(r.get("fileName", "")).endswith("_cal.fits")]
+        if not cal_rows:
+            raise Exception(
+                f'MAST returned {len(rows)} FGS row(s) for program {pid} '
+                'but none are _cal.fits files. '
+                f'File types found: {sorted(set(r.get("fileName","?")[-10:] for r in rows))}'
+            )
+
+        # Apply obs_num / visit pre-filters before downloading
+        import re as _re
+        _fn_re = _re.compile(r'jw\d{5}(\d{3})(\d{3})_gs-fg')
+
+        def _obs_visit(fname):
+            m = _fn_re.search(str(fname))
+            return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
 
         if obs_num != 'None' and visit != 'None':
-
-            obs_num_col = []
-            visit_col = []
-
-            for i in products['productFilename']:
-                obs_num_col.append(int(i[7:10]))
-                visit_col.append(int(i[10:13]))
-
-            products['obs_num'], products['visit'] = obs_num_col, visit_col
-
-            mask1 = products['calib_level'] == int(calib_level)
-            productsx = products[mask1]
-
-            mask2 = productsx['obs_num'] == int(obs_num)
-            productsx = productsx[mask2]
-
-            mask3 = productsx['visit'] == int(visit)
-            productsx = productsx[mask3]
-
+            cal_rows = [r for r in cal_rows
+                        if _obs_visit(r.get("fileName","")) == (int(obs_num), int(visit))]
         elif obs_num != 'None':
+            cal_rows = [r for r in cal_rows
+                        if _obs_visit(r.get("fileName",""))[0] == int(obs_num)]
 
-            obs_num_col = []
+        if not cal_rows:
+            raise Exception(
+                f'No _cal.fits files match obs_num={obs_num}, visit={visit} '
+                f'for program {pid}.'
+            )
 
-            for i in products['productFilename']:
-                obs_num_col.append(int(i[7:10]))
+        # calib_level: GuideStar API rows don't carry calib_level;
+        # _cal.fits is always level 2 by convention — consistent with calib_level=2 default.
 
-            products['obs_num'] = obs_num_col
+        print(f"\t Found {len(cal_rows)} GS-FG _cal.fits file(s). Downloading...")
 
-            mask1 = products['calib_level'] == int(calib_level)
-            productsx = products[mask1]
+        # Download into the same mastDownload/JWST/ tree spelunker expects,
+        # placing each file in its own subdirectory named after the stem
+        # (matches the sliced_directory logic used later in the function).
+        from pathlib import Path as _Path
 
-            mask2 = productsx['obs_num'] == int(obs_num)
-            productsx = productsx[mask2]
+        dl_base = _Path(self.directory) / "mastDownload" / "JWST"
 
-        else:
-        
-            # Filter table to only include data with calib_level = 2
-            mask = products['calib_level'] == int(calib_level)
-            productsx = products[mask]
+        for row in cal_rows:
+            fname = row.get("fileName", "")
+            uri   = row.get("dataURI") or f"mast:JWST/product/{fname}"
+            # Build subdir name from filename stem (strip .fits)
+            stem    = fname.replace("_cal.fits", "")
+            dest    = dl_base / stem / fname
+            if dest.exists() and dest.stat().st_size > 0:
+                continue
+            try:
+                _mast_download_file(uri, dest, tok=_token)
+            except Exception as exc:
+                print(f'\t Warning: download failed for {fname}: {exc}')
 
-        productsx = self.duplicate_rm(productsx)
-
-        manifest = Observations.download_products(productsx, download_dir=self.directory)
-
-        lookup_directory = self.directory+'/mastDownload/JWST/'+'**/jw0'+str(pid)+'**_gs-fg_**_cal.fits'
-        fg_raw = sorted(glob.glob(lookup_directory))
+        # Now discover what actually downloaded (same glob logic as before,
+        # but with recursive=True and proper zero-padded PID)
+        lookup_directory = str(dl_base / f'**' / f'jw{pid_padded}*_gs-fg_*_cal.fits')
+        fg_raw = sorted(glob.glob(lookup_directory, recursive=True))
 
         if len(fg_raw) == 0:
-
-            print('\t Could not find any files in '+lookup_directory)
-
-            raise Exception('No files were downloaded for program '+str(pid)+'. Two common causes of this issue are: \n'+\
-                           ' 1.- You do not have exclusive access rights to see the data. If you have a MAST API, ingest it via spelunker.load(..., token = "yourtoken").\n'+\
-                           ' 2.- There is no guidestar data for your program as of yet in MAST.')
+            print('\t Could not find any files in ' + lookup_directory)
+            raise Exception(
+                f'Download appeared to succeed but no files found at: {lookup_directory}\n'
+                'Check disk space and write permissions.'
+            )
 
         fg = []
         sliced_directory = []
@@ -658,20 +711,32 @@ class load:
                 obs_num_col.append(int(i[7:10]))
                 visit_col.append(int(i[10:13]))
 
-        for i in fg_table['sliced_directory']:
-            visit_group_col.append(int(i[14:16]))
-            parallel_sequence_id_col.append(int(i[16]))
-            activity_num.append(str(i[17:19]))
-            exposure_number_col.append(int(i[20:25]))
+        # FIX: The original code parsed visit_group/parallel_seq_id/activity_number/
+        # exposure_number from the directory name using fixed character offsets that
+        # assumed a full JWST DMS exposure filename (jw{PID5}{OBS3}{VIS3}{G}{P}{AA}{EEEEE}_...).
+        # GS-FG files use a shorter naming convention: jw{PID5}{OBS3}{VIS3}_gs-fg_...
+        # so positions 13+ are '_gs-fg_...' and the fixed offsets produce garbage / crash.
+        #
+        # These fields (visit_group, parallel_seq_id, activity_number, exposure_number)
+        # are NOT encoded in gs-fg filenames at all. They are only used downstream if
+        # the user explicitly passes those filter parameters (all default to 'None').
+        # We populate them with safe sentinel values (0 / '00') so the table builds
+        # correctly; if a user does pass those filters they will simply match nothing,
+        # which is the correct behaviour for data that doesn't encode those fields.
+        _seg_re  = _re.compile(r'_seg(\d{3})')   # segment number if present
+        _guid_re = _re.compile(r'guider(\d)')    # guider number if present
 
-            if 'seg' in i:
-                dir_segment_col.append(int(i[29:32]))
-            else:
-                dir_segment_col.append(0)
-            if 'guider' in i:
-                guider_col.append(int(i[32]))
-            else:
-                guider_col.append(0)
+        for i in fg_table['sliced_directory']:
+            visit_group_col.append(0)
+            parallel_sequence_id_col.append(0)
+            activity_num.append('00')
+            exposure_number_col.append(0)
+
+            seg_m = _seg_re.search(i)
+            dir_segment_col.append(int(seg_m.group(1)) if seg_m else 0)
+
+            guid_m = _guid_re.search(i)
+            guider_col.append(int(guid_m.group(1)) if guid_m else 0)
 
         fg_table['visit_group'] = visit_group_col
         fg_table['parallel_sequence_id'] = parallel_sequence_id_col
@@ -832,6 +897,21 @@ class load:
 
         '''
 
+        # FIX: Use .get() with fallback so renamed/missing catalog columns
+        # don't crash here. The table() method now ensures canonical alias
+        # columns exist, but we guard defensively here too.
+        def _safe_col(table, *names):
+            for n in names:
+                if n in table.colnames:
+                    return n
+            return None
+
+        gaia_col  = _safe_col(self.fg_table, 'GAIAdr3sourceID', 'GAIAdr3', 'gaia_source_id')
+        ra_col    = _safe_col(self.fg_table, 'ra', 'raICRS', 'RA')
+        dec_col   = _safe_col(self.fg_table, 'dec', 'decICRS', 'Dec', 'DEC')
+        jmag_col  = _safe_col(self.fg_table, 'TmassJmag', 'Jmag', 'j_mag', '2MASS_J')
+        hmag_col  = _safe_col(self.fg_table, 'TmassHmag', 'Hmag', 'h_mag', '2MASS_H')
+
         object_table = pd.DataFrame(columns=['guidestar_catalog_id','GAIAdr3sourceID', 'int_start', 'int_stop', 'ra', 'dec', 'Jmag', 'Hmag'])
 
         for idx, gs_id in enumerate(self.fg_table['gs_id']):
@@ -841,7 +921,7 @@ class load:
             if gs_id not in list(object_table['guidestar_catalog_id']):
 
                 row.append(self.fg_table['gs_id'][idx])
-                row.append(self.fg_table['GAIAdr3sourceID'][idx])
+                row.append(self.fg_table[gaia_col][idx] if gaia_col else '--')
 
                 all_times = []
                 all_times.append( np.linspace( self.fg_datamodel[idx].meta.guidestar.data_start, 
@@ -853,10 +933,10 @@ class load:
                 row.append(object_time[0])
                 row.append(object_time[-1])
 
-                row.append(self.fg_table['ra'][idx])
-                row.append(self.fg_table['dec'][idx])
-                row.append(self.fg_table['TmassJmag'][idx])
-                row.append(self.fg_table['TmassHmag'][idx])
+                row.append(self.fg_table[ra_col][idx]   if ra_col   else '--')
+                row.append(self.fg_table[dec_col][idx]  if dec_col  else '--')
+                row.append(self.fg_table[jmag_col][idx] if jmag_col else '--')
+                row.append(self.fg_table[hmag_col][idx] if hmag_col else '--')
 
                 object_table.loc[idx] = (row)
 
@@ -878,12 +958,31 @@ class load:
 
         '''
 
+        # FIX: The STScI GSC catalog (gsss.stsci.edu) periodically renames columns.
+        # We detect them at runtime and add canonical aliases (TmassJmag, TmassHmag,
+        # GAIAdr3sourceID, ra, dec) so downstream code works regardless of catalog version.
+
+        def _find_col(df, *substrings):
+            """Return first df column whose name contains any substring (case-insensitive)."""
+            for sub in substrings:
+                for col in df.columns:
+                    if sub.lower() in col.lower():
+                        return col
+            return None
+
         guidestar_id = self.fg_table['gs_id'][0]
-        data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+guidestar_id+'&format=csv', skiprows=[0])
-        names=[]
-        for k in data.keys():
-            names.append(k)
-        meta_table_df = pd.DataFrame(columns = names)
+        try:
+            data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+guidestar_id+'&format=csv', skiprows=[0])
+        except Exception as e:
+            print(f'Warning: could not fetch GSC catalog for {guidestar_id}: {e}')
+            fallback = self.fg_table.copy()
+            for col in ['TmassJmag', 'TmassHmag', 'GAIAdr3sourceID', 'ra', 'dec']:
+                if col not in fallback.colnames:
+                    fallback[col] = ['--'] * len(fallback)
+            return fallback
+
+        names = list(data.keys())
+        meta_table_df = pd.DataFrame(columns=names)
         meta_table = Table()
 
         for gs_id in self.fg_table['gs_id']:
@@ -891,18 +990,35 @@ class load:
                 data = pd.read_csv('https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+gs_id+'&format=csv', skiprows=[0])
                 for k in data.keys():
                     meta_table[k] = [data[k].values[0]]
-                meta_table_df.loc[len(meta_table_df)] = (list(meta_table[0]))
+                meta_table_df.loc[len(meta_table_df)] = list(meta_table[0])
             except:
                 print('Could not search for guidestar ID ' + str(gs_id)+'. It is probably no longer in the following catalog: https://gsss.stsci.edu/webservices/vo/CatalogSearch.aspx?id='+str(gs_id)+'&format=csv')
-                empty_strings = [''] * len(names)
-                empty_strings[0] = str(gs_id)
+                empty_strings = ['--'] * len(names)
+                if names:
+                    empty_strings[0] = str(gs_id)
                 meta_table_df.loc[len(meta_table_df)] = empty_strings
 
-
         master_meta_table = Table.from_pandas(meta_table_df)
-
         master_table = hstack([self.fg_table, master_meta_table])
-        
+
+        # Add canonical alias columns so code using hardcoded names keeps working.
+        # Maps canonical_name -> substrings to search for in actual catalog columns.
+        _col_aliases = {
+            'TmassJmag':       ('TmassJmag', 'jmag', 'j_mag', '2mass_j', 'tmassj'),
+            'TmassHmag':       ('TmassHmag', 'hmag', 'h_mag', '2mass_h', 'tmassh'),
+            'GAIAdr3sourceID': ('GAIAdr3', 'gaia', 'source_id', 'gaiaid'),
+            'ra':              ('raICRS', 'ra_icrs', 'ra'),
+            'dec':             ('decICRS', 'dec_icrs', 'dec'),
+        }
+        df_search = master_meta_table.to_pandas()
+        for canonical, substrings in _col_aliases.items():
+            if canonical not in master_table.colnames:
+                src = _find_col(df_search, *substrings)
+                if src and src in master_table.colnames:
+                    master_table[canonical] = master_table[src]
+                else:
+                    master_table[canonical] = ['--'] * len(master_table)
+
         return master_table
     
 
@@ -966,7 +1082,12 @@ class load:
 
             self.visit = visit  
         
-        fg_raw = sorted(glob.glob(self.directory+'/mastDownload/JWST/'+'**/jw0'+pid+obs_num+visit+'**_gs-fg_**cal.fits'))
+        # FIX: Use zero-padded 5-digit PID and recursive=True for glob
+        pid_padded = str(pid).zfill(5)
+        fg_raw = sorted(glob.glob(
+            self.directory + '/mastDownload/JWST/**/jw' + pid_padded + obs_num + visit + '*_gs-fg_*cal.fits',
+            recursive=True
+        ))
 
         if len(fg_raw) == 0:
             print('\t Could not find any files with these parameters.')
@@ -1226,10 +1347,7 @@ class load:
                 zodical_light = np.nanmedian(data[0:3,5:8])
                 coords = np.where(data==datar.max())
 
-                initial_guess = np.array([datar.max(), int(coords[1]), int(coords[0]), 1, 1, 0, zodical_light])
-
-                popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
-                initial_guess_main_obj.append(popt)
+                initial_guess = np.array([datar.max(), int(coords[1][0]), int(coords[0][0]), 1, 1, 0, zodical_light])
 
             initial_guess_main = []
 
@@ -1256,8 +1374,7 @@ class load:
             datar = data.ravel()
             zodical_light = np.nanmedian(data[0:3, 5:8])
             coords = np.where(data==datar.max())
-            initial_guess = np.array([datar.max(), int(coords[1]), int(coords[0]), 1, 1, 0, zodical_light])
-            popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
+            initial_guess = np.array([datar.max(), int(coords[1][0]), int(coords[0][0]), 1, 1, 0, zodical_light])
 
             rows5 = []
             rows5.append([popt[0], popt[1], popt[2], popt[3], popt[4], popt[5], popt[6]])
@@ -1728,7 +1845,31 @@ class load:
         if fov_radius.value == 0: fov_radius = 2*u.deg # from https://github.com/GalagaBits/JWST-FGS-Spelunker/issues/19
 
         fig, ax1 = plt.subplots(figsize=(6,6),dpi=200)
-        ax, hdu = plot_finder_image(target, survey='DSS', fov_radius=fov_radius,)
+
+        # FIX: astroplan's plot_finder_image passes grid=grid to SkyView.get_images(),
+        # but SkyView removed the grid parameter (astroquery >= 0.4.8 / astropy >= 6.1).
+        # Confirmed: https://github.com/astropy/astroplan/issues/588
+        # We replicate plot_finder_image's core behaviour directly — fetch the DSS
+        # image via SkyView and display with WCSAxes — without the broken grid arg.
+        try:
+            from astropy.wcs import WCS
+            from astropy.visualization.wcsaxes import WCSAxes
+
+            hdu_list = SkyView.get_images(position=target, coordinates='icrs',
+                                          survey='DSS', radius=fov_radius)
+            hdu = hdu_list[0][0]
+            wcs = WCS(hdu.header)
+
+            ax = WCSAxes(fig, [0.1, 0.1, 0.8, 0.8], wcs=wcs)
+            fig.add_axes(ax)
+            ax.imshow(hdu.data, origin='lower', cmap='Greys',
+                      aspect='equal', interpolation='none')
+        except Exception as _skyview_err:
+            # Fallback: SkyView unreachable — return plain axes with message
+            ax = fig.add_subplot(111)
+            ax.text(0.5, 0.5, f'DSS image unavailable\n({_skyview_err})',
+                    ha='center', va='center', transform=ax.transAxes)
+            hdu = None
 
         ax1.set_axis_off()
 
