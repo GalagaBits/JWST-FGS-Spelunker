@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.2.0] - 2026-03-02
+
+- Adressed issue #51 which caused `spelunker.load()` to stop working.
+
 ## [1.1.18] - 2024-05-24
 
 - Fixed bug raised by issue #48 which made `spelunker` to crash.
