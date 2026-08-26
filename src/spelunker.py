@@ -1311,6 +1311,9 @@ class load:
 
                 initial_guess = np.array([datar.max(), int(coords[1][0]), int(coords[0][0]), 1, 1, 0, zodical_light])
 
+                popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
+                initial_guess_main_obj.append(popt)
+
             initial_guess_main = []
 
             for i in initial_guess_main_obj:
@@ -1337,6 +1340,7 @@ class load:
             zodical_light = np.nanmedian(data[0:3, 5:8])
             coords = np.where(data==datar.max())
             initial_guess = np.array([datar.max(), int(coords[1][0]), int(coords[0][0]), 1, 1, 0, zodical_light])
+            popt = ray_curve_fit(gaussian_2d, xx, yy, datar, initial_guess)
 
             rows5 = []
             rows5.append([popt[0], popt[1], popt[2], popt[3], popt[4], popt[5], popt[6]])
